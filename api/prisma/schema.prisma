@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String
+  oauthSub      String
+  oauthProvider String // github, google, etc.
+
+  role Role @default(USER)
+
+  balance Decimal @db.Decimal(15, 2)
+
+  activeBicycle Bicycle?
+  rides         Ride[]
+
+  apiCalls Int @default(0)
+}
+
+model Applications {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  apiCalls Int @default(0)
+}
+
+model Bicycle {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  latitude  Decimal @db.Decimal(8, 6)
+  longitude Decimal @db.Decimal(8, 6)
+
+  battery  Int
+  speed    Float
+  disabled Boolean @default(false)
+
+  activeUser   User?   @relation(fields: [activeUserId], references: [id])
+  activeUserId String? @unique
+
+  chargingStation   ChargingStation? @relation(fields: [chargingStationId], references: [id])
+  chargingStationId String?
+
+  parkingZone   ParkingZone? @relation(fields: [parkingZoneId], references: [id])
+  parkingZoneId String?
+
+  rides Ride[]
+}
+
+model ChargingStation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  latitude  Decimal @db.Decimal(8, 6)
+  longitude Decimal @db.Decimal(8, 6)
+
+  bicycles Bicycle[]
+}
+
+model Ride {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startTime DateTime
+  endTime   DateTime?
+
+  startLatitude  Decimal @db.Decimal(8, 6)
+  startLongitude Decimal @db.Decimal(8, 6)
+
+  endLatitude  Decimal? @db.Decimal(8, 6)
+  endLongitude Decimal? @db.Decimal(8, 6)
+
+  fromParkingZone Boolean
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  bicycle   Bicycle @relation(fields: [bicycleId], references: [id])
+  bicycleId String
+}
+
+model ParkingZone {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  latitude  Decimal @db.Decimal(8, 6)
+  longitude Decimal @db.Decimal(8, 6)
+
+  radius Decimal @db.Decimal(8, 6)
+
+  bicycles Bicycle[]
+}
+
+model DrivingZone {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  latitude  Decimal @db.Decimal(8, 6)
+  longitude Decimal @db.Decimal(8, 6)
+
+  radius Decimal @db.Decimal(8, 6)
+}

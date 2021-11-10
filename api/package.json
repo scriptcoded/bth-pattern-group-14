@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-uml": "prisma generate && dbml-renderer -i prisma/dbml/schema.dbml -f dot | dot -Tpng -o docs/uml.png",
+    "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^3.4.2",
+    "prisma-dbml-generator": "^0.8.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.4.2"
+  }
+}
