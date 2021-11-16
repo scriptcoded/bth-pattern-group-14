@@ -18,7 +18,7 @@
     ```bash
     docker compose up -d
     ```
-1. Migrate the database
+1. Migrate the database. Note that MySQL can take a few seconds to start.
     ```bash
     npx prisma migrate dev
     ```
