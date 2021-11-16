@@ -18,6 +18,10 @@
     ```bash
     docker compose up -d
     ```
+1. Migrate the database
+    ```bash
+    npx prisma migrate dev
+    ```
 1. Start the application
     ```bash
     npm run dev
