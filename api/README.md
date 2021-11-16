@@ -16,7 +16,7 @@
     ```
 1. Start MySQL and Redis (for persistent login sessions)
     ```bash
-    docker compose up -d
+    docker-compose up -d
     ```
 1. Migrate the database. Note that MySQL can take a few seconds to start.
     ```bash
