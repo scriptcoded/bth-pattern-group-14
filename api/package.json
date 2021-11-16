@@ -10,6 +10,9 @@
     "generate-uml": "prisma generate && dbml-renderer -i prisma/dbml/schema.dbml -f dot | dot -Tpng -o docs/uml.png",
     "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
