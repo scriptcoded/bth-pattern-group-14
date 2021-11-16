@@ -4,12 +4,12 @@ CREATE TABLE `User` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `oauthSub` VARCHAR(191) NOT NULL,
-    `oauthProvider` VARCHAR(191) NOT NULL,
+    `githubId` VARCHAR(191) NOT NULL,
     `role` ENUM('ADMIN', 'USER') NOT NULL DEFAULT 'USER',
-    `balance` DECIMAL(15, 2) NOT NULL,
+    `balance` DECIMAL(15, 2) NOT NULL DEFAULT 0,
     `apiCalls` INTEGER NOT NULL DEFAULT 0,
 
+    UNIQUE INDEX `User_githubId_key`(`githubId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

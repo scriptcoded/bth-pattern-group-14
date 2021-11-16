@@ -7,3 +7,13 @@ services:
       - MYSQL_ROOT_PASSWORD=changeme
     ports:
       - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql-data:

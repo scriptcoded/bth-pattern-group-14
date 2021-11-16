@@ -2,19 +2,41 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
+    "start": "node -r dotenv/config src/main.js",
+    "dev": "nodemon -r dotenv/config src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-uml": "prisma generate && dbml-renderer -i prisma/dbml/schema.dbml -f dot | dot -Tpng -o docs/uml.png",
     "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "dotenv": "^10.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.1",
+    "nodemon": "^2.0.15",
     "prisma": "^3.4.2",
     "prisma-dbml-generator": "^0.8.1"
   },
   "dependencies": {
-    "@prisma/client": "^3.4.2"
+    "@prisma/client": "^3.4.2",
+    "connect-redis": "^6.0.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "express-validator": "^6.13.0",
+    "http-errors": "^1.8.0",
+    "passport": "^0.5.0",
+    "passport-github2": "^0.1.12",
+    "redis": "^3.1.2"
   }
 }
