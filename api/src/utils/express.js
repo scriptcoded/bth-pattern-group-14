@@ -37,12 +37,17 @@ module.exports.errorHandler = function errorHandler (err, req, res, next) {
   // By default this is true for all messages < 500.
   const message = err.expose ? err.message : null
 
+  const fields = err.status === 400
+    ? (err.fields || [])
+    : undefined
+
   res
     .status(err.status)
     .send({
       error: {
         message,
-        name: err.name
+        name: err.name,
+        fields
       }
     })
 }

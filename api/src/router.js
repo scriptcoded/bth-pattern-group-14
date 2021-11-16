@@ -10,6 +10,9 @@ router.get('/auth/github', authController.githubAuth)
 router.get('/auth/github/callback', authController.githubCallback)
 
 router.get('/users', userController.getAllUsers)
+router.get('/users/:id', userController.getOneUser)
+router.patch('/users/:id', userController.updateUser)
+router.delete('/users/:id', userController.deleteUser)
 
 module.exports = {
   router
