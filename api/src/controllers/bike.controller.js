@@ -17,6 +17,11 @@ module.exports.getAllBikes = [
 
   useAsync(async (req, res) => {
     const bikes = await req.db.bike.findMany()
+
+    for (const bike of bikes) {
+      delete bike.token
+    }
+
     res.json({ data: bikes })
   })
 ]
@@ -86,6 +91,8 @@ module.exports.deleteBike = [
         }
       })
 
+      delete bike.token
+
       res.json({ data: bike })
     } catch (e) {
       if (isPrismaError(e, 'P2025')) {
@@ -110,6 +117,8 @@ module.exports.getOneBike = [
     if (!bike) {
       throw createError(404, 'User not found')
     }
+
+    delete bike.token
 
     res.json({ data: bike })
   })
@@ -137,38 +146,7 @@ module.exports.updateBike = [
         data: req.body
       })
 
-      res.json({ data: bike })
-    } catch (e) {
-      if (isPrismaError(e, 'P2025')) {
-        throw createError(404, 'Bike not found')
-      }
-
-      throw e
-    }
-  })
-]
-
-module.exports.updateBike = [
-  auth('ADMIN'),
-
-  checkSchema({
-    disabled: {
-      optional: true,
-      isBoolean: true,
-      errorMessage: 'disabled must be a boolean'
-    }
-  }),
-
-  validate(),
-
-  useAsync(async (req, res) => {
-    try {
-      const bike = await req.db.bike.update({
-        where: {
-          id: req.params.id
-        },
-        data: req.body
-      })
+      delete bike.token
 
       res.json({ data: bike })
     } catch (e) {
@@ -319,6 +297,8 @@ module.exports.updateStatus = [
         speed: req.body.speed
       }
     })
+
+    delete bike.token
 
     res.send({ data: updatedBike })
   })
