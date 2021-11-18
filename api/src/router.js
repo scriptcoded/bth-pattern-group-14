@@ -21,6 +21,10 @@ router.get('/bikes/:id', bikeController.getOneBike)
 router.patch('/bikes/:id', bikeController.updateBike)
 router.delete('/bikes/:id', bikeController.deleteBike)
 
+router.post('/bikes/:id/start', bikeController.startRide)
+router.post('/bikes/:id/end', bikeController.endRide)
+router.post('/bikes/:id/status', bikeController.updateStatus)
+
 module.exports = {
   router
 }

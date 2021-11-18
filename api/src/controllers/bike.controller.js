@@ -5,9 +5,12 @@ const { checkSchema } = require('express-validator')
 
 const { useAsync } = require('../utils/express')
 const { auth } = require('../middleware/auth')
+const { bikeAuth } = require('../middleware/bikeAuth')
 const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 const { generateBikeID } = require('../utils/bike')
+const { findParkingZoneAtPoint } = require('../utils/zone')
+const { generateToken } = require('../utils/crypto')
 
 module.exports.getAllBikes = [
   auth('ADMIN'),
@@ -35,6 +38,8 @@ module.exports.createBike = [
   validate(),
 
   useAsync(async (req, res) => {
+    const token = await generateToken()
+
     // Try generating a unique ID and create bike 10 times. If it fails all 10
     // times, throw an error.
     let bike
@@ -46,7 +51,8 @@ module.exports.createBike = [
           data: {
             id,
             latitude: req.body.latitude,
-            longitude: req.body.longitude
+            longitude: req.body.longitude,
+            token
           }
         })
         // If the creation succeeded, break the for loop
@@ -139,5 +145,181 @@ module.exports.updateBike = [
 
       throw e
     }
+  })
+]
+
+module.exports.updateBike = [
+  auth('ADMIN'),
+
+  checkSchema({
+    disabled: {
+      optional: true,
+      isBoolean: true,
+      errorMessage: 'disabled must be a boolean'
+    }
+  }),
+
+  validate(),
+
+  useAsync(async (req, res) => {
+    try {
+      const bike = await req.db.bike.update({
+        where: {
+          id: req.params.id
+        },
+        data: req.body
+      })
+
+      res.json({ data: bike })
+    } catch (e) {
+      if (isPrismaError(e, 'P2025')) {
+        throw createError(404, 'Bike not found')
+      }
+
+      throw e
+    }
+  })
+]
+
+module.exports.startRide = [
+  auth(),
+
+  useAsync(async (req, res) => {
+    // Make sure that there is not already a ride in progress
+    const activeRide = await req.db.ride.findFirst({
+      where: {
+        bikeId: req.params.id,
+        endTime: null
+      }
+    })
+
+    if (activeRide) {
+      throw createError(409, 'Bike is already in use')
+    }
+
+    const bike = await req.db.bike.findUnique({
+      where: {
+        id: req.params.id
+      }
+    })
+
+    if (!bike) {
+      throw createError(404, 'Bike not found')
+    }
+
+    const parkingZone = await findParkingZoneAtPoint(req.db, bike.latitude, bike.longitude)
+
+    // Create a new ride
+    const ride = await req.db.ride.create({
+      data: {
+        bike: { connect: { id: bike.id } },
+        user: { connect: { id: req.user.id } },
+        startTime: new Date(),
+        fromParkingZone: !!parkingZone,
+        startLatitude: bike.latitude,
+        startLongitude: bike.longitude
+      }
+    })
+
+    res.send({ data: ride })
+  })
+]
+
+module.exports.endRide = [
+  auth(),
+
+  useAsync(async (req, res) => {
+    // Make sure that there is not already a ride in progress
+    const activeRide = await req.db.ride.findFirst({
+      where: {
+        bikeId: req.params.id,
+        endTime: null
+      },
+      include: {
+        bike: true
+      }
+    })
+
+    if (!activeRide) {
+      throw createError(409, 'Bike is not in use')
+    }
+
+    const bike = activeRide.bike
+
+    const parkingZone = await findParkingZoneAtPoint(req.db, bike.latitude, bike.longitude)
+
+    // Update active ride
+    const ride = await req.db.ride.update({
+      where: {
+        id: activeRide.id
+      },
+      data: {
+        endTime: new Date(),
+        toParkingZone: !!parkingZone,
+        endLatitude: bike.latitude,
+        endLongitude: bike.longitude
+      }
+    })
+
+    res.send({ data: ride })
+  })
+]
+
+module.exports.updateStatus = [
+  bikeAuth(),
+
+  checkSchema({
+    latitude: {
+      isDecimal: true,
+      optional: true,
+      errorMessage: 'latitude must be a decimal'
+    },
+    longitude: {
+      isDecimal: true,
+      optional: true,
+      errorMessage: 'longitude must be a decimal'
+    },
+    battery: {
+      isInt: {
+        options: {
+          min: 0,
+          max: 100
+        }
+      },
+      optional: true,
+      errorMessage: 'battery must be an integer between 0-100'
+    },
+    speed: {
+      isDecimal: true,
+      optional: true,
+      errorMessage: 'speed must be a decimal'
+    }
+  }),
+
+  useAsync(async (req, res) => {
+    const bike = await req.db.bike.findUnique({
+      where: {
+        id: req.params.id
+      }
+    })
+
+    if (!bike) {
+      throw createError(404, 'Bike not found')
+    }
+
+    // Update bike
+    const updatedBike = await req.db.bike.update({
+      where: {
+        id: bike.id
+      },
+      data: {
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        battery: req.body.battery,
+        speed: req.body.speed
+      }
+    })
+
+    res.send({ data: updatedBike })
   })
 ]
