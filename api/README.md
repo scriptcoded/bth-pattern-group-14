@@ -15,6 +15,7 @@
     openssl rand -hex 32
     ```
 1. Start MySQL and Redis (for persistent login sessions)
+    (systemctl stop mysql.service)
     ```bash
     docker-compose up -d
     ```

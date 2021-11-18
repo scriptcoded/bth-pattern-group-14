@@ -29,8 +29,8 @@ Table Bike {
   updatedAt DateTime [not null]
   latitude Decimal [not null]
   longitude Decimal [not null]
-  battery Int [not null]
-  speed Float [not null]
+  battery Int [not null, default: 0]
+  speed Float [not null, default: 0]
   disabled Boolean [not null, default: false]
   activeUser User
   activeUserId String [unique]
