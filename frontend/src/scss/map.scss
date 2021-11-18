@@ -1,0 +1,16 @@
+.mapblock {
+  width: 50%;
+  height: 40rem;
+  // padding-left: 20px;
+  // margin-left: auto;
+  // margin-right: auto;
+}
+
+.mapblock::backdrop {
+  background-color: darkorange;
+}
+
+.map {
+  margin-left: auto;
+  margin-right: auto;
+}
