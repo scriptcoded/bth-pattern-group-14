@@ -31,8 +31,7 @@ model User {
 
   balance Decimal @default(0) @db.Decimal(15, 2)
 
-  activeBike Bike?
-  rides      Ride[]
+  rides Ride[]
 
   apiCalls Int @default(0)
 }
@@ -52,15 +51,14 @@ model Bike {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  token String
+
   latitude  Decimal @db.Decimal(8, 6)
   longitude Decimal @db.Decimal(8, 6)
 
   battery  Int     @default(0)
   speed    Float   @default(0)
   disabled Boolean @default(false)
-
-  activeUser   User?   @relation(fields: [activeUserId], references: [id])
-  activeUserId String? @unique
 
   rides Ride[]
 }
@@ -80,6 +78,7 @@ model Ride {
   endLongitude Decimal? @db.Decimal(8, 6)
 
   fromParkingZone Boolean
+  toParkingZone   Boolean?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
