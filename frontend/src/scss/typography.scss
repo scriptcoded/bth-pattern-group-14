@@ -1,0 +1,31 @@
+@import '@/scss/variables.scss';
+
+* {
+  font-family: $font-family;
+}
+
+span, a, p {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+a {
+  font-size: 26px;
+  margin-left: auto;
+  margin-right: auto;
+  text-decoration: none 3px rgba(0, 0, 0, 0);
+  color: $color;
+  transition: all 1s ease 0s;
+  padding: 0 20px;
+}
+
+a:hover {
+  // color: black;
+  text-decoration: underline;
+  text-decoration-color: black;
+  text-decoration-thickness: 3px; // not sure why this isn't blue var color :thinking:
+}
+
+.map a {
+  font-size: 13px;
+}

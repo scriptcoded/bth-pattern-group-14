@@ -1,16 +1,31 @@
+@import './main.scss';
+// Scale 676
+// $color: darkorange;
+
 .mapblock {
-  width: 50%;
-  height: 40rem;
+  width: 80%;
+  // height: 40rem;
+  // background-color: gray;
   // padding-left: 20px;
-  // margin-left: auto;
-  // margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
+  border: 3px solid $color;
+  h1 {
+    text-align: center;
+  }
 }
 
 .mapblock::backdrop {
-  background-color: darkorange;
+  background-color: $color;
 }
 
 .map {
   margin-left: auto;
   margin-right: auto;
+}
+
+@media only screen and (max-width: 676px) {
+  body {
+    background-color: lightblue;
+  }
 }

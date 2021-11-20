@@ -1,7 +1,5 @@
-$color: red;
-
-.button {
-  box-shadow: none;
-  border: 1px solid $color;
-  border-radius: 9999px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import '@/scss/variables.scss';
+@import '@/scss/typography.scss';
+@import '@/scss/header.scss';
+@import '@/scss/footer.scss';
