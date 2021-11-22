@@ -16,10 +16,10 @@ module.exports.githubStrategy = new GitHubStrategy(
       },
       create: {
         githubId: profile.id,
-        name: profile.displayName
+        name: profile.displayName ?? profile.username
       },
       update: {
-        name: profile.displayName
+        name: profile.displayName ?? profile.username
       }
     })
       .then(user => done(null, user))
