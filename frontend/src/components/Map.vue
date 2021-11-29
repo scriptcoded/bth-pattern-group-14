@@ -1,5 +1,8 @@
 <template>
-  <div ref="map" class="map"></div>
+  <div>
+    <div ref='map' class='map'></div>
+    <div class='stuff'></div>
+  </div>
 </template>
 
 <script>
@@ -10,7 +13,7 @@ import markerGray from '../assets/gray.png'
 import markerGreen from '../assets/green.png'
 import markerRed from '../assets/red.png'
 import markerYellow from '../assets/yellow.png'
-import '../scss/map.scss'
+// import '../scss/map.scss'
 
 export default {
   data () {
@@ -55,7 +58,7 @@ export default {
     }
   },
   methods: {
-    setupLeafletMap: function () {
+    async setupLeafletMap () {
       const mapContainer = L.map(this.$refs.map).setView(this.center, 13)
 
       // Setup map
@@ -95,32 +98,66 @@ export default {
       /**
        * Max cord maker
        */
-      const arr = [...Array(200)]
-      const maxX = (this.top - this.bottom).toFixed(4)
-      const maxY = (this.right - this.left).toFixed(4)
+      const res = await fetch('http://localhost:5000/bike')
+      const arr = await res.json()
+      // arr.forEach(e => arr.push(e))
+      // const arr = [...Array(200)]
+      // const maxX = (this.top - this.bottom).toFixed(4)
+      // const maxY = (this.right - this.left).toFixed(4)
 
       /**
        * Spew out markers randomly :D
        */
       let count = 0
-      arr.forEach((_, i) => {
-        const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
-        const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
-        const position = [X, Y]
-        // console.log(X, this.bottom[0])
 
+      arr.forEach((e, i) => {
+        // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
+        // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
+        console.log(e)
+        // Lat = Y, Long = X
+        const position = [e.lat, e.long]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
+        let charge = false
+        let name = ''
+        typeof e.name === 'undefined' ? name = '' : name = e.name
 
-        if ((X >= this.bottom[0] && X <= this.bottom[0] + 0.01) && (Y >= this.left[0] && Y <= this.left[0] + 0.01)) {
+        if (name) {
+          mark.options.icon = this.locationMarkerYellow
+        } else if ((position[0] >= this.bottom[0] && position[0] <= this.bottom[0] + 0.01) && (position[1] >= this.left[0] && position[1] <= this.left[0] + 0.01)) {
           mark.options.icon = this.locationMarkerGreen
+          charge = true
           count++
-        } else if (i % 3 === 0) {
+        } else if (e.active) {
           mark.options.icon = this.locationMarkerBlue
         }
 
-        mark.addTo(mapContainer)
+        // mark.on('click', this.onMarkClick)
+        console.log(charge)
+        charge ? mark.addTo(mapContainer).bindPopup(`
+          <h1>Bike id:${e.id}</h1>
+          <h2 class='dab'>Go away!</h2>
+          <p>Im charging!</p>
+        `)
+          : e.active ? mark.addTo(mapContainer)
+            .bindPopup(`
+              <h1>Bike id:${e.id}</h1>
+              <h2 class='dab'>Hello there ${e.user} ${e.name}</h2>
+              <p>*insert starwars meme*</p>
+            `)
+            : mark.addTo(mapContainer)
+              .bindPopup(`
+                <h1>Bike id:${e.id}</h1>
+                <h2>Not active</h2>
+                <p>Please help me :<</p>
+              `)
+        // mark.addPopup(e)
       })
       console.log(`There are ${count} charing atm :D`)
+    },
+    onMarkClick (e) {
+      // var popup = e.target.getPopup()
+
+      // console.log(popup)
     }
   },
   mounted () {
@@ -128,10 +165,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.map {
-  width: 25rem;
-  height: 50vh;
-}
-</style>
