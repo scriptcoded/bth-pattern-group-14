@@ -14,6 +14,10 @@
     ```bash
     openssl rand -hex 32
     ```
+1. If you already have MySQL running using systemd, stop it:
+    ```bash
+    systemctl stop mysql.service
+    ```
 1. Start MySQL and Redis (for persistent login sessions)
     ```bash
     docker-compose up -d

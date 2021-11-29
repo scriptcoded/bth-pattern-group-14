@@ -42,7 +42,12 @@ app.use(session({
   secret: config.appSecret,
   store: redisStore,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    sameSite: config.isDev ? 'lax' : 'none',
+    secure: !config.isDev,
+    httpOnly: true
+  }
 }))
 app.use(cors())
 

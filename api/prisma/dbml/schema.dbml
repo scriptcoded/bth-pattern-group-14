@@ -10,7 +10,6 @@ Table User {
   githubId String [unique, not null]
   role Role [not null, default: 'USER']
   balance Decimal [not null, default: 0]
-  activeBike Bike
   rides Ride [not null]
   apiCalls Int [not null, default: 0]
 }
@@ -27,27 +26,13 @@ Table Bike {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
+  token String [not null]
   latitude Decimal [not null]
   longitude Decimal [not null]
-  battery Int [not null]
-  speed Float [not null]
+  battery Int [not null, default: 0]
+  speed Float [not null, default: 0]
   disabled Boolean [not null, default: false]
-  activeUser User
-  activeUserId String [unique]
-  chargingStation ChargingStation
-  chargingStationId String
-  parkingZone ParkingZone
-  parkingZoneId String
   rides Ride [not null]
-}
-
-Table ChargingStation {
-  id String [pk]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-  latitude Decimal [not null]
-  longitude Decimal [not null]
-  bikes Bike [not null]
 }
 
 Table Ride {
@@ -61,20 +46,31 @@ Table Ride {
   endLatitude Decimal
   endLongitude Decimal
   fromParkingZone Boolean [not null]
+  toParkingZone Boolean
   user User [not null]
   userId String [not null]
   bike Bike [not null]
   bikeId String [not null]
 }
 
+Table ChargingStation {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  latitudeStart Decimal [not null]
+  longitudeStart Decimal [not null]
+  latitudeEnd Decimal [not null]
+  longitudeEnd Decimal [not null]
+}
+
 Table ParkingZone {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
-  latitude Decimal [not null]
-  longitude Decimal [not null]
-  radius Decimal [not null]
-  bikes Bike [not null]
+  latitudeStart Decimal [not null]
+  longitudeStart Decimal [not null]
+  latitudeEnd Decimal [not null]
+  longitudeEnd Decimal [not null]
 }
 
 Table DrivingZone {
@@ -82,21 +78,16 @@ Table DrivingZone {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   name String [not null]
-  latitude Decimal [not null]
-  longitude Decimal [not null]
-  radius Decimal [not null]
+  latitudeStart Decimal [not null]
+  longitudeStart Decimal [not null]
+  latitudeEnd Decimal [not null]
+  longitudeEnd Decimal [not null]
 }
 
 Enum Role {
   ADMIN
   USER
 }
-
-Ref: Bike.activeUserId - User.id
-
-Ref: Bike.chargingStationId > ChargingStation.id
-
-Ref: Bike.parkingZoneId > ParkingZone.id
 
 Ref: Ride.userId > User.id
 

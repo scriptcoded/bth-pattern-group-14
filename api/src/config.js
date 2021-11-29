@@ -5,6 +5,8 @@
  * this object, and not through direct reads from `process.env`.
  */
 const config = {
+  isDev: process.env.NODE_ENV === 'development',
+
   port: process.env.PORT || 4000,
 
   appSecret: process.env.APP_SECRET,
