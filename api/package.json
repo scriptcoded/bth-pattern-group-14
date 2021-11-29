@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r dotenv/config src/main.js",
     "dev": "nodemon -r dotenv/config src/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "generate-uml": "prisma generate && dbml-renderer -i prisma/dbml/schema.dbml -f dot | dot -Tpng -o docs/uml.png",
     "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done"
   },
@@ -17,12 +17,16 @@
   "license": "ISC",
   "devDependencies": {
     "@softwaretechnik/dbml-renderer": "^1.0.19",
+    "@types/jest": "^27.0.3",
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.1",
+    "jest": "^27.4.0",
+    "jest-mock-extended": "^2.0.4",
     "nodemon": "^2.0.15",
     "prisma": "^3.4.2",
     "prisma-dbml-generator": "^0.8.1"

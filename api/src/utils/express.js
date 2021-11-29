@@ -13,6 +13,7 @@ module.exports.useAsync = function useAsync (callback) {
   return function (req, res, next) {
     callback(req, res, next)
       .catch(next)
+      .then(() => next())
   }
 }
 

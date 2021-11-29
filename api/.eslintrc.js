@@ -5,13 +5,16 @@ module.exports = {
     node: true
   },
   extends: [
-    'standard'
+    'standard',
+    'plugin:jest/recommended',
+    'plugin:jest/style'
   ],
   parserOptions: {
     ecmaVersion: 12
   },
   plugins: [
-    'import'
+    'import',
+    'jest'
   ],
   rules: {
     'import/order': ['error', {
@@ -26,4 +29,7 @@ module.exports = {
     }],
     'no-process-env': 'error'
   },
+  env: {
+    'jest/globals': true
+  }
 }
