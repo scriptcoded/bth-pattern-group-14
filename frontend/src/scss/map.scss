@@ -1,0 +1,27 @@
+.mapblock {
+  width: 100%;
+  // height: 40rem;
+  // background-color: gray;
+  // padding-left: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  // border: 3px solid $color;
+  h1 {
+    text-align: center;
+  }
+}
+
+// fun thing to try out
+// .mapblock::backdrop {
+//   background-color: $color;
+// }
+
+.map {
+  margin-left: auto;
+  margin-right: auto;
+  height: 75vh;
+}
+
+// body .mapblock {
+//   height: 100%;
+// }

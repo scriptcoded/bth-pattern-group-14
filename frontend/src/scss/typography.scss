@@ -1,0 +1,46 @@
+// @import '@/scss/variables.scss';
+
+* {
+  font-family: $font-family;
+  text-align: center;
+}
+
+h1 {
+  font-size: 48px;
+}
+
+h2 {
+  font-size: 36px;
+}
+
+span, p {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+a {
+  font-size: 26px;
+  margin-left: auto;
+  margin-right: auto;
+  color: $font-color;
+  text-decoration: none 2px $underline-normal;
+  text-underline-offset: 20px;
+  transition: text-decoration-color 1000ms;
+  padding: 0 20px;
+}
+
+a.router-link-exact-active {
+  text-decoration: underline 2px $color;
+  text-decoration-color: $color;
+}
+
+a:hover {
+  // color: black;
+  text-decoration: underline;
+  text-decoration-color: $underline-hover;
+  text-decoration-thickness: 2px; // not sure why this isn't blue var color :thinking:
+}
+
+.map a {
+  font-size: 13px;
+}
