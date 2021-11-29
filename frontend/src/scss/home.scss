@@ -1,0 +1,44 @@
+.home {
+  h1 {
+    color: $darkcyan;
+    margin: 8rem 0
+  }
+
+  h2 {
+    margin-bottom: 1em;
+  }
+
+  div {
+    padding: 2.5em 2.5rem;
+  }
+
+  .panel-1 {
+    background-color: rgb(212, 212, 212);
+  }
+
+  .panel-2 {
+    background-color: $cyan;
+  }
+
+  .panel-3 {
+    background-color: $darkcyan;
+  }
+
+  @media only screen and (min-width: 420px) {
+    div {
+      padding: 2.5em 5em;
+    }
+  }
+
+  @media only screen and (min-width: 676px) {
+    div {
+      padding: 2.5em 25%;
+    }
+  }
+
+  @media only screen and (max-width: 320px) {
+    div {
+      padding: 2.5em 0;
+    }
+  }
+}
