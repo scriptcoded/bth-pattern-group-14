@@ -49,7 +49,13 @@ app.use(session({
     httpOnly: true
   }
 }))
-app.use(cors())
+
+const corsOptions = {
+  origin: ['http://localhost:8080'],
+  credentials: true
+}
+
+app.use(cors(corsOptions))
 
 app.use(passport.initialize())
 app.use(passport.session())
