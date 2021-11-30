@@ -21,6 +21,12 @@
     >
       Admin
     </router-link>
+    <router-link
+      v-if="$auth.loggedIn()"
+      :to="{ name: 'profile' }"
+    >
+      Profile
+    </router-link>
     <a
       v-if="$auth.loggedIn()"
       href="#"
