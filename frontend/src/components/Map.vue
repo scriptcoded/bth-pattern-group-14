@@ -13,7 +13,6 @@ import markerGray from '../assets/gray.png'
 import markerGreen from '../assets/green.png'
 import markerRed from '../assets/red.png'
 import markerYellow from '../assets/yellow.png'
-import config from '../config'
 // import '../scss/map.scss'
 
 export default {
@@ -99,8 +98,7 @@ export default {
       /**
        * Max cord maker
        */
-      const res = await fetch(`${config.apiURL}/bikes`)
-      const arr = await res.json()
+      const arr = await this.$api.get('/bikes')
       // arr.forEach(e => arr.push(e))
       // const arr = [...Array(200)]
       // const maxX = (this.top - this.bottom).toFixed(4)
@@ -109,14 +107,12 @@ export default {
       /**
        * Spew out markers randomly :D
        */
-      let count = 0
-
       arr.forEach((e, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         console.log(e)
         // Lat = Y, Long = X
-        const position = [e.lat, e.long]
+        const position = [e.latitude, e.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
         let charge = false
         let name = ''
@@ -127,7 +123,6 @@ export default {
         } else if ((position[0] >= this.bottom[0] && position[0] <= this.bottom[0] + 0.01) && (position[1] >= this.left[0] && position[1] <= this.left[0] + 0.01)) {
           mark.options.icon = this.locationMarkerGreen
           charge = true
-          count++
         } else if (e.active) {
           mark.options.icon = this.locationMarkerBlue
         }
@@ -136,13 +131,13 @@ export default {
         console.log(charge)
         charge ? mark.addTo(mapContainer).bindPopup(`
           <h1>Bike id:${e.id}</h1>
-          <h2 class='dab'>Go away!</h2>
+          <h2 class="dab">Go away!</h2>
           <p>Im charging!</p>
         `)
           : e.active ? mark.addTo(mapContainer)
             .bindPopup(`
               <h1>Bike id:${e.id}</h1>
-              <h2 class='dab'>Hello there ${e.user} ${e.name}</h2>
+              <h2 class="dab">Hello there ${e.user} ${e.name}</h2>
               <p>*insert starwars meme*</p>
             `)
             : mark.addTo(mapContainer)
@@ -153,7 +148,6 @@ export default {
               `)
         // mark.addPopup(e)
       })
-      console.log(`There are ${count} charing atm :D`)
     },
     onMarkClick (e) {
       // var popup = e.target.getPopup()
