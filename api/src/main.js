@@ -49,7 +49,14 @@ app.use(session({
     httpOnly: true
   }
 }))
-app.use(cors())
+
+// TODO: This is just a temporary solution while in dev. It should not be used in production.
+const corsOptions = {
+  origin: (origin, cb) => cb(null, origin),
+  credentials: true
+}
+
+app.use(cors(corsOptions))
 
 app.use(passport.initialize())
 app.use(passport.session())
