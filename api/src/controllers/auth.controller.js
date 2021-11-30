@@ -26,7 +26,8 @@ module.exports.githubCallback = [
    */
   (req, res, next) => passport.authenticate('github', {}, (err, user) => {
     if (err) {
-      throw err
+      console.error('Error from passport:', err)
+      return next(err)
     }
 
     if (!user) {
@@ -41,8 +42,7 @@ module.exports.githubCallback = [
       req.login(user, (err) => {
         if (err) {
           console.error('Error while setting user:', err)
-          next(err)
-          return
+          return next(err)
         }
         res.redirect(config.frontendURL)
       })

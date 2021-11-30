@@ -11,8 +11,11 @@ const createError = require('http-errors')
  */
 module.exports.useAsync = function useAsync (callback) {
   return function (req, res, next) {
-    callback(req, res, next)
-      .catch(next)
+    const result = callback(req, res, next)
+
+    if (result) {
+      result.catch(next)
+    }
   }
 }
 

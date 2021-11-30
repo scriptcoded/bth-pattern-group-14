@@ -13,6 +13,7 @@ import markerGray from '../assets/gray.png'
 import markerGreen from '../assets/green.png'
 import markerRed from '../assets/red.png'
 import markerYellow from '../assets/yellow.png'
+import config from '../config'
 // import '../scss/map.scss'
 
 export default {
@@ -98,7 +99,7 @@ export default {
       /**
        * Max cord maker
        */
-      const res = await fetch('http://localhost:5000/bike')
+      const res = await fetch(`${config.apiURL}/bikes`)
       const arr = await res.json()
       // arr.forEach(e => arr.push(e))
       // const arr = [...Array(200)]
