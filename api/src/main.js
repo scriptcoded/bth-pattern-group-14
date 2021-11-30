@@ -50,8 +50,9 @@ app.use(session({
   }
 }))
 
+// TODO: This is just a temporary solution while in dev. It should not be used in production.
 const corsOptions = {
-  origin: ['http://localhost:8080'],
+  origin: (origin, cb) => cb(null, origin),
   credentials: true
 }
 
