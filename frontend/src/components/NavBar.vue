@@ -22,6 +22,12 @@
       Admin
     </router-link>
     <router-link
+      v-if="$auth.hasRole('admin')"
+      :to="{ name: 'bike' }"
+    >
+      Bikes
+    </router-link>
+    <router-link
       v-if="$auth.loggedIn()"
       :to="{ name: 'profile' }"
     >

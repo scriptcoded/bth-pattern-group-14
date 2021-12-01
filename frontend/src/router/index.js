@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Map from '../views/Map.vue'
 import Admin from '../views/Admin.vue'
 import Profile from '../views/Profile.vue'
+import Bike from '../views/Bike.vue'
 import { authGuard } from '../guards/auth'
 
 Vue.use(VueRouter)
@@ -24,6 +25,14 @@ export default (auth) => {
       path: '/admin',
       name: 'admin',
       component: Admin,
+      meta: {
+        auth: 'admin'
+      }
+    },
+    {
+      path: '/bikes',
+      name: 'bike',
+      component: Bike,
       meta: {
         auth: 'admin'
       }

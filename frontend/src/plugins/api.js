@@ -40,6 +40,9 @@ class Api {
     return this.request(path, {
       ...options,
       method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(data)
     })
   }
