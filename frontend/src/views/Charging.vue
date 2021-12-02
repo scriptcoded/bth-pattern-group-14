@@ -1,15 +1,15 @@
 <template>
   <div class="home">
-    <BikeList />
+    <ChargingList />
   </div>
 </template>
 
 <script>
-import BikeList from '@/components/BikeList.vue'
+import ChargingList from '@/components/ChargingList.vue'
 
 export default {
   components: {
-    BikeList
+    ChargingList
   }
 }
 </script>

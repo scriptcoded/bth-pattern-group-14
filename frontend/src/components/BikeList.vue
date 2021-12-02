@@ -6,6 +6,7 @@
         <th> ID </th>
         <th> Active </th>
         <th> Battery </th>
+        <th></th>
       </tr>
       <tr v-for="item in arr" :key="item.id" class="table-content">
         <th> {{ item.id }} </th>
@@ -36,10 +37,17 @@ export default {
       const data = {
         disabled: !disabled
       }
-      const result = await this.$api.patch(`/bikes/${id}`, data)
-      console.log(result)
+      await this.$api.patch(`/bikes/${id}`, data)
+      // console.log(result)
+      // console.log(this.arr)
+      this.arr.forEach((e, i) => {
+        if (e.id === id) {
+          e.disabled = !e.disabled
+        }
+        return e
+      })
       // yanky solution to refresh page
-      this.$router.go()
+      // this.$router.go()
     }
   },
   mounted () {

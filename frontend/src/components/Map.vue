@@ -82,18 +82,25 @@ export default {
         fillColor: 'lightblue',
         fillOpacity: 0.5,
         radius: 500
-      }).addTo(mapContainer).bindPopup('Reload station 1')
+      }).addTo(mapContainer).bindPopup('Reload station test')
       L.circle([55.5885, 13.0170], {
         color: 'steelblue',
         fillColor: 'lightblue',
         fillOpacity: 0.5,
         radius: 500
-      }).addTo(mapContainer).bindPopup('Reload station 2')
+      }).addTo(mapContainer).bindPopup('Reload station test')
 
       // Create rectangle shape. Aka reload station
-      var recXY = [[this.bottom[0], this.left[0]], [this.bottom[0] + 0.01, this.left[0] + 0.01]]
+      // var recXY = [[this.bottom[0], this.left[0]], [this.bottom[0] + 0.01, this.left[0] + 0.01]]
 
-      L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup('Reload station 3, the correct one')
+      // L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup('Reload station 3, the correct one')
+
+      const chargingstations = await this.$api.get('/charging-stations')
+      chargingstations.forEach((e, i) => {
+        console.log(e)
+        var recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
+        L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup(`Reload station ${i + 1}`)
+      })
 
       /**
        * Max cord maker
@@ -123,7 +130,7 @@ export default {
         } else if ((position[0] >= this.bottom[0] && position[0] <= this.bottom[0] + 0.01) && (position[1] >= this.left[0] && position[1] <= this.left[0] + 0.01)) {
           mark.options.icon = this.locationMarkerGreen
           charge = true
-        } else if (e.active) {
+        } else if (!e.disabled) {
           mark.options.icon = this.locationMarkerBlue
         }
 
@@ -134,7 +141,7 @@ export default {
           <h2 class="dab">Go away!</h2>
           <p>Im charging!</p>
         `)
-          : e.active ? mark.addTo(mapContainer)
+          : !e.disabled ? mark.addTo(mapContainer)
             .bindPopup(`
               <h1>Bike id:${e.id}</h1>
               <h2 class="dab">Hello there ${e.user} ${e.name}</h2>
