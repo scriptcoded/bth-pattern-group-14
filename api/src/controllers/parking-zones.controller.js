@@ -124,17 +124,17 @@ module.exports.updateParkingStation = [
 
   useAsync(async (req, res) => {
     try {
-      const charginstation = await req.db.chargingStation.update({
+      const parkingZone = await req.db.parkingZone.update({
         where: {
           id: req.params.id
         },
         data: req.body
       })
 
-      res.json({ data: charginstation })
+      res.json({ data: parkingZone })
     } catch (e) {
       if (isPrismaError(e, 'P2025')) {
-        throw createError(404, 'Charging station not found')
+        throw createError(404, 'Parking zone not found')
       }
 
       throw e
