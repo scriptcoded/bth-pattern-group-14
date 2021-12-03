@@ -37,6 +37,7 @@ router.get('/parking-zones', parkingZoneController.getAllParkingZones)
 router.post('/parking-zones', parkingZoneController.createParkingZone)
 router.delete('/parking-zones/:id', parkingZoneController.deleteParkingZone)
 router.get('/parking-zones/:id', parkingZoneController.getOneParkingZone)
+router.patch('/charging-stations/:id', chargingStationController.updateParkingStation)
 
 module.exports = {
   router
