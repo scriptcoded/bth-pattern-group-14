@@ -1,5 +1,5 @@
 <template>
-  <div class="admin">
+  <div class="home">
     <h1>Admin</h1>
     <router-link
       v-if="$auth.hasRole('admin')"

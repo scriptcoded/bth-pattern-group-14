@@ -97,9 +97,14 @@ export default {
 
       const chargingstations = await this.$api.get('/charging-stations')
       chargingstations.forEach((e, i) => {
-        console.log(e)
         var recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
-        L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup(`Reload station ${i + 1}`)
+        L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup(`Charging-station ${i + 1}`)
+      })
+
+      const parkingzones = await this.$api.get('/parking-zones')
+      parkingzones.forEach((e, i) => {
+        var recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
+        L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(mapContainer).bindPopup(`Parking-zone ${i + 1}`)
       })
 
       /**
@@ -144,8 +149,8 @@ export default {
           : !e.disabled ? mark.addTo(mapContainer)
             .bindPopup(`
               <h1>Bike id:${e.id}</h1>
-              <h2 class="dab">Hello there ${e.user} ${e.name}</h2>
-              <p>*insert starwars meme*</p>
+              <h2 class="dab">Hello there</h2>
+              <p>*Available for ride*</p>
             `)
             : mark.addTo(mapContainer)
               .bindPopup(`

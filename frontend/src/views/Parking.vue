@@ -1,11 +1,12 @@
 <template>
-  <div class="home">
+  <div class="parking">
+    <h1>Parking Zones</h1>
     <ParkingList />
   </div>
 </template>
 
 <script>
-import ParkingList from '@/components/ParkingList.vue'
+import ParkingList from '@/components/admin/ParkingList.vue'
 
 export default {
   components: {

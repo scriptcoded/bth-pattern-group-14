@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <h1> Bikes </h1>
-    <div>
+    <table>
       <tr class="table-header">
         <th> ID </th>
         <th> Active </th>
@@ -9,15 +7,15 @@
         <th></th>
       </tr>
       <tr v-for="item in arr" :key="item.id" class="table-content">
-        <th> {{ item.id }} </th>
-        <th v-if="item.disabled"> No </th>
-        <th v-else> Yes </th>
-        <th> {{ item.battery }} </th>
-        <th v-if="!item.disabled"> <button @click="disableBike(item.id, item.disabled)"> Disable bike </button></th>
-        <th v-else> <button @click="disableBike(item.id, item.disabled)"> Turn on bike </button></th>
+        <td> {{ item.id }} </td>
+        <td v-if="item.disabled"> No </td>
+        <td v-else> Yes </td>
+        <td> {{ item.battery }} </td>
+        <td v-if="!item.disabled"> <button @click="disableBike(item.id, item.disabled)"> Disable bike </button></td>
+        <td v-else><button class="red" @click="disableBike(item.id, item.disabled)"> Turn on bike </button></td>
       </tr>
-    </div>
-  </div>
+      <button @click='createBike()'>Create bike</button>
+    </table>
 </template>
 
 <script>
@@ -32,6 +30,13 @@ export default {
     async test () {
       const bikes = await this.$api.get('/bikes')
       this.arr = bikes
+    },
+    async createBike () {
+      const data = {
+        latitude: 55.5605,
+        longitude: 13.105
+      }
+      await this.$api.post('/bikes', data)
     },
     async disableBike (id, disabled) {
       const data = {
