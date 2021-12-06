@@ -1,5 +1,5 @@
-const { prismaMock } = require('../utils/mockPrisma')
-const { createWaitableMock, getControllerMethod } = require('../utils/tests')
+const { prismaMock } = require('../utils/tests/mockPrisma')
+const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 
 const bikeController = require('./bike.controller')
 
