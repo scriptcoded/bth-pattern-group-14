@@ -6,6 +6,15 @@ const cookieParser = require('cookie-parser')
 const redis = require('redis')
 const connectRedis = require('connect-redis')
 
+// sockets and bike cache
+const NodeCache = require('node-cache');
+const bikeCache = new NodeCache();
+
+const { bikeCacheMiddleware } = require('./middleware/bikeCacheMiddleware');
+const initCacheToPrisma = require('./utils/cacheToPrisma');
+const initSocketServer = require('./socket/socketServer');
+// end sockets and bike cache
+
 const { router } = require('./router')
 const { errorHandler } = require('./utils/express')
 const { config, checkConfig } = require('./config')
@@ -65,6 +74,22 @@ app.use(router)
 
 app.use(errorHandler)
 
-app.listen(config.port, () => {
+// attaching bikecache to request object for access in controllers
+app.use(bikeCacheMiddleware(bikeCache));
+
+// start the automatic updating of prisma database table bike from bikeCache
+initCacheToPrisma(prisma, bikeCache);
+
+const server = app.listen(config.port, () => {
   console.log(`🚀 Server is running on port ${config.port}`)
 })
+
+// init socketserver "on top" of http server 
+const socketServer = initSocketServer(server, bikeCache);
+
+// TODO: for debug now, maybe move to debug folder to start on debug mode?
+setInterval(() => {
+    server.getConnections((err, count) => {
+        console.log('Connections:' + count);
+    });
+}, 1000);
