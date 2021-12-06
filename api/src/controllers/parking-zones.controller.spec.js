@@ -36,7 +36,7 @@ beforeEach(() => {
   next = createWaitableMock()
 })
 
-test('getAllParkingZones returns correct users', async () => {
+test('getAllParkingZones returns correct parking zones', async () => {
   req.db.parkingZone.findMany.mockResolvedValue(mockZones)
 
   getControllerMethod(parkingZoneController.getAllParkingZones)(req, res, next)
@@ -58,7 +58,7 @@ test('getOneParkingZone respects url param', async () => {
   }))
 })
 
-test('getOneParkingZone returns correct user', async () => {
+test('getOneParkingZone returns correct parking zone', async () => {
   req.db.parkingZone.findUnique.mockResolvedValue(mockZones[0])
   req.params.id = 'a'
 
@@ -82,7 +82,7 @@ test('updateParkingStation respects url param', async () => {
 })
 
 
-test('updateParkingStation modifies user', async () => {
+test('updateParkingStation modifies parking zone', async () => {
   req.body = {
     name: 'steve'
   }
@@ -97,7 +97,7 @@ test('updateParkingStation modifies user', async () => {
   }))
 })
 
-test('updateParkingStation returns updated user', async () => {
+test('updateParkingStation returns updated parking zone', async () => {
   req.body = {
     name: 'steve'
   }
@@ -122,7 +122,7 @@ test('deleteParkingZone respects url param', async () => {
   }))
 })
 
-test('deleteParkingZone returns deleted user', async () => {
+test('deleteParkingZone returns deleted parking zone', async () => {
   req.db.parkingZone.delete.mockResolvedValue(mockZones[0])
 
   getControllerMethod(parkingZoneController.deleteParkingZone)(req, res, next)

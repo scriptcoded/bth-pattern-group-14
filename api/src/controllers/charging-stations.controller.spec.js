@@ -36,7 +36,7 @@ beforeEach(() => {
   next = createWaitableMock()
 })
 
-test('getAllStations returns correct users', async () => {
+test('getAllStations returns correct charging stations', async () => {
   req.db.chargingStation.findMany.mockResolvedValue(mockZones)
 
   getControllerMethod(chargingStationController.getAllStations)(req, res, next)
@@ -58,7 +58,7 @@ test('getOneStation respects url param', async () => {
   }))
 })
 
-test('getOneStation returns correct user', async () => {
+test('getOneStation returns correct charging station', async () => {
   req.db.chargingStation.findUnique.mockResolvedValue(mockZones[0])
   req.params.id = 'a'
 
@@ -82,7 +82,7 @@ test('updateStation respects url param', async () => {
 })
 
 
-test('updateStation modifies user', async () => {
+test('updateStation modifies charging station', async () => {
   req.body = {
     name: 'steve'
   }
@@ -97,7 +97,7 @@ test('updateStation modifies user', async () => {
   }))
 })
 
-test('updateStation returns updated user', async () => {
+test('updateStation returns updated charging station', async () => {
   req.body = {
     name: 'steve'
   }
@@ -122,7 +122,7 @@ test('deleteStation respects url param', async () => {
   }))
 })
 
-test('deleteStation returns deleted user', async () => {
+test('deleteStation returns deleted charging station', async () => {
   req.db.chargingStation.delete.mockResolvedValue(mockZones[0])
 
   getControllerMethod(chargingStationController.deleteStation)(req, res, next)
