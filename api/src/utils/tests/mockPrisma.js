@@ -2,7 +2,7 @@ const { mockDeep, mockReset } = require('jest-mock-extended')
 
 const { prisma } = require('../prisma')
 
-jest.mock('./prisma', () => ({
+jest.mock('../prisma', () => ({
   __esModule: true,
   prisma: mockDeep()
 }))
