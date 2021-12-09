@@ -56,7 +56,7 @@ export default {
       // Find bike to modify and modify it
       const bike = this.arr.find(b => b.id === id)
       bike.updatedAt = res.updatedAt
-      
+
       // Replace the original bike with the new one in the array and
       // *reassign the array*. This is important to trigger the
       // rectivity in Vue.
