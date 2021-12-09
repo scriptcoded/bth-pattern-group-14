@@ -15,17 +15,21 @@ const { generateToken } = require('../utils/crypto')
 module.exports.getAllBikes = [
 
   useAsync(async (req, res) => {
-    const bikes = await req.db.bike.findMany({
-      where: {
-        disabled: false,
-        rides: {
-          every: {
-            endTime: {
-              not: null
-            }
+    const isAdmin = req.user.role === 'ADMIN'
+
+    const where = isAdmin ? undefined : {
+      disabled: false,
+      rides: {
+        every: {
+          endTime: {
+            not: null
           }
         }
       }
+    }
+
+    const bikes = await req.db.bike.findMany({
+      where
     })
 
     for (const bike of bikes) {
