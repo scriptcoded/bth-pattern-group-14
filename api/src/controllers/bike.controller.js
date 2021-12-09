@@ -13,10 +13,20 @@ const { findParkingZoneAtPoint } = require('../utils/zone')
 const { generateToken } = require('../utils/crypto')
 
 module.exports.getAllBikes = [
-  auth('ADMIN'),
 
   useAsync(async (req, res) => {
-    const bikes = await req.db.bike.findMany()
+    const bikes = await req.db.bike.findMany({
+      where: {
+        disabled: false,
+        rides: {
+          every: {
+            endTime: {
+              not: null
+            }
+          }
+        }
+      }
+    })
 
     for (const bike of bikes) {
       delete bike.token

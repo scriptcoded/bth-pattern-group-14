@@ -9,7 +9,6 @@ const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
 module.exports.getAllParkingZones = [
-  auth('ADMIN'),
 
   useAsync(async (req, res) => {
     const zones = await req.db.parkingZone.findMany()
