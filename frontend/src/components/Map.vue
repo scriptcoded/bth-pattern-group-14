@@ -169,6 +169,7 @@ export default {
   },
   mounted () {
     this.setupLeafletMap()
+    // Interval fetch - set clear interval when refresh site / map
   }
 }
 </script>
