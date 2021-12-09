@@ -1,9 +1,4 @@
 .home {
-  h1 {
-    color: $darkcyan;
-    margin: 8rem 0
-  }
-
   h2 {
     margin-bottom: 1em;
   }
@@ -25,19 +20,19 @@
   }
 
   @media only screen and (min-width: 420px) {
-    div {
+    .panels {
       padding: 2.5em 5em;
     }
   }
 
   @media only screen and (min-width: 676px) {
-    div {
+    .panels {
       padding: 2.5em 25%;
     }
   }
 
   @media only screen and (max-width: 320px) {
-    div {
+    .panels {
       padding: 2.5em 0;
     }
   }

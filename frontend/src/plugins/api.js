@@ -32,6 +32,9 @@ class Api {
     return this.request(path, {
       ...options,
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(data)
     })
   }
@@ -40,6 +43,9 @@ class Api {
     return this.request(path, {
       ...options,
       method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(data)
     })
   }
@@ -47,7 +53,10 @@ class Api {
   async delete (path, options) {
     return this.request(path, {
       ...options,
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
   }
 }
