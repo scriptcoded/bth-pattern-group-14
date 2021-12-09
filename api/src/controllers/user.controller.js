@@ -5,40 +5,29 @@ const { checkSchema } = require('express-validator')
 const { Role } = require('@prisma/client')
 
 const { useAsync } = require('../utils/express')
-const { auth } = require('../middleware/auth')
 const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
-module.exports.getAllUsers = [
-  auth('ADMIN'),
+module.exports.getAllUsers = useAsync(async (req, res) => {
+  const users = await req.db.user.findMany()
+  res.json({ data: users })
+})
 
-  useAsync(async (req, res) => {
-    const users = await req.db.user.findMany()
-    res.json({ data: users })
-  })
-]
-
-module.exports.getOneUser = [
-  auth('ADMIN'),
-
-  useAsync(async (req, res) => {
-    const user = await req.db.user.findUnique({
-      where: {
-        id: req.params.id
-      }
-    })
-
-    if (!user) {
-      throw createError(404, 'User not found')
+module.exports.getOneUser = useAsync(async (req, res) => {
+  const user = await req.db.user.findUnique({
+    where: {
+      id: req.params.id
     }
-
-    res.json({ data: user })
   })
-]
+
+  if (!user) {
+    throw createError(404, 'User not found')
+  }
+
+  res.json({ data: user })
+})
 
 module.exports.updateUser = [
-  auth('ADMIN'),
-
   checkSchema({
     name: {
       isString: true,
@@ -74,24 +63,20 @@ module.exports.updateUser = [
   })
 ]
 
-module.exports.deleteUser = [
-  auth('ADMIN'),
-
-  useAsync(async (req, res) => {
-    try {
-      const user = await req.db.user.delete({
-        where: {
-          id: req.params.id
-        }
-      })
-
-      res.json({ data: user })
-    } catch (e) {
-      if (isPrismaError(e, 'P2025')) {
-        throw createError(404, 'User not found')
+module.exports.deleteUser = useAsync(async (req, res) => {
+  try {
+    const user = await req.db.user.delete({
+      where: {
+        id: req.params.id
       }
+    })
 
-      throw e
+    res.json({ data: user })
+  } catch (e) {
+    if (isPrismaError(e, 'P2025')) {
+      throw createError(404, 'User not found')
     }
-  })
-]
+
+    throw e
+  }
+})

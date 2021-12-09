@@ -12,6 +12,7 @@ module.exports.bikeAuth = (idParam = 'id') => useAsync(async function bikeAuth (
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
     const token = req.headers.authorization.split(' ')[1]
 
+    console.log(req)
     bike = await prisma.bike.findFirst({
       where: {
         id: req.params[idParam],
