@@ -45,12 +45,14 @@ export default {
       await this.$api.patch(`/bikes/${id}`, data)
       // console.log(result)
       // console.log(this.arr)
-      this.arr.forEach((e, i) => {
-        if (e.id === id) {
-          e.disabled = !e.disabled
-        }
-        return e
-      })
+      // Find bike to modify and modify it
+      const bike = this.arr.find(b => b.id === id)
+      bike.disabled = !bike.disabled
+      
+      // Replace the original bike with the new one in the array and
+      // *reassign the array*. This is important to trigger the
+      // rectivity in Vue.
+      this.arr = this.arr.map(b => b.id === id ? bike : b)
       // yanky solution to refresh page
       // this.$router.go()
     }
