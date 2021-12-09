@@ -53,12 +53,14 @@ export default {
       }
 
       const res = await this.$api.patch(`/charging-stations/${id}`, data)
-      this.arr = this.arr.filter(e => {
-        if (e.id === id) {
-          e.updatedAt = res.updatedAt
-        }
-        return e
-      })
+      // Find bike to modify and modify it
+      const bike = this.arr.find(b => b.id === id)
+      bike.updatedAt = res.updatedAt
+      
+      // Replace the original bike with the new one in the array and
+      // *reassign the array*. This is important to trigger the
+      // rectivity in Vue.
+      this.arr = this.arr.map(b => b.id === id ? bike : b)
     },
     async createChargingZone () {
       const data = {
