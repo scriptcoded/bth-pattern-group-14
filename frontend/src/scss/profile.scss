@@ -28,3 +28,43 @@ div.bigboi {
   }
 
 }
+
+.history {
+  display: grid;
+  grid-column: 2;
+}
+
+.home .stuffi {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  filter: drop-shadow(10px 10px 10px #00685b);
+
+  .left {
+    text-align: left;
+    padding: 0;
+    width: 50%;
+    float: left;
+  }
+
+  .right {
+    text-align: right;
+    float: right;
+    padding: 0;
+    width: 50%;
+  }
+
+  .faktura {
+    width: 100%;
+    height: 100%;
+    background-color: $cyan;
+    padding: 1rem;
+  }
+
+  .ride-history {
+    width: 100%;
+    height: 100%;
+    background-color: $darkcyan;
+    padding: 1rem;
+  }
+}
