@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "axios": "^0.24.0",
+    "csver": "^1.2.0",
+    "csvreader": "^1.0.4"
+  }
+}
