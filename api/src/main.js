@@ -11,8 +11,8 @@ const NodeCache = require('node-cache');
 const bikeCache = new NodeCache();
 
 const { bikeCacheMiddleware } = require('./middleware/bikeCacheMiddleware');
-const initCacheToPrisma = require('./utils/cacheToPrisma');
-const initSocketServer = require('./socket/socketServer');
+const { initCacheToPrisma }= require('./utils/cacheToPrisma');
+const { initSocketServer } = require('./socket/socketServer');
 // end sockets and bike cache
 
 const { router } = require('./router')
@@ -70,15 +70,17 @@ app.use(cors(corsOptions))
 app.use(passport.initialize())
 app.use(passport.session())
 
+// attaching bikecache to request object for access in controllers
+app.use(bikeCacheMiddleware(bikeCache));
+
+// // start the automatic updating of prisma database table bike from bikeCache
+initCacheToPrisma(prisma, bikeCache);
+
 app.use(router)
 
 app.use(errorHandler)
 
-// attaching bikecache to request object for access in controllers
-app.use(bikeCacheMiddleware(bikeCache));
 
-// start the automatic updating of prisma database table bike from bikeCache
-initCacheToPrisma(prisma, bikeCache);
 
 const server = app.listen(config.port, () => {
   console.log(`🚀 Server is running on port ${config.port}`)

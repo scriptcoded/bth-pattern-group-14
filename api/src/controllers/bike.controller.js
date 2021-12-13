@@ -13,7 +13,7 @@ const { findParkingZoneAtPoint } = require('../utils/zone')
 const { generateToken } = require('../utils/crypto')
 
 module.exports.getAllBikes = [
-  auth('ADMIN'),
+  //auth('ADMIN'),
 
   useAsync(async (req, res) => {
     const bikes = await req.db.bike.findMany()

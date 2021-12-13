@@ -40,14 +40,11 @@ const initCacheToPrisma = (prisma, bikeCache) => {
                         console.log("prisma updated id:", key, "in(ms): ", updateTime, "\tavg:", Math.round(totalUpdateTime/updates), "min: ", minUpdateTime, "max: ", maxUpdateTime);
                     })
                     .catch(e => {
-                        if (isPrismaError(e, "P2025")) {
-                            throw createError(404, "User not found");
-                        }
-                        throw e;
+                        console.log(e);
                     });
             }, dbInterval * index);
         });
     }, INTERVAL);
 };
 
-module.exports = initCacheToPrisma;
+module.exports = { initCacheToPrisma };
