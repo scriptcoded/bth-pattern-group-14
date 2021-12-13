@@ -31,9 +31,23 @@ model User {
 
   balance Decimal @default(0) @db.Decimal(15, 2)
 
-  rides Ride[]
-
   apiCalls Int @default(0)
+
+  rides    Ride[]
+  payments Payment[]
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  amount Decimal @default(0) @db.Decimal(15, 2)
+
+  automatic Boolean @default(false)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 }
 
 model Applications {
