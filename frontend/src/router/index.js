@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Map from '../views/Map.vue'
 import Admin from '../views/Admin.vue'
 import Profile from '../views/Profile.vue'
+import TopUp from '../views/TopUp.vue'
 import Bike from '../views/Bike.vue'
 import Parking from '../views/Parking.vue'
 import Charging from '../views/Charging.vue'
@@ -59,6 +60,14 @@ export default (auth) => {
       path: '/profile',
       name: 'profile',
       component: Profile,
+      meta: {
+        auth: true
+      }
+    },
+    {
+      path: '/profile/topup',
+      name: 'topup',
+      component: TopUp,
       meta: {
         auth: true
       }

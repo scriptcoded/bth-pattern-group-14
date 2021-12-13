@@ -7,11 +7,28 @@ Table User {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
   name String [not null]
+  email String [not null]
   githubId String [unique, not null]
   role Role [not null, default: 'USER']
-  balance Decimal [not null, default: 0]
-  rides Ride [not null]
+  balance Int [not null, default: 0]
   apiCalls Int [not null, default: 0]
+  stripeCustomerId String
+  rides Ride [not null]
+  payments Payment [not null]
+}
+
+Table Payment {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  amount Int [not null, default: 0]
+  automatic Boolean [not null, default: false]
+  paid Boolean [not null, default: false]
+  checkoutId String [unique]
+  invoiceId String [unique]
+  invoiceLink String [unique]
+  user User [not null]
+  userId String [not null]
 }
 
 Table Applications {
@@ -88,6 +105,8 @@ Enum Role {
   ADMIN
   USER
 }
+
+Ref: Payment.userId > User.id
 
 Ref: Ride.userId > User.id
 
