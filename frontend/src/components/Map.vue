@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div ref='map' class='map'></div>
-    <div class='stuff'></div>
+    <div
+      ref="map"
+      class="map"
+    />
+    <div class="stuff" />
   </div>
 </template>
 
@@ -57,6 +60,10 @@ export default {
       })
     }
   },
+  mounted () {
+    this.setupLeafletMap()
+    // Interval fetch - set clear interval when refresh site / map
+  },
   methods: {
     async setupLeafletMap () {
       const mapContainer = L.map(this.$refs.map).setView(this.center, 13)
@@ -97,13 +104,13 @@ export default {
 
       const chargingstations = await this.$api.get('/charging-stations')
       chargingstations.forEach((e, i) => {
-        var recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
+        const recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
         L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup(`Charging-station ${i + 1}`)
       })
 
       const parkingzones = await this.$api.get('/parking-zones')
       parkingzones.forEach((e, i) => {
-        var recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
+        const recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
         L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(mapContainer).bindPopup(`Parking-zone ${i + 1}`)
       })
 
@@ -141,19 +148,21 @@ export default {
 
         // mark.on('click', this.onMarkClick)
         console.log(charge)
-        charge ? mark.addTo(mapContainer).bindPopup(`
+        charge
+          ? mark.addTo(mapContainer).bindPopup(`
           <h1>Bike id:${e.id}</h1>
           <h2 class="dab">Go away!</h2>
           <p>Im charging!</p>
         `)
-          : !e.disabled ? mark.addTo(mapContainer)
-            .bindPopup(`
+          : !e.disabled
+              ? mark.addTo(mapContainer)
+                .bindPopup(`
               <h1>Bike id:${e.id}</h1>
               <h2 class="dab">Hello there</h2>
               <p>*Available for ride*</p>
             `)
-            : mark.addTo(mapContainer)
-              .bindPopup(`
+              : mark.addTo(mapContainer)
+                .bindPopup(`
                 <h1>Bike id:${e.id}</h1>
                 <h2>Not active</h2>
                 <p>Please help me :<</p>
@@ -166,10 +175,6 @@ export default {
 
       // console.log(popup)
     }
-  },
-  mounted () {
-    this.setupLeafletMap()
-    // Interval fetch - set clear interval when refresh site / map
   }
 }
 </script>
