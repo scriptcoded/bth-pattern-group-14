@@ -10,13 +10,18 @@ module.exports.githubStrategy = new GitHubStrategy(
     callbackURL: `${config.apiURL}/auth/github/callback`
   },
   function (accessToken, refreshToken, profile, done) {
+    const email = profile.emails.length && profile.emails[0].value
+      ? profile.emails[0].value
+      : profile._json.email
+
     prisma.user.upsert({
       where: {
         githubId: profile.id
       },
       create: {
         githubId: profile.id,
-        name: profile.displayName
+        name: profile.displayName,
+        email
       },
       update: {
         name: profile.displayName

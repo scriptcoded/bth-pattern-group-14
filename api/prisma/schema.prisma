@@ -25,6 +25,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   name     String
+  email    String
   githubId String @unique
 
   role Role @default(USER)
