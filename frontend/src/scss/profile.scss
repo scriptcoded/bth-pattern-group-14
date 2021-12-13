@@ -1,0 +1,70 @@
+.home .profile {
+  margin: 4rem 0;
+}
+
+div.bigboi {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem;
+  background-color: #7efff0;
+  filter: drop-shadow(10px 10px 10px #00685b);
+
+  h2 {
+    margin-block-end: 0;
+    margin-block-start: 0;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+
+    &.canNotRide {
+      text-decoration: underline;
+      text-decoration-color: $button-color-danger;
+    }
+
+    &.canRide {
+      text-decoration: underline;
+      text-decoration-color: $button-color;
+    }
+  }
+
+}
+
+.history {
+  display: grid;
+  grid-column: 2;
+}
+
+.home .stuffi {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  filter: drop-shadow(10px 10px 10px #00685b);
+
+  .left {
+    text-align: left;
+    padding: 0;
+    width: 50%;
+    float: left;
+  }
+
+  .right {
+    text-align: right;
+    float: right;
+    padding: 0;
+    width: 50%;
+  }
+
+  .faktura {
+    width: 100%;
+    height: 100%;
+    background-color: $cyan;
+    padding: 1rem;
+  }
+
+  .ride-history {
+    width: 100%;
+    height: 100%;
+    background-color: $darkcyan;
+    padding: 1rem;
+  }
+}

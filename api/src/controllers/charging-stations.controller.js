@@ -9,7 +9,6 @@ const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
 module.exports.getAllStations = [
-  auth('ADMIN'),
 
   useAsync(async (req, res) => {
     const stations = await req.db.chargingStation.findMany()

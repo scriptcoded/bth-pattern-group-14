@@ -1,0 +1,28 @@
+button {
+  background-color: $button-color;
+  color: white;
+  font-size: 16px;
+  padding: 12px 28px;
+  border-radius: 4px;
+  border: none;
+
+  &:hover {
+    background-color: lighten($button-color, 10%);
+  }
+}
+
+button.red {
+  background-color: $button-color-danger;
+
+  &:hover {
+    background-color: lighten($button-color-danger, 10%);
+  }
+}
+
+button.blue {
+  background-color: $button-color-update;
+
+  &:hover {
+    background-color: lighten($button-color-update, 10%);
+  }
+}

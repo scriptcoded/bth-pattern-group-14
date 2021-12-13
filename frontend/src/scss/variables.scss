@@ -1,11 +1,22 @@
 $cyan: #00ffe1;
 $darkcyan: #00aa96;
+$lightgrey: #a1a1a14b;
+$darkblue: #0056a7;
+$red: #ff0000;
+$green: #00c82b;
 
+// Font / text color
 $color: $cyan;
 $font-color: black;
 $nav-color: black;
 $nav-underline: $cyan;
 $font-family: 'Lato', sans-serif;
 
+// Buttons
+$button-color: $green;
+$button-color-update: $darkblue;
+$button-color-danger: $red;
+
+// Navbar
 $underline-normal: rgba(0, 255, 255, 0);
 $underline-hover: rgba(0, 255, 255, 1);

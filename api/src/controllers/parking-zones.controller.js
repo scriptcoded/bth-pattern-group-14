@@ -9,7 +9,6 @@ const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
 module.exports.getAllParkingZones = [
-  auth('ADMIN'),
 
   useAsync(async (req, res) => {
     const zones = await req.db.parkingZone.findMany()
@@ -87,7 +86,7 @@ module.exports.getOneParkingZone = [
     })
 
     if (!parkingzone) {
-      throw createError(404, 'Charging station not found')
+      throw createError(404, 'Parking zone not found')
     }
 
     res.json({ data: parkingzone })
@@ -124,17 +123,17 @@ module.exports.updateParkingStation = [
 
   useAsync(async (req, res) => {
     try {
-      const charginstation = await req.db.chargingStation.update({
+      const parkingZone = await req.db.parkingZone.update({
         where: {
           id: req.params.id
         },
         data: req.body
       })
 
-      res.json({ data: charginstation })
+      res.json({ data: parkingZone })
     } catch (e) {
       if (isPrismaError(e, 'P2025')) {
-        throw createError(404, 'Charging station not found')
+        throw createError(404, 'Parking zone not found')
       }
 
       throw e

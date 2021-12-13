@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="all-seeing-odin">
     <header>
       <NavBar />
     </header>
