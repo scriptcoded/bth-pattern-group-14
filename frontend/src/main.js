@@ -9,6 +9,13 @@ import AuthPlugin from './plugins/auth'
 import '@/scss/styles.scss'
 import ApiPlugin from './plugins/api'
 
+import * as dayjs from 'dayjs'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import 'dayjs/locale/sv'
+
+dayjs.locale('sv')
+dayjs.extend(localizedFormat)
+
 Vue.config.productionTip = false
 
 Vue.use(ApiPlugin)

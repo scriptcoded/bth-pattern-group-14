@@ -64,6 +64,7 @@ Table Ride {
   endLongitude Decimal
   fromParkingZone Boolean [not null]
   toParkingZone Boolean
+  chargedAmount Int
   user User [not null]
   userId String [not null]
   bike Bike [not null]

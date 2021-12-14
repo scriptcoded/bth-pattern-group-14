@@ -22,6 +22,9 @@ router.get('/users/:id', auth('ADMIN'), userController.getOneUser)
 router.patch('/users/:id', auth('ADMIN'), userController.updateUser)
 router.delete('/users/:id', auth('ADMIN'), userController.deleteUser)
 
+router.get('/users/me/rides', auth(), userController.getMyRides)
+router.get('/users/me/payments', auth(), userController.getMyPayments)
+
 router.get('/bikes', bikeController.getAllBikes)
 router.post('/bikes', bikeController.createBike)
 router.get('/bikes/:id', bikeController.getOneBike)

@@ -80,3 +80,28 @@ module.exports.deleteUser = useAsync(async (req, res) => {
     throw e
   }
 })
+
+module.exports.getMyRides = useAsync(async (req, res) => {
+  const rides = await req.db.ride.findMany({
+    where: {
+      userId: req.user.id
+    }
+  })
+
+  res.json({ data: rides })
+})
+
+module.exports.getMyPayments = useAsync(async (req, res) => {
+  const payments = await req.db.payment.findMany({
+    where: {
+      userId: req.user.id,
+      // Make sure not to include unpaid manual payments
+      NOT: {
+        automatic: false,
+        paid: false
+      }
+    }
+  })
+
+  res.json({ data: payments })
+})

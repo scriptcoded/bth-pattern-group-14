@@ -1,0 +1,56 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin: 0 0 8px 0;
+  padding: 16px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+}
+
+.card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card__title-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.card__title {
+  display: inline;
+  font-size: 24px;
+  border-left: 4px solid #333;
+  padding-left: 4px;
+}
+
+.card__addon-title {
+  font-size: 16px;
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.card__date {
+  font-weight: 400;
+  font-size: 13px;
+  color: #333;
+}
+
+.card__payment {
+  display: flex;
+  justify-content: space-between;
+}
+
+.card__amount {
+  font-size: 18px;
+  font-family: monospace;
+}
+
+.card__unpaid {
+  
+}

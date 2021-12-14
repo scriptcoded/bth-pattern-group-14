@@ -1,70 +1,135 @@
 <template>
-  <div class="history">
-    <div v-for="item in user" :key="item.id" class="stuffi"> <!-- Change id to type -->
-      <div v-if="item.disabled" class="ride-history"> <!--Change logic to match "history" -->
-        <div class="left">
-          <p>Datum: {{changeDate(item.createdAt)}}</p> <!-- Change argument -->
-          <p>Start: {{changeTime(item.createdAt)}}</p> <!-- Change argument -->
-          <p>End:   {{changeTime(item.updatedAt)}}</p> <!-- Change argument -->
-          <p>ID:    {{item.id}}</p>
-        </div>
-        <div class="right">
-          <p>Pris:   {{item.id}}</p> <!-- Change variable -->
-          <p>Rabatt: {{item.id}}</p> <!-- Change variable -->
-          <p>Summa:  {{item.id}}</p> <!-- Change variable -->
-        </div>
-      </div>
-      <div v-else-if="!item.disabled" class="faktura"> <!-- Change logic to match "Add to balance" -->
-        <div class="left">
-          <p>Inlagd balans: {{item.id}}</p> <!-- Change variable -->
-          <p>ID: {{item.id}}</p>
-        </div>
-        <div class="right">
-          <p>Datum: {{changeDate(item.createdAt)}}</p> <!-- Change argument -->
-          <p>Tid: {{changeTime(item.updatedAt)}}</p> <!-- Change argument -->
-        </div>
-      </div>
-      <div v-else class="faktura">
-        <div class="left">
-          <p>Faktura: {{item.id}}</p> <!-- Change variable -->
-          <p>ID: {{item.id}}</p>
-          <p>Betald: {{item.disabled ? "Ja" : "Nej"}}</p> <!-- Change variable -->
-        </div>
-        <div class="right">
-          <p>Datum utskick: {{changeDate(item.createdAt)}}</p> <!-- Change argument -->
-          <p v-if="item.disabled">Datum betald: {{changeDate(item.updatedAt)}}</p> <!-- Change argument && change if statement's variable-->
-          <p>Bästföre datum: {{changeDate(item.createdAt)}}</p> <!-- Change argument -->
-        </div>
-      </div>
+  <div>
+    <h2 class="history__title">
+      Unpaid invoices
+    </h2>
+
+    <div v-if="historyOnlyUnpaid.length > 0">
+      <InvoiceCard
+        v-for="item in historyOnlyUnpaid"
+        :key="item.id"
+        :amount="item.amount"
+        :date="item.dateStart"
+        :paid="item.paid"
+        :invoice-link="item.invoiceLink"
+      />
     </div>
+
+    <HistoryCard
+      v-else
+      class="history__empty-state"
+    >
+      You're all caught up! 🎉
+    </HistoryCard>
+
+    <h2 class="history__title">
+      History
+    </h2>
+
+    <div v-if="historyWithoutUnpaid.length > 0">
+      <template
+        v-for="item in historyWithoutUnpaid"
+      >
+        <TopupCard
+          v-if="item.type === 'topup'"
+          :key="item.id"
+          :amount="item.amount"
+          :date="item.dateStart"
+        />
+        <InvoiceCard
+          v-else-if="item.type === 'invoice'"
+          :key="item.id"
+          :amount="item.amount"
+          :date="item.dateStart"
+          :paid="item.paid"
+          :invoice-link="item.invoiceLink"
+        />
+        <RideCard
+          v-else
+          :key="item.id"
+          :amount="item.amount"
+        />
+      </template>
+    </div>
+    <HistoryCard
+      v-else
+      class="history__empty-state"
+    >
+      There is no history, go ride! 🚗
+    </HistoryCard>
   </div>
 </template>
 
 <script>
+import HistoryCard from './HistoryCard'
+
+import TopupCard from './TopupCard'
+import InvoiceCard from './InvoiceCard'
+import RideCard from './RideCard'
 
 export default {
-  data () {
-    return {
-      user: {},
-      history: []
+  components: {
+    HistoryCard,
+    TopupCard,
+    InvoiceCard,
+    RideCard
+  },
+  props: {
+    user: {
+      type: Object,
+      required: true
+    },
+    rides: {
+      type: Array,
+      required: true
+    },
+    payments: {
+      type: Array,
+      required: true
     }
   },
-  methods: {
-    async userInfo () {
-      const user = await this.$api.get('/bikes')
-      this.user = user
+  computed: {
+    history () {
+      const rides = this.rides.map(ride => ({
+        id: ride.id,
+        dateStart: ride.startTime,
+        dateEnd: ride.endTime,
+        type: 'ride'
+      }))
+
+      const payments = this.payments.map(payment => ({
+        id: payment.id,
+        dateStart: new Date(payment.createdAt),
+        dateEnd: null,
+        type: payment.automatic ? 'invoice' : 'topup',
+        amount: payment.amount,
+        paid: payment.paid,
+        invoiceLink: payment.invoiceLink
+      }))
+
+      const combined = [...rides, ...payments]
+
+      return combined.slice().sort((a, b) => new Date(b.dateStart) - new Date(a.dateStart))
     },
-    changeTime (time) {
-      const actualDate = time.split('T')
-      return actualDate[1].substring(0, 8)
+    historyWithoutUnpaid () {
+      return this.history.filter(item => item.type !== 'invoice' || item.paid)
     },
-    changeDate (time) {
-      const actualDate = time.split('T')
-      return actualDate[0]
+    historyOnlyUnpaid () {
+      return this.history.filter(item => item.type === 'invoice' && !item.paid)
     }
-  },
-  mounted () {
-    this.userInfo()
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.history__title {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.history__empty-state {
+  text-align: center;
+  color: #555;
+  border-color: #777;
+}
+</style>
