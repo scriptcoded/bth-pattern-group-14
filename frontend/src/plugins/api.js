@@ -21,14 +21,14 @@ class Api {
     return data
   }
 
-  async get (path, options) {
+  get (path, options) {
     return this.request(path, {
       ...options,
       method: 'GET'
     })
   }
 
-  async post (path, data, options) {
+  post (path, data, options) {
     return this.request(path, {
       ...options,
       method: 'POST',
@@ -39,7 +39,7 @@ class Api {
     })
   }
 
-  async patch (path, data, options) {
+  patch (path, data, options) {
     return this.request(path, {
       ...options,
       method: 'PATCH',
@@ -50,7 +50,7 @@ class Api {
     })
   }
 
-  async delete (path, options) {
+  delete (path, options) {
     return this.request(path, {
       ...options,
       method: 'DELETE',

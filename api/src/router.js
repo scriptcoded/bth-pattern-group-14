@@ -1,6 +1,7 @@
 const { Router } = require('express')
 
 const authController = require('./controllers/auth.controller')
+const paymentController = require('./controllers/payment.controller')
 const userController = require('./controllers/user.controller')
 const bikeController = require('./controllers/bike.controller')
 const chargingStationController = require('./controllers/charging-stations.controller')
@@ -12,6 +13,9 @@ const router = new Router()
 router.get('/auth/me', authController.getCurrentUser)
 router.get('/auth/github', authController.githubAuth)
 router.get('/auth/github/callback', authController.githubCallback)
+
+router.post('/payments/topup', auth(), paymentController.topup)
+router.post('/payments/stripe/webhook', paymentController.stripeWebhook)
 
 router.get('/users', auth('ADMIN'), userController.getAllUsers)
 router.get('/users/:id', auth('ADMIN'), userController.getOneUser)

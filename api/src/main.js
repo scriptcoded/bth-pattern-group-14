@@ -37,7 +37,12 @@ if (config.redisURL) {
 }
 
 app.use(cookieParser())
-app.use(express.json())
+app.use(express.json({
+  // Add raw body to request. Used for Stripe.
+  verify: (req, res, buf) => {
+    req.rawBody = buf
+  }
+}))
 app.use(session({
   secret: config.appSecret,
   store: redisStore,

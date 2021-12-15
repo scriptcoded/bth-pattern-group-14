@@ -90,7 +90,7 @@ export default {
       this.mapLayers = L.layerGroup()
 
       if (!this.intervalMap) {
-        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+        this.intervalMap = setInterval(this.setupLeafletMap, 15000)
       } else {
         clearInterval(this.intervalMap)
       }
@@ -170,7 +170,7 @@ export default {
                   <p>Please help me :<</p>
                 `)
         mark.addEventListener('click', () => {
-          console.log("Hej", e.target.getPopup())
+          console.log('Hej', e.target.getPopup())
         })
         this.mapLayers.addLayer(mark)
       })

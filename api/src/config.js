@@ -19,6 +19,12 @@ const config = {
   passport: {
     githubClientID: process.env.GITHUB_CLIENT_ID,
     githubClientSecret: process.env.GITHUB_CLIENT_SECRET
+  },
+
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY,
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET
   }
 }
 
@@ -38,6 +44,10 @@ module.exports.checkConfig = function checkConfig () {
 
   if (!config.passport.githubClientID) { missingVariables.push('GITHUB_CLIENT_ID') }
   if (!config.passport.githubClientSecret) { missingVariables.push('GITHUB_CLIENT_SECRET') }
+
+  if (!config.stripe.secretKey) { missingVariables.push('STRIPE_SECRET_KEY') }
+  if (!config.stripe.publishableKey) { missingVariables.push('STRIPE_PUBLISHABLE_KEY') }
+  if (!config.stripe.webhookSecret) { missingVariables.push('STRIPE_WEBHOOK_SECRET') }
 
   // Display a nice list of missing environment variables
   if (missingVariables.length > 0) {
