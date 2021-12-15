@@ -4,7 +4,19 @@
       ref="mapcontainer"
       class="map"
     />
-    <div class="stuff" />
+    <div v-if="startedRide">
+      <button @click="endRide(selectedBike.bikeId)">
+        End ride
+      </button>
+    </div>
+    <div v-if="selectedBike && !startedRide">
+      <p>
+        Battery Level: {{ selectedBike.battery }}%
+      </p>
+      <button @click="startRide(selectedBike.bikeId, selectedBike.latitude, selectedBike.longitude)">
+        Start ride
+      </button>
+    </div>
   </div>
 </template>
 
@@ -22,6 +34,8 @@ export default {
   data () {
     return {
       // center: [56.1803, 15.5906],
+      startedRide: false,
+      selectedBike: null,
       intervalMap: null,
       mapContainer: null,
       clickedMarker: null,
@@ -67,12 +81,31 @@ export default {
   mounted () {
     this.setupMap()
     this.setupLeafletMap()
-    // Interval fetch - set clear interval when refresh site / map
   },
   beforeDestroy () {
     clearInterval(this.intervalMap)
   },
   methods: {
+    async startRide (id, lat, long) {
+      const data = {
+        id: id,
+        latitude: lat,
+        longitude: long
+      }
+      await this.$api.post(`/bikes/${id}/start`, data)
+      // fix if fail response
+      this.startedRide = true
+      this.resetMap()
+      clearInterval(this.intervalMap)
+      this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
+    },
+    async endRide (id) {
+      await this.$api.post(`/bikes/${id}/end`)
+      this.startedRide = false
+      this.resetMap()
+      clearInterval(this.intervalMap)
+      this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+    },
     async setupMap () {
       this.mapContainer = L.map(this.$refs.mapcontainer).setView(this.center, 13)
 
@@ -99,6 +132,17 @@ export default {
       this.mapLayers.eachLayer(layer => {
         this.mapContainer.removeLayer(layer)
       })
+    },
+    async rentedBikeUpdate (id) {
+      const rentedBike = await this.$api.get(`/bikes/${id}`)
+      const position = [rentedBike.latitude, rentedBike.longitude]
+      const mark = L.marker(position, { icon: this.locationMarkerRed })
+
+      mark.bindPopup(`
+          <h1>Bike id:${rentedBike.id}</h1>
+          <h2 class="dab">Hey!</h2>
+          <p>I'm riding along!</p>
+        `).addTo(this.mapContainer)
     },
     async setupLeafletMap () {
       const chargingstations = await this.$api.get('/charging-stations')
@@ -128,9 +172,14 @@ export default {
       // const maxY = (this.right - this.left).toFixed(4)
 
       /**
+       * Remove active popup from changing on map
+       */
+      // console.log('Leta: ', arr, this.activePopup)
+      const bike = arr.map(b => b.id === this.activePopup ? null : b).filter(n => n)
+      /**
        * Spew out markers randomly :D
        */
-      arr.forEach((e, i) => {
+      bike.forEach((e, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         // console.log(e)
@@ -171,7 +220,26 @@ export default {
                   <p>Please help me :<</p>
                 `)
         mark.addEventListener('click', () => {
-          console.log('Hej', e.target.getPopup())
+          console.log('Hej', mark.getPopup())
+          this.selectedBike = {
+            battery: e.battery,
+            bikeId: e.id,
+            latitude: e.latitude,
+            longitude: e.longitude
+          }
+          // this.activePopup = e.id
+          // const markerId = mark._leaflet_id
+          // // Marker
+          // // Find bk id ->marker.id where cykild.id = bk.id
+
+          // // this.mapLayers.eachLayer(e => console.log(e))
+          // // layer id === marker id (marker är en layer)
+          // this.mapLayers.eachLayer(layer => {
+          //   if (layer._leaflet_id === markerId) {
+          //     console.log(layer._leaflet_id, markerId, layer)
+          //     this.mapLayers.removeLayer(layer)
+          //   }
+          // })
         })
         this.mapLayers.addLayer(mark)
       })
