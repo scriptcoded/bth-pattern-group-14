@@ -3,6 +3,22 @@
     <h1 class="home-title profile">
       Profile
     </h1>
+
+    <MessageBox
+      v-if="$route.query.topup_result === 'success'"
+      type="success"
+      @dismiss="dismissTopupMessage"
+    >
+      Account topped up!
+    </MessageBox>
+    <MessageBox
+      v-else-if="$route.query.topup_result === 'cancelled'"
+      type="info"
+      @dismiss="dismissTopupMessage"
+    >
+      Top up cancelled.
+    </MessageBox>
+
     <Profile
       :user="$auth.user"
     />
@@ -16,11 +32,14 @@
 </template>
 
 <script>
+import MessageBox from '@/components/MessageBox.vue'
+
 import Profile from '@/components/profile/Profile.vue'
 import History from '@/components/profile/History.vue'
 
 export default {
   components: {
+    MessageBox,
     Profile,
     History
   },
@@ -38,6 +57,15 @@ export default {
     },
     async loadPayments () {
       this.payments = await this.$api.get('/users/me/payments')
+    },
+    dismissTopupMessage () {
+      this.$router.replace({
+        ...this.$route,
+        query: {
+          ...this.$route.query || {},
+          topup_result: undefined
+        }
+      })
     }
   }
 }

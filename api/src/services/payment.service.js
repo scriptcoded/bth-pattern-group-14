@@ -147,8 +147,8 @@ async function createCheckoutSession (db, userId, paymentName, total) {
       }
     ],
     mode: 'payment',
-    success_url: `${config.frontendURL}/profile/topup/success`,
-    cancel_url: `${config.frontendURL}/profile/topup/cancel`
+    success_url: `${config.frontendURL}/profile?topup_result=success`,
+    cancel_url: `${config.frontendURL}/profile?topup_result=cancelled`
   })
 
   await db.payment.create({
