@@ -32,13 +32,13 @@
       >
         <TopupCard
           v-if="item.type === 'topup'"
-          :key="item.id"
+          :key="`${item.id}_topup`"
           :amount="item.amount"
           :date="item.dateStart"
         />
         <InvoiceCard
           v-else-if="item.type === 'invoice'"
-          :key="item.id"
+          :key="`${item.id}_invoice`"
           :amount="item.amount"
           :date="item.dateStart"
           :paid="item.paid"
@@ -46,8 +46,10 @@
         />
         <RideCard
           v-else
-          :key="item.id"
+          :key="`${item.id}_ride`"
           :amount="item.amount"
+          :date-start="item.dateStart"
+          :date-end="item.dateEnd"
         />
       </template>
     </div>
@@ -90,12 +92,15 @@ export default {
   },
   computed: {
     history () {
-      const rides = this.rides.map(ride => ({
-        id: ride.id,
-        dateStart: ride.startTime,
-        dateEnd: ride.endTime,
-        type: 'ride'
-      }))
+      const rides = this.rides
+        .filter(ride => ride.endTime) // Ride must have ended for it to show here
+        .map(ride => ({
+          id: ride.id,
+          dateStart: new Date(ride.startTime),
+          dateEnd: new Date(ride.endTime),
+          amount: ride.chargedAmount,
+          type: 'ride'
+        }))
 
       const payments = this.payments.map(payment => ({
         id: payment.id,
