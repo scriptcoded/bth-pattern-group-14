@@ -1,6 +1,8 @@
 <template>
   <div class="home">
-    <h1>ELSP</h1>
+    <h1 class="home-title">
+      ELSP
+    </h1>
     <div class="panel-1 panels">
       <h2>Title text</h2>
       <p>

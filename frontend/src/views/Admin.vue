@@ -1,6 +1,8 @@
 <template>
   <div class="home">
-    <h1>Admin</h1>
+    <h1 class="home-title">
+      Admin
+    </h1>
     <router-link
       v-if="$auth.hasRole('admin')"
       :to="{ name: 'bike' }"

@@ -3,6 +3,8 @@ const { Stripe } = require('stripe')
 
 const { config } = require('../config')
 
+const constants = require('../constants')
+
 /**
  * Send a new invoice with a total ride cost to a user via email.
  * @param {import("@prisma/client").PrismaClient} db Prisma instance
@@ -55,6 +57,31 @@ async function createInvoice (db, userId, total) {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Send a new invoice to a user based on their balance.
+ * @param {import("@prisma/client").PrismaClient} db Prisma instance
+ * @param {string} userId
+ */
+async function createInvoiceFromBalance (db, userId) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId
+    }
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  // Only charge if they owe us money
+  if (user.balance < 0) {
+    await createInvoice(db, userId, -user.balance)
+  }
+}
+
+/**
+>>>>>>> 3ed1b38c5684fe824a400598c95d213ee55a23a3
  * Ensure that a user is registered as a customer in Stripe. If not, create a
  * new customer.
  * @param {import("@prisma/client").PrismaClient} db Prisma instance
@@ -124,8 +151,8 @@ async function createCheckoutSession (db, userId, paymentName, total) {
       }
     ],
     mode: 'payment',
-    success_url: `${config.frontendURL}/profile/topup/success`,
-    cancel_url: `${config.frontendURL}/profile/topup/cancel`
+    success_url: `${config.frontendURL}/profile?topup_result=success`,
+    cancel_url: `${config.frontendURL}/profile?topup_result=cancelled`
   })
 
   await db.payment.create({
@@ -174,6 +201,8 @@ async function getInvoiceStatus (db, invoiceId) {
         paid: true
       }
     })
+
+    await topUpUser(db, payment.userId, invoice.amount_paid)
   }
 }
 
@@ -206,6 +235,8 @@ async function getCheckoutStatus (db, checkoutId) {
         paid: true
       }
     })
+
+    await topUpUser(db, payment.userId, session.amount_total)
   }
 }
 
@@ -219,11 +250,89 @@ function verifyWebhook (payload, sig) {
   }
 }
 
+/**
+ *
+ * @param {number} rideMinutes Number of minutes to charge for
+ * @param {boolean} correctedParking If the bike parking was corrected
+ * @param {boolean} invalidParking If the bike was parked outside a parking zone
+ */
+function calculateRideCost (rideMinutes, correctedParking, invalidParking) {
+  const baseCharge = constants.MINUTE_PRICE * rideMinutes
+  const parkingDiscount = constants.FIX_INVALID_PARK_DISCOUNT * correctedParking
+  const parkingFee = constants.INVALID_PARK_FEE * invalidParking
+
+  const total = baseCharge - parkingDiscount + parkingFee
+
+  return total
+}
+
+/**
+ *
+ * @param {import("@prisma/client").PrismaClient} db Prisma instance
+ * @param {string} userId ID of user to charge
+ * @param {number} amount Amount to charge user in Swedish öre
+ */
+async function chargeUser (db, userId, amount) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId
+    }
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  await db.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      balance: {
+        decrement: amount
+      }
+    }
+  })
+}
+
+/**
+ *
+ * @param {import("@prisma/client").PrismaClient} db Prisma instance
+ * @param {string} userId ID of user to top up
+ * @param {number} amount Amount to top up user in Swedish öre
+ */
+async function topUpUser (db, userId, amount) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId
+    }
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  await db.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      balance: {
+        increment: amount
+      }
+    }
+  })
+}
+
 module.exports = {
   createInvoice,
+  createInvoiceFromBalance,
   ensureCustomer,
   createCheckoutSession,
   getInvoiceStatus,
   getCheckoutStatus,
-  verifyWebhook
+  verifyWebhook,
+  calculateRideCost,
+  chargeUser,
+  topUpUser
 }

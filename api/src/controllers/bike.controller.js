@@ -11,22 +11,25 @@ const { isPrismaError } = require('../utils/prisma')
 const { generateBikeID } = require('../utils/bike')
 const { findParkingZoneAtPoint } = require('../utils/zone')
 const { generateToken } = require('../utils/crypto')
+const paymentService = require('../services/payment.service')
 
 module.exports.getAllBikes = [
 
   useAsync(async (req, res) => {
     const isAdmin = req.user.role === 'ADMIN'
 
-    const where = isAdmin ? undefined : {
-      disabled: false,
-      rides: {
-        every: {
-          endTime: {
-            not: null
+    const where = isAdmin
+      ? undefined
+      : {
+          disabled: false,
+          rides: {
+            every: {
+              endTime: {
+                not: null
+              }
+            }
           }
         }
-      }
-    }
 
     const bikes = await req.db.bike.findMany({
       where
@@ -225,6 +228,7 @@ module.exports.endRide = [
     const activeRide = await req.db.ride.findFirst({
       where: {
         bikeId: req.params.id,
+        userId: req.user.id,
         endTime: null
       },
       include: {
@@ -237,8 +241,14 @@ module.exports.endRide = [
     }
 
     const bike = activeRide.bike
-
+    const endTime = new Date()
     const parkingZone = await findParkingZoneAtPoint(req.db, bike.latitude, bike.longitude)
+
+    const rideMinutes = Math.ceil((endTime - activeRide.startTime) / 1000 / 60)
+    const correctedParking = !activeRide.fromParkingZone && !!parkingZone
+    const invalidParking = !parkingZone
+
+    const rideCost = paymentService.calculateRideCost(rideMinutes, correctedParking, invalidParking)
 
     // Update active ride
     const ride = await req.db.ride.update({
@@ -246,12 +256,15 @@ module.exports.endRide = [
         id: activeRide.id
       },
       data: {
-        endTime: new Date(),
+        endTime,
         toParkingZone: !!parkingZone,
         endLatitude: bike.latitude,
-        endLongitude: bike.longitude
+        endLongitude: bike.longitude,
+        chargedAmount: rideCost
       }
     })
+
+    await paymentService.chargeUser(req.db, req.user.id, rideCost)
 
     res.send({ data: ride })
   })

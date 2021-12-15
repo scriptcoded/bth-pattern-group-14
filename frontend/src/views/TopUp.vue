@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1 class="profile">
+    <h1 class="home-title profile">
       Top up account
     </h1>
     <TopUp

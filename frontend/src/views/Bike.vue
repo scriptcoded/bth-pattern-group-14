@@ -1,6 +1,8 @@
 <template>
   <div class="home">
-    <h1>Bikes</h1>
+    <h1 class="home-title">
+      Bikes
+    </h1>
     <BikeList />
   </div>
 </template>
