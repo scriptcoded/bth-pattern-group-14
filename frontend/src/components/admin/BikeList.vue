@@ -1,21 +1,42 @@
 <template>
-    <table>
-      <tr class="table-header">
-        <th> ID </th>
-        <th> Active </th>
-        <th> Battery </th>
-        <th></th>
-      </tr>
-      <tr v-for="item in arr" :key="item.id" class="table-content">
-        <td> {{ item.id }} </td>
-        <td v-if="item.disabled"> No </td>
-        <td v-else> Yes </td>
-        <td> {{ item.battery }} </td>
-        <td v-if="!item.disabled"> <button @click="disableBike(item.id, item.disabled)"> Disable bike </button></td>
-        <td v-else><button class="red" @click="disableBike(item.id, item.disabled)"> Turn on bike </button></td>
-      </tr>
-      <button @click='createBike()'>Create bike</button>
-    </table>
+  <table>
+    <tr class="table-header">
+      <th> ID </th>
+      <th> Active </th>
+      <th> Battery </th>
+      <th />
+    </tr>
+    <tr
+      v-for="item in arr"
+      :key="item.id"
+      class="table-content"
+    >
+      <td> {{ item.id }} </td>
+      <td v-if="item.disabled">
+        No
+      </td>
+      <td v-else>
+        Yes
+      </td>
+      <td> {{ item.battery }} </td>
+      <td v-if="!item.disabled">
+        <button @click="disableBike(item.id, item.disabled)">
+          Disable bike
+        </button>
+      </td>
+      <td v-else>
+        <button
+          class="red"
+          @click="disableBike(item.id, item.disabled)"
+        >
+          Turn on bike
+        </button>
+      </td>
+    </tr>
+    <button @click="createBike()">
+      Create bike
+    </button>
+  </table>
 </template>
 
 <script>
@@ -25,6 +46,9 @@ export default {
     return {
       arr: null
     }
+  },
+  mounted () {
+    this.test()
   },
   methods: {
     async test () {
@@ -56,9 +80,6 @@ export default {
       // yanky solution to refresh page
       // this.$router.go()
     }
-  },
-  mounted () {
-    this.test()
   }
 }
 </script>
