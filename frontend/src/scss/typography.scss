@@ -16,8 +16,17 @@ h2 {
 }
 
 span, p {
-  font-weight: 700;
-  font-size: 18px;
+  // NOTE(scriptcoded): Kommenterade ut dessa stylesen för att de gör det
+  // väldigt svårt att styla andra delar av applikationen. Använd scoped klasser
+  // om sådan specifik styling behövs.
+
+  // font-weight: 700;
+  // font-size: 18px;
+}
+
+// Space between successive paragraphs
+p ~ p {
+  margin-top: 8px;
 }
 
 a {

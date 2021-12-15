@@ -84,7 +84,8 @@ export default {
 .message-box__dismiss:after {
   position: absolute;
   left: calc(50% - 1px);
-  top: 19px;
+  // top: 19px;
+  top: calc(50% - 8px);
   content: ' ';
   height: 16px;
   width: 2px;

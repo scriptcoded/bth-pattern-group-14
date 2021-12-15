@@ -9,7 +9,12 @@
       type="success"
       @dismiss="dismissTopupMessage"
     >
-      Account topped up!
+      <p>
+        Account topped up!
+      </p>
+      <p>
+        <small><i>Note that it might take a few seconds for your balance to update.</i></small>
+      </p>
     </MessageBox>
     <MessageBox
       v-else-if="$route.query.topup_result === 'cancelled'"

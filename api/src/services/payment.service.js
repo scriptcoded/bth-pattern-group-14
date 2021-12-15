@@ -197,6 +197,8 @@ async function getInvoiceStatus (db, invoiceId) {
         paid: true
       }
     })
+
+    await topUpUser(db, payment.userId, invoice.amount_paid)
   }
 }
 
@@ -229,6 +231,8 @@ async function getCheckoutStatus (db, checkoutId) {
         paid: true
       }
     })
+
+    await topUpUser(db, payment.userId, session.amount_total)
   }
 }
 
@@ -287,6 +291,35 @@ async function chargeUser (db, userId, amount) {
   })
 }
 
+/**
+ *
+ * @param {import("@prisma/client").PrismaClient} db Prisma instance
+ * @param {string} userId ID of user to top up
+ * @param {number} amount Amount to top up user in Swedish öre
+ */
+async function topUpUser (db, userId, amount) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId
+    }
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  await db.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      balance: {
+        increment: amount
+      }
+    }
+  })
+}
+
 module.exports = {
   createInvoice,
   createInvoiceFromBalance,
@@ -296,5 +329,6 @@ module.exports = {
   getCheckoutStatus,
   verifyWebhook,
   calculateRideCost,
-  chargeUser
+  chargeUser,
+  topUpUser
 }

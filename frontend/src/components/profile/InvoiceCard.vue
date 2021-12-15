@@ -30,15 +30,21 @@
         {{ formatCurrency(amount) }}
       </div>
 
-      <div class="card__unpaid">
+      <div v-if="!paid">
         <a
-          v-if="!paid"
+          v-if="invoiceLink"
           class="button"
           :href="invoiceLink"
           target="_blank"
         >
           Pay now
         </a>
+        <div
+          v-else
+          class="card__unpaid-no-link"
+        >
+          Check your email
+        </div>
       </div>
     </div>
   </HistoryCard>
@@ -100,4 +106,8 @@ $unpaid-color: rgb(228, 78, 78);
   font-size: 20px;
 }
 
+.card__unpaid-no-link {
+  font-weight: 700;
+  text-decoration: underline;
+}
 </style>
