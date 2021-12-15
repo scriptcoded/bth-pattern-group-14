@@ -1,15 +1,15 @@
 <template>
   <div class="mapblock">
-    <Map />
+    <MapView />
   </div>
 </template>
 
 <script>
-import Map from '@/components/Map.vue'
+import MapView from '@/components/MapComponent.vue'
 
 export default {
   components: {
-    Map
+    MapView
   }
 }
 </script>

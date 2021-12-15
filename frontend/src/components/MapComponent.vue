@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      ref="map"
+      ref="mapcontainer"
       class="map"
     />
     <div class="stuff" />
@@ -22,6 +22,10 @@ export default {
   data () {
     return {
       // center: [56.1803, 15.5906],
+      intervalMap: null,
+      mapContainer: null,
+      clickedMarker: null,
+      mapLayers: [],
       center: [55.5652, 13.0481],
       baseXY: [55.5642, 13.0651],
       top: [55.5885],
@@ -61,12 +65,16 @@ export default {
     }
   },
   mounted () {
+    this.setupMap()
     this.setupLeafletMap()
     // Interval fetch - set clear interval when refresh site / map
   },
+  beforeDestroy () {
+    clearInterval(this.intervalMap)
+  },
   methods: {
-    async setupLeafletMap () {
-      const mapContainer = L.map(this.$refs.map).setView(this.center, 13)
+    async setupMap () {
+      this.mapContainer = L.map(this.$refs.mapcontainer).setView(this.center, 13)
 
       // Setup map
       L.tileLayer(
@@ -77,47 +85,43 @@ export default {
           id: 'mapbox/streets-v11',
           accessToken: 'pk.eyJ1IjoiYXJlb25sIiwiYSI6ImNrdzFibmFndTE3N2gyeG5vcGlieXZsMWMifQ.S0ysiWIrgu-AbLrC_OAmKA'
         }
-      ).addTo(mapContainer)
-      // L.getJSON(data)
-      // L.marker(this.center, {icon: this.locationMarker}).addTo(mapContainer).bindPopup("*Finger guns*");
+      ).addTo(this.mapContainer)
 
-      /**
-       * Reload stations 1->3
-       */
-      L.circle(this.baseXY, {
-        color: 'steelblue',
-        fillColor: 'lightblue',
-        fillOpacity: 0.5,
-        radius: 500
-      }).addTo(mapContainer).bindPopup('Reload station test')
-      L.circle([55.5885, 13.0170], {
-        color: 'steelblue',
-        fillColor: 'lightblue',
-        fillOpacity: 0.5,
-        radius: 500
-      }).addTo(mapContainer).bindPopup('Reload station test')
+      this.mapLayers = L.layerGroup()
 
-      // Create rectangle shape. Aka reload station
-      // var recXY = [[this.bottom[0], this.left[0]], [this.bottom[0] + 0.01, this.left[0] + 0.01]]
-
-      // L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup('Reload station 3, the correct one')
-
+      if (!this.intervalMap) {
+        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+      } else {
+        clearInterval(this.intervalMap)
+      }
+    },
+    async resetMap () {
+      this.mapLayers.eachLayer(layer => {
+        this.mapContainer.removeLayer(layer)
+      })
+    },
+    async setupLeafletMap () {
       const chargingstations = await this.$api.get('/charging-stations')
+      const parkingzones = await this.$api.get('/parking-zones')
+      const arr = await this.$api.get('/bikes')
+
+      await this.resetMap()
+
       chargingstations.forEach((e, i) => {
         const recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
-        L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(mapContainer).bindPopup(`Charging-station ${i + 1}`)
+        const station = L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(this.mapContainer).bindPopup(`Charging-station ${i + 1}`)
+        this.mapLayers.addLayer(station)
       })
 
-      const parkingzones = await this.$api.get('/parking-zones')
       parkingzones.forEach((e, i) => {
         const recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
-        L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(mapContainer).bindPopup(`Parking-zone ${i + 1}`)
+        const zone = L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(this.mapContainer).bindPopup(`Parking-zone ${i + 1}`)
+        this.mapLayers.addLayer(zone)
       })
 
       /**
        * Max cord maker
        */
-      const arr = await this.$api.get('/bikes')
       // arr.forEach(e => arr.push(e))
       // const arr = [...Array(200)]
       // const maxX = (this.top - this.bottom).toFixed(4)
@@ -129,7 +133,7 @@ export default {
       arr.forEach((e, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
-        console.log(e)
+        // console.log(e)
         // Lat = Y, Long = X
         const position = [e.latitude, e.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
@@ -147,30 +151,33 @@ export default {
         }
 
         // mark.on('click', this.onMarkClick)
-        console.log(charge)
+        // console.log(charge)
         charge
-          ? mark.addTo(mapContainer).bindPopup(`
+          ? mark.bindPopup(`
           <h1>Bike id:${e.id}</h1>
           <h2 class="dab">Go away!</h2>
           <p>Im charging!</p>
         `)
           : !e.disabled
-              ? mark.addTo(mapContainer)
-                .bindPopup(`
-              <h1>Bike id:${e.id}</h1>
-              <h2 class="dab">Hello there</h2>
-              <p>*Available for ride*</p>
-            `)
-              : mark.addTo(mapContainer)
-                .bindPopup(`
+              ? mark.bindPopup(`
                 <h1>Bike id:${e.id}</h1>
-                <h2>Not active</h2>
-                <p>Please help me :<</p>
+                <h2 class="dab">Hello there</h2>
+                <p>*Available for ride*</p>
               `)
-        // mark.addPopup(e)
+              : mark.bindPopup(`
+                  <h1>Bike id:${e.id}</h1>
+                  <h2>Not active</h2>
+                  <p>Please help me :<</p>
+                `)
+        mark.addEventListener('click', () => {
+          console.log("Hej", e.target.getPopup())
+        })
+        this.mapLayers.addLayer(mark)
       })
+      // this.mapLayers.addTo(this.mapContainer) || EXTRA || Make popup stay if we click on it, aka remove from mapLayers
     },
     onMarkClick (e) {
+      // console.log("Hej")
       // var popup = e.target.getPopup()
 
       // console.log(popup)
