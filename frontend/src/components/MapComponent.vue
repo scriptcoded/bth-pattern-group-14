@@ -90,7 +90,7 @@ export default {
       this.mapLayers = L.layerGroup()
 
       if (!this.intervalMap) {
-        this.intervalMap = setInterval(this.setupLeafletMap, 15000)
+        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
       } else {
         clearInterval(this.intervalMap)
       }
@@ -135,6 +135,7 @@ export default {
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         // console.log(e)
         // Lat = Y, Long = X
+        // console.log(e)
         const position = [e.latitude, e.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
         let charge = false
@@ -174,7 +175,8 @@ export default {
         })
         this.mapLayers.addLayer(mark)
       })
-      // this.mapLayers.addTo(this.mapContainer) || EXTRA || Make popup stay if we click on it, aka remove from mapLayers
+      // || EXTRA || Make popup stay if we click on it, aka remove from mapLayers
+      this.mapLayers.addTo(this.mapContainer)
     },
     onMarkClick (e) {
       // console.log("Hej")

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import About from '../views/About.vue'
-import Map from '../views/Map.vue'
+import MapView from '../views/MapView.vue'
 import Admin from '../views/Admin.vue'
 import Profile from '../views/Profile.vue'
 import TopUp from '../views/TopUp.vue'
@@ -23,7 +23,7 @@ export default (auth) => {
     {
       path: '/map',
       name: 'map',
-      component: Map
+      component: MapView
     },
     {
       path: '/admin',
