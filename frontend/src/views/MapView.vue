@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import MapView from '@/components/MapComponent.vue'
+import MapView from '@/components/map/MapComponent.vue'
 
 export default {
   components: {

@@ -4,36 +4,36 @@
       ref="mapcontainer"
       class="map"
     />
-    <div v-if="startedRide">
-      <button @click="endRide(selectedBike.bikeId)">
-        End ride
-      </button>
-    </div>
-    <div v-if="selectedBike && !startedRide">
-      <p>
-        Battery Level: {{ selectedBike.battery }}%
-      </p>
-      <button @click="startRide(selectedBike.bikeId, selectedBike.latitude, selectedBike.longitude)">
-        Start ride
-      </button>
-    </div>
+    <RentedBike
+      :started="startedRide"
+      :selected="selectedBike"
+      @clicked="resetMap"
+      @inter="resetInterval"
+    />
   </div>
 </template>
 
 <script>
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import markerBlue from '../assets/blue.png'
-import markerGray from '../assets/gray.png'
-import markerGreen from '../assets/green.png'
-import markerRed from '../assets/red.png'
-import markerYellow from '../assets/yellow.png'
+import markerBlue from '@/assets/blue.png'
+import markerGray from '@/assets/gray.png'
+import markerGreen from '@/assets/green.png'
+import markerRed from '@/assets/red.png'
+import markerYellow from '@/assets/yellow.png'
+import RentedBike from '@/components/map/RentedBike.vue'
+
 // import '../scss/map.scss'
 
 export default {
+  components: {
+    RentedBike
+  },
   data () {
     return {
       // center: [56.1803, 15.5906],
+      chargingPosition: [],
+      parkingPosition: [],
       startedRide: false,
       selectedBike: null,
       intervalMap: null,
@@ -78,33 +78,81 @@ export default {
       })
     }
   },
-  mounted () {
+  async mounted () {
     this.setupMap()
+    await this.setupZones()
     this.setupLeafletMap()
   },
   beforeDestroy () {
     clearInterval(this.intervalMap)
   },
   methods: {
-    async startRide (id, lat, long) {
-      const data = {
-        id: id,
-        latitude: lat,
-        longitude: long
+    // async startRide (id, lat, long) {
+    //   const data = {
+    //     id: id,
+    //     latitude: lat,
+    //     longitude: long
+    //   }
+    //   await this.$api.post(`/bikes/${id}/start`, data)
+    //   // fix if fail response
+    //   this.startedRide = true
+    //   this.resetMap()
+    //   clearInterval(this.intervalMap)
+    //   this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
+    // },
+    // async endRide (id) {
+    //   await this.$api.post(`/bikes/${id}/end`)
+    //   this.startedRide = false
+    //   this.resetMap()
+    //   clearInterval(this.intervalMap)
+    //   this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+    // },
+    checkZone (bikePosition, disabled) {
+      /**
+       * BP[0] = Latitude
+       * BP[1] = Long
+       * P[0] = latitudeStart
+       * P[1] = longitudeStart
+       * P[2] = latitudeEnd
+       * P[3] = longitudeEnd
+       */
+      if (disabled) {
+        return [this.locationMarkerGray, false]
       }
-      await this.$api.post(`/bikes/${id}/start`, data)
-      // fix if fail response
-      this.startedRide = true
-      this.resetMap()
-      clearInterval(this.intervalMap)
-      this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
+
+      const marker = [this.locationMarkerBlue, false]
+      this.chargingPosition.forEach((p, i) => {
+        if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
+          marker[0] = this.locationMarkerGreen
+          marker[1] = true
+        }
+      })
+      this.parkingPosition.forEach((p, i) => {
+        if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
+          marker[0] = this.locationMarkerYellow
+        }
+      })
+      return marker
     },
-    async endRide (id) {
-      await this.$api.post(`/bikes/${id}/end`)
-      this.startedRide = false
-      this.resetMap()
-      clearInterval(this.intervalMap)
-      this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+    async setupZones () {
+      const chargingstations = await this.$api.get('/charging-stations')
+      const parkingzones = await this.$api.get('/parking-zones')
+
+      chargingstations.forEach((e, i) => {
+        const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        this.chargingPosition.push(position)
+        const recXY = [[position[0], position[1]], [position[2], position[3]]]
+        L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(this.mapContainer).bindPopup(`Charging-station ${i + 1}`)
+        // this.mapLayers.addLayer(station)
+      })
+
+      parkingzones.forEach((e, i) => {
+        const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        this.parkingPosition.push(position)
+        const recXY = [[position[0], position[1]], [position[2], position[3]]]
+        L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(this.mapContainer).bindPopup(`Parking-zone ${i + 1}`)
+        // this.mapLayers.addLayer(zone)
+      })
     },
     async setupMap () {
       this.mapContainer = L.map(this.$refs.mapcontainer).setView(this.center, 13)
@@ -120,7 +168,7 @@ export default {
         }
       ).addTo(this.mapContainer)
 
-      this.mapLayers = L.layerGroup()
+      this.markerLayers = L.layerGroup()
 
       if (!this.intervalMap) {
         this.intervalMap = setInterval(this.setupLeafletMap, 2000)
@@ -129,9 +177,17 @@ export default {
       }
     },
     async resetMap () {
-      this.mapLayers.eachLayer(layer => {
+      this.markerLayers.eachLayer(layer => {
         this.mapContainer.removeLayer(layer)
       })
+    },
+    async resetInterval (id = null, what = false) {
+      clearInterval(this.intervalMap)
+      if (what) {
+        this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
+      } else {
+        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+      }
     },
     async rentedBikeUpdate (id) {
       const rentedBike = await this.$api.get(`/bikes/${id}`)
@@ -145,23 +201,9 @@ export default {
         `).addTo(this.mapContainer)
     },
     async setupLeafletMap () {
-      const chargingstations = await this.$api.get('/charging-stations')
-      const parkingzones = await this.$api.get('/parking-zones')
       const arr = await this.$api.get('/bikes')
 
       await this.resetMap()
-
-      chargingstations.forEach((e, i) => {
-        const recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
-        const station = L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(this.mapContainer).bindPopup(`Charging-station ${i + 1}`)
-        this.mapLayers.addLayer(station)
-      })
-
-      parkingzones.forEach((e, i) => {
-        const recXY = [[e.latitudeStart, e.longitudeStart], [e.latitudeEnd, e.longitudeEnd]]
-        const zone = L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(this.mapContainer).bindPopup(`Parking-zone ${i + 1}`)
-        this.mapLayers.addLayer(zone)
-      })
 
       /**
        * Max cord maker
@@ -179,33 +221,26 @@ export default {
       /**
        * Spew out markers randomly :D
        */
-      bike.forEach((e, i) => {
+      bike.forEach(async (e, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         // console.log(e)
         // Lat = Y, Long = X
-        // console.log(e)
+        // console.log('Bike: ', e)
         const position = [e.latitude, e.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
-        let charge = false
-        let name = ''
-        typeof e.name === 'undefined' ? name = '' : name = e.name
+        // console.log('%c Color' + i, 'background: #222; color: #bada55')
+        const icon = this.checkZone(position, e.disabled)
+        const charge = icon[1]
 
-        if (name) {
-          mark.options.icon = this.locationMarkerYellow
-        } else if ((position[0] >= this.bottom[0] && position[0] <= this.bottom[0] + 0.01) && (position[1] >= this.left[0] && position[1] <= this.left[0] + 0.01)) {
-          mark.options.icon = this.locationMarkerGreen
-          charge = true
-        } else if (!e.disabled) {
-          mark.options.icon = this.locationMarkerBlue
-        }
+        mark.options.icon = icon[0]
 
         // mark.on('click', this.onMarkClick)
         // console.log(charge)
         charge
           ? mark.bindPopup(`
           <h1>Bike id:${e.id}</h1>
-          <h2 class="dab">Go away!</h2>
+          <h2 class="dab">Get me when im full!</h2>
           <p>Im charging!</p>
         `)
           : !e.disabled
@@ -241,10 +276,10 @@ export default {
           //   }
           // })
         })
-        this.mapLayers.addLayer(mark)
+        this.markerLayers.addLayer(mark)
       })
-      // || EXTRA || Make popup stay if we click on it, aka remove from mapLayers
-      this.mapLayers.addTo(this.mapContainer)
+      // || EXTRA || Make popup stay if we click on it, aka remove from markerLayers
+      this.markerLayers.addTo(this.mapContainer)
     },
     onMarkClick (e) {
       // console.log("Hej")
