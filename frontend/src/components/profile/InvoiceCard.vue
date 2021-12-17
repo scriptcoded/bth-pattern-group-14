@@ -31,20 +31,23 @@
       </div>
 
       <div v-if="!paid">
-        <a
+        <button
           v-if="invoiceLink"
-          class="button"
-          :href="invoiceLink"
-          target="_blank"
+          :class="{
+            loading: checkLoading
+          }"
+          @click="checkInvoice"
         >
-          Pay now
-        </a>
-        <div
+          <span>Pay now</span>
+        </button>
+        <a
           v-else
+          href="#"
           class="card__unpaid-no-link"
+          @click.prevent="checkInvoice"
         >
-          Check your email
-        </div>
+          Check if paid
+        </a>
       </div>
     </div>
   </HistoryCard>
@@ -60,6 +63,10 @@ export default {
     HistoryCard
   },
   props: {
+    invoiceId: {
+      type: String,
+      default: null
+    },
     amount: {
       type: Number,
       required: true
@@ -77,9 +84,26 @@ export default {
       default: null
     }
   },
+  data: () => ({
+    checkLoading: false
+  }),
   methods: {
     formatCurrency,
-    formatDate
+    formatDate,
+
+    async checkInvoice () {
+      this.checkLoading = true
+
+      const { paid, link } = await this.$api.post(`/payments/invoices/${this.invoiceId}/check`)
+
+      if (paid) {
+        this.checkLoading = false
+        this.$emit('set-paid', true)
+        return
+      }
+
+      window.location.href = link
+    }
   }
 }
 </script>
@@ -107,7 +131,9 @@ $unpaid-color: rgb(228, 78, 78);
 }
 
 .card__unpaid-no-link {
+  font-size: 16px;
   font-weight: 700;
   text-decoration: underline;
+  text-underline-offset: 0;
 }
 </style>

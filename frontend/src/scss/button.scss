@@ -31,3 +31,39 @@ button.blue {
     background-color: lighten($button-color-update, 10%);
   }
 }
+
+.loading {
+  position: relative;
+  opacity: 1;
+  cursor: default;
+}
+
+.loading span {
+  opacity: 0;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border: 3px solid transparent;
+  border-top-color: var(--color);
+  border-radius: 50%;
+  animation: button-loading-spinner 1s linear infinite;
+}
+
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -33,6 +33,7 @@
         :user="user"
         :rides="rides"
         :payments="payments"
+        @set-invoice-paid="setInvoicePaid"
       />
     </template>
     <div v-else>
@@ -83,6 +84,15 @@ export default {
           ...this.$route.query || {},
           topup_result: undefined
         }
+      })
+    },
+    setInvoicePaid ({ id, paid }) {
+      this.payments = this.payments.map(payment => {
+        if (payment.id === id) {
+          payment.paid = paid
+        }
+
+        return payment
       })
     }
   }
