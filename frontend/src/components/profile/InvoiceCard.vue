@@ -92,17 +92,24 @@ export default {
     formatDate,
 
     async checkInvoice () {
+      if (this.checkLoading) { return }
+
       this.checkLoading = true
 
       const { paid, link } = await this.$api.post(`/payments/invoices/${this.invoiceId}/check`)
 
-      if (paid) {
+      // Delay so that even if opening the new tab takes time the loader will
+      // still show
+      setTimeout(() => {
         this.checkLoading = false
+      }, 1000)
+
+      if (paid) {
         this.$emit('set-paid', true)
         return
       }
 
-      window.location.href = link
+      window.open(link, '_blank').focus()
     }
   }
 }
