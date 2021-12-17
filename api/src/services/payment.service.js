@@ -2,7 +2,6 @@ const createError = require('http-errors')
 const { Stripe } = require('stripe')
 
 const { config } = require('../config')
-
 const constants = require('../constants')
 
 /**
