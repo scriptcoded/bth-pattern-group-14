@@ -57,8 +57,8 @@ export default {
     },
     async createBike () {
       const data = {
-        latitude: 55.5605,
-        longitude: 13.105
+        latitude: 55.5605 + ((Math.random() * 100) / 10000),
+        longitude: 13.105 + ((Math.random() * 100) / 10000)
       }
       await this.$api.post('/bikes', data)
     },
