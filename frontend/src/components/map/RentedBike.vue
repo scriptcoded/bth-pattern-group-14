@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div v-if="startedRide">
+    <div v-if="started">
       <button @click="endRide(selected.bikeId)">
         End ride
       </button>
     </div>
-    <div v-if="selected && !startedRide">
+    <div v-if="selected && !started">
       <p>
         Battery Level: {{ selected.battery }}%
       </p>
@@ -17,7 +17,6 @@
 </template>
 
 <script>
-// import { resetInterval } from '../../mapUtils.js'
 
 export default {
   props: {
@@ -46,21 +45,15 @@ export default {
       }
       await this.$api.post(`/bikes/${id}/start`, data)
       // fix if fail response
-      this.startedRide = true
-      this.$emit('clicked')
+      this.$emit('toggle-started-ride')
+      this.$emit('resetmap')
       this.$emit('inter', id, true)
-      // clearInterval(this.intervalMap)
-      // this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
     },
     async endRide (id) {
       await this.$api.post(`/bikes/${id}/end`)
-      this.startedRide = false
-      this.$emit('clicked')
+      this.$emit('toggle-started-ride')
+      this.$emit('resetmap')
       this.$emit('inter', id, false)
-      // this.resetMap()
-      // resetInterval()
-      // clearInterval(this.intervalMap)
-      // this.intervalMap = setInterval(this.setupLeafletMap, 2000)
     }
   }
 }

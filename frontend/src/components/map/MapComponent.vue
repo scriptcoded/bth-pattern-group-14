@@ -7,7 +7,8 @@
     <RentedBike
       :started="startedRide"
       :selected="selectedBike"
-      @clicked="resetMap"
+      @resetmap="resetMap"
+      @toggle-started-ride="toggleStartedRide"
       @inter="resetInterval"
     />
   </div>
@@ -18,9 +19,9 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import markerBlue from '@/assets/blue.png'
 import markerGray from '@/assets/gray.png'
-import markerGreen from '@/assets/green.png'
+import markerPurple from '@/assets/purple.png'
 import markerRed from '@/assets/red.png'
-import markerYellow from '@/assets/yellow.png'
+import markerOrange from '@/assets/orange.png'
 import RentedBike from '@/components/map/RentedBike.vue'
 
 // import '../scss/map.scss'
@@ -52,28 +53,28 @@ export default {
         iconAnchor: [12, 12],
         popupAnchor: [0, 0]
       }),
-      locationMarkerGreen: L.icon({
-        iconUrl: markerGreen,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+      locationMarkerPurple: L.icon({
+        iconUrl: markerPurple,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
         popupAnchor: [0, 0]
       }),
       locationMarkerRed: L.icon({
         iconUrl: markerRed,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
         popupAnchor: [0, 0]
       }),
-      locationMarkerYellow: L.icon({
-        iconUrl: markerYellow,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+      locationMarkerOrange: L.icon({
+        iconUrl: markerOrange,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
         popupAnchor: [0, 0]
       }),
       locationMarkerGray: L.icon({
         iconUrl: markerGray,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6],
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
         popupAnchor: [0, 0]
       })
     }
@@ -81,32 +82,39 @@ export default {
   async mounted () {
     this.setupMap()
     await this.setupZones()
-    this.setupLeafletMap()
+    const check = await this.getRide()
+    if (!check) {
+      this.setupLeafletMap()
+      this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+    }
   },
   beforeDestroy () {
     clearInterval(this.intervalMap)
   },
   methods: {
-    // async startRide (id, lat, long) {
-    //   const data = {
-    //     id: id,
-    //     latitude: lat,
-    //     longitude: long
-    //   }
-    //   await this.$api.post(`/bikes/${id}/start`, data)
-    //   // fix if fail response
-    //   this.startedRide = true
-    //   this.resetMap()
-    //   clearInterval(this.intervalMap)
-    //   this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
-    // },
-    // async endRide (id) {
-    //   await this.$api.post(`/bikes/${id}/end`)
-    //   this.startedRide = false
-    //   this.resetMap()
-    //   clearInterval(this.intervalMap)
-    //   this.intervalMap = setInterval(this.setupLeafletMap, 2000)
-    // },
+    /**
+    * This function checks if user is currently
+    * riding a bike
+    * @returns {boolean} resets interval
+    */
+    async getRide () {
+      const rides = await this.$api.get('/users/me/rides')
+      const bike = rides.find(i => !i.endTime)
+      if (bike === undefined) { return false }
+      const bikeId = bike.bikeId
+      this.startedRide = true
+      this.rentedBikeUpdate(bikeId)
+      this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, bikeId)
+      return true
+    },
+    /**
+     * Toggels startedRide variable between true or false
+     * Makse sure the start / end ride button changes accordingly
+     * @returns {boolean} this.startedRide reversed
+     */
+    toggleStartedRide () {
+      this.startedRide = !this.startedRide
+    },
     checkZone (bikePosition, disabled) {
       /**
        * BP[0] = Latitude
@@ -121,19 +129,25 @@ export default {
       }
 
       const marker = [this.locationMarkerBlue, false]
-      this.chargingPosition.forEach((p, i) => {
-        if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
-          marker[0] = this.locationMarkerGreen
-          marker[1] = true
-        }
-      })
       this.parkingPosition.forEach((p, i) => {
         if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
-          marker[0] = this.locationMarkerYellow
+          marker[0] = this.locationMarkerOrange
+        }
+      })
+      this.chargingPosition.forEach((p, i) => {
+        if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
+          marker[0] = this.locationMarkerPurple
+          marker[1] = true
         }
       })
       return marker
     },
+
+    /**
+    * This function sets up all the zone
+    * no @parameters in
+    * @returns all zones
+    */
     async setupZones () {
       const chargingstations = await this.$api.get('/charging-stations')
       const parkingzones = await this.$api.get('/parking-zones')
@@ -154,6 +168,12 @@ export default {
         // this.mapLayers.addLayer(zone)
       })
     },
+
+    /**
+    * This function sets up the map
+    * no @parameters in
+    * @returns the map
+    */
     async setupMap () {
       this.mapContainer = L.map(this.$refs.mapcontainer).setView(this.center, 13)
 
@@ -170,25 +190,47 @@ export default {
 
       this.markerLayers = L.layerGroup()
 
-      if (!this.intervalMap) {
-        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
-      } else {
-        clearInterval(this.intervalMap)
-      }
+      // if (!this.intervalMap) {
+      // this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+      // } else {
+      //   clearInterval(this.intervalMap)
+      // }
     },
+
+    /**
+    * This function resets the map
+    * no @parameters in
+    * @returns the resetted map
+    */
     async resetMap () {
       this.markerLayers.eachLayer(layer => {
         this.mapContainer.removeLayer(layer)
       })
     },
+
+    /**
+    * This function resets the refresh interval
+    * for bikes
+    * @param {special id} id (default null)
+    * @param {boolean} what (default false)
+    * @returns resets interval
+    */
     async resetInterval (id = null, what = false) {
       clearInterval(this.intervalMap)
       if (what) {
+        this.rentedBikeUpdate(id)
         this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
       } else {
+        this.setupLeafletMap()
         this.intervalMap = setInterval(this.setupLeafletMap, 2000)
       }
     },
+
+    /**
+    * If a bike is rented this function
+    * will get that specific bike
+    * @param {special id} id
+    */
     async rentedBikeUpdate (id) {
       const rentedBike = await this.$api.get(`/bikes/${id}`)
       const position = [rentedBike.latitude, rentedBike.longitude]
@@ -198,20 +240,23 @@ export default {
           <h1>Bike id:${rentedBike.id}</h1>
           <h2 class="dab">Hey!</h2>
           <p>I'm riding along!</p>
-        `).addTo(this.mapContainer)
+        `).addTo(this.markerLayers)
+      this.markerLayers.addTo(this.mapContainer)
+
+      this.selectedBike = {
+        battery: rentedBike.battery,
+        bikeId: rentedBike.id,
+        latitude: rentedBike.latitude,
+        longitude: rentedBike.longitude
+      }
     },
+    /**
+    * This function sets up leafletmap
+    */
     async setupLeafletMap () {
       const arr = await this.$api.get('/bikes')
 
       await this.resetMap()
-
-      /**
-       * Max cord maker
-       */
-      // arr.forEach(e => arr.push(e))
-      // const arr = [...Array(200)]
-      // const maxX = (this.top - this.bottom).toFixed(4)
-      // const maxY = (this.right - this.left).toFixed(4)
 
       /**
        * Remove active popup from changing on map
