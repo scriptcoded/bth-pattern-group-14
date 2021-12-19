@@ -8,6 +8,13 @@
       Balance: <span class="profile-card__balance-amount">{{ formatCurrency(user.balance) }}</span>
     </div>
 
+    <a
+      v-if="$auth.hasRole('admin')"
+      href="#"
+      class="profile-card__generate-invoice"
+      @click.prevent="generateInvoice"
+    >{{ invoiceText }}</a>
+
     <h3 class="profile-card__topup-heading">
       Top up
     </h3>
@@ -19,7 +26,7 @@
         :disabled="topupLoading"
         class="profile-card__topup-button"
         :class="{
-          'profile-card__topup-button--loading': topupLoading === amount
+          'loading': topupLoading === amount
         }"
         @click="topup(amount)"
       >
@@ -43,8 +50,23 @@ export default {
   },
   data: () => ({
     topupAmounts: [2000, 5000, 10000, 20000],
-    topupLoading: null
+    topupLoading: null,
+    invoiceLoading: false,
+    invoiceGenerated: false
   }),
+  computed: {
+    invoiceText () {
+      if (this.invoiceLoading) {
+        return 'Generating invoice...'
+      }
+
+      if (this.invoiceGenerated) {
+        return 'Invoice generated!'
+      }
+
+      return 'Generate invoice (admin only)'
+    }
+  },
   methods: {
     formatCurrency,
 
@@ -62,6 +84,20 @@ export default {
         console.error('Error while topping up:', e)
         this.topupLoading = null
       }
+    },
+    async generateInvoice () {
+      if (this.invoiceLoading || this.invoiceGenerated) { return }
+
+      this.invoiceLoading = true
+
+      await this.$api.post('/payments/invoice')
+
+      this.invoiceLoading = false
+      this.invoiceGenerated = true
+
+      setTimeout(() => {
+        this.invoiceGenerated = false
+      }, 1500)
     }
   }
 }
@@ -92,6 +128,14 @@ export default {
 .profile-card__balance-amount {
   font-family: monospace;
   font-weight: 600;
+}
+
+.profile-card__generate-invoice {
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: initial;
 }
 
 .profile-card__topup-heading {
@@ -129,43 +173,8 @@ export default {
   color: #fff;
 }
 
-.profile-card__topup-button[disabled]:not(.profile-card__topup-button--loading) {
+.profile-card__topup-button[disabled]:not(.loading) {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.profile-card__topup-button--loading {
-  opacity: 1;
-  cursor: default;
-}
-
-.profile-card__topup-button--loading span {
-  opacity: 0;
-}
-
-.profile-card__topup-button--loading::after {
-  content: '';
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  border: 3px solid transparent;
-  border-top-color: var(--color);
-  border-radius: 50%;
-  animation: button-loading-spinner 1s linear infinite;
-}
-
-@keyframes button-loading-spinner {
-  from {
-    transform: rotate(0);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>

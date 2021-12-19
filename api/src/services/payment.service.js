@@ -2,7 +2,6 @@ const createError = require('http-errors')
 const { Stripe } = require('stripe')
 
 const { config } = require('../config')
-
 const constants = require('../constants')
 
 /**
@@ -57,8 +56,6 @@ async function createInvoice (db, userId, total) {
 }
 
 /**
-<<<<<<< HEAD
-=======
  * Send a new invoice to a user based on their balance.
  * @param {import("@prisma/client").PrismaClient} db Prisma instance
  * @param {string} userId
@@ -81,7 +78,6 @@ async function createInvoiceFromBalance (db, userId) {
 }
 
 /**
->>>>>>> 3ed1b38c5684fe824a400598c95d213ee55a23a3
  * Ensure that a user is registered as a customer in Stripe. If not, create a
  * new customer.
  * @param {import("@prisma/client").PrismaClient} db Prisma instance
@@ -178,7 +174,7 @@ async function createCheckoutSession (db, userId, paymentName, total) {
  * @param {string} invoiceId Stripe invoice ID
  */
 async function getInvoiceStatus (db, invoiceId) {
-  const payment = await db.payment.findUnique({
+  let payment = await db.payment.findUnique({
     where: {
       invoiceId
     }
@@ -193,7 +189,7 @@ async function getInvoiceStatus (db, invoiceId) {
   const invoice = await stripe.invoices.retrieve(invoiceId)
 
   if (invoice.paid) {
-    await db.payment.update({
+    payment = await db.payment.update({
       where: {
         id: payment.id
       },
@@ -204,6 +200,8 @@ async function getInvoiceStatus (db, invoiceId) {
 
     await topUpUser(db, payment.userId, invoice.amount_paid)
   }
+
+  return payment
 }
 
 /**

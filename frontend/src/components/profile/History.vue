@@ -8,10 +8,12 @@
       <InvoiceCard
         v-for="item in historyOnlyUnpaid"
         :key="item.id"
+        :invoice-id="item.invoiceId"
         :amount="item.amount"
         :date="item.dateStart"
         :paid="item.paid"
         :invoice-link="item.invoiceLink"
+        @set-paid="paid => setInvoicePaid(item.id, paid)"
       />
     </div>
 
@@ -39,10 +41,12 @@
         <InvoiceCard
           v-else-if="item.type === 'invoice'"
           :key="`${item.id}_invoice`"
+          :invoice-id="item.invoiceId"
           :amount="item.amount"
           :date="item.dateStart"
           :paid="item.paid"
           :invoice-link="item.invoiceLink"
+          @set-paid="paid => setInvoicePaid(item.id, paid)"
         />
         <RideCard
           v-else
@@ -104,6 +108,7 @@ export default {
 
       const payments = this.payments.map(payment => ({
         id: payment.id,
+        invoiceId: payment.invoiceId,
         dateStart: new Date(payment.createdAt),
         dateEnd: null,
         type: payment.automatic ? 'invoice' : 'topup',
@@ -121,6 +126,11 @@ export default {
     },
     historyOnlyUnpaid () {
       return this.history.filter(item => item.type === 'invoice' && !item.paid)
+    }
+  },
+  methods: {
+    setInvoicePaid (id, paid) {
+      this.$emit('set-invoice-paid', { id, paid })
     }
   }
 }

@@ -1,38 +1,44 @@
 <template>
   <div class="home profile-page">
-    <h1 class="home-title profile">
-      Profile
-    </h1>
+    <template v-if="loaded">
+      <h1 class="home-title profile">
+        Profile
+      </h1>
 
-    <MessageBox
-      v-if="$route.query.topup_result === 'success'"
-      type="success"
-      @dismiss="dismissTopupMessage"
-    >
-      <p>
-        Account topped up!
-      </p>
-      <p>
-        <small><i>Note that it might take a few seconds for your balance to update.</i></small>
-      </p>
-    </MessageBox>
-    <MessageBox
-      v-else-if="$route.query.topup_result === 'cancelled'"
-      type="info"
-      @dismiss="dismissTopupMessage"
-    >
-      Top up cancelled.
-    </MessageBox>
+      <MessageBox
+        v-if="$route.query.topup_result === 'success'"
+        type="success"
+        @dismiss="dismissTopupMessage"
+      >
+        <p>
+          Account topped up!
+        </p>
+        <p>
+          <small><i>Note that it might take a few seconds for your balance to update.</i></small>
+        </p>
+      </MessageBox>
+      <MessageBox
+        v-else-if="$route.query.topup_result === 'cancelled'"
+        type="info"
+        @dismiss="dismissTopupMessage"
+      >
+        Top up cancelled.
+      </MessageBox>
 
-    <Profile
-      :user="$auth.user"
-    />
+      <Profile
+        :user="user"
+      />
 
-    <History
-      :user="$auth.user"
-      :rides="rides"
-      :payments="payments"
-    />
+      <History
+        :user="user"
+        :rides="rides"
+        :payments="payments"
+        @set-invoice-paid="setInvoicePaid"
+      />
+    </template>
+    <div v-else>
+      Loading...
+    </div>
   </div>
 </template>
 
@@ -49,14 +55,22 @@ export default {
     History
   },
   data: () => ({
+    loaded: false,
+    user: null,
     rides: [],
     payments: []
   }),
   async mounted () {
+    await this.loadUser()
     await this.loadRides()
     await this.loadPayments()
+
+    this.loaded = true
   },
   methods: {
+    async loadUser () {
+      this.user = await this.$api.get('/auth/me')
+    },
     async loadRides () {
       this.rides = await this.$api.get('/users/me/rides')
     },
@@ -70,6 +84,15 @@ export default {
           ...this.$route.query || {},
           topup_result: undefined
         }
+      })
+    },
+    setInvoicePaid ({ id, paid }) {
+      this.payments = this.payments.map(payment => {
+        if (payment.id === id) {
+          payment.paid = paid
+        }
+
+        return payment
       })
     }
   }

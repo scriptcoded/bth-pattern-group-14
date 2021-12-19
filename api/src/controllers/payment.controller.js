@@ -7,7 +7,6 @@ const { Role } = require('@prisma/client')
 const paymentService = require('../services/payment.service')
 const { useAsync } = require('../utils/express')
 const { validate } = require('../middleware/validate')
-const { isPrismaError } = require('../utils/prisma')
 
 module.exports.topup = [
   checkSchema({
@@ -30,6 +29,16 @@ module.exports.topup = [
   })
 ]
 
+module.exports.invoice = [
+  useAsync(async (req, res) => {
+    await paymentService.createInvoiceFromBalance(req.db, req.user.id)
+
+    res.json({
+      data: {}
+    })
+  })
+]
+
 module.exports.stripeWebhook = [
   useAsync(async (req, res) => {
     const payload = req.rawBody
@@ -44,5 +53,18 @@ module.exports.stripeWebhook = [
     }
 
     res.json({})
+  })
+]
+
+module.exports.checkInvoice = [
+  useAsync(async (req, res) => {
+    const invoice = await paymentService.getInvoiceStatus(req.db, req.params.id)
+
+    res.json({
+      data: {
+        paid: invoice.paid,
+        link: invoice.paid ? undefined : invoice.invoiceLink
+      }
+    })
   })
 ]

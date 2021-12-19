@@ -15,7 +15,10 @@ router.get('/auth/github', authController.githubAuth)
 router.get('/auth/github/callback', authController.githubCallback)
 
 router.post('/payments/topup', auth(), paymentController.topup)
+router.post('/payments/invoice', auth('ADMIN'), paymentController.invoice)
 router.post('/payments/stripe/webhook', paymentController.stripeWebhook)
+
+router.post('/payments/invoices/:id/check', paymentController.checkInvoice)
 
 router.get('/users', auth('ADMIN'), userController.getAllUsers)
 router.get('/users/:id', auth('ADMIN'), userController.getOneUser)
