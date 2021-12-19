@@ -122,7 +122,7 @@ module.exports.deleteBike = [
 ]
 
 module.exports.getOneBike = [
-  auth('ADMIN'),
+  auth(),
 
   useAsync(async (req, res) => {
     const bike = await req.db.bike.findUnique({
