@@ -1,6 +1,6 @@
 <template>
   <div class="charing">
-    <h1>Charging Zones</h1>
+    <h1>Charging Station</h1>
     <ChargingList />
   </div>
 </template>

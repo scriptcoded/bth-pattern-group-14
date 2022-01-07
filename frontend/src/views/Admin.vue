@@ -19,7 +19,13 @@
       v-if="$auth.hasRole('admin')"
       :to="{ name: 'parking' }"
     >
-      Parking station
+      Parking zone
+    </router-link>
+    <router-link
+      v-if="$auth.hasRole('admin')"
+      :to="{ name: 'driving' }"
+    >
+      Driving Zone
     </router-link>
   </div>
 </template>
