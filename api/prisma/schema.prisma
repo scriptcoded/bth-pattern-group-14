@@ -63,7 +63,8 @@ model Applications {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name String
+  name  String
+  token String
 
   apiCalls Int @default(0)
 }
