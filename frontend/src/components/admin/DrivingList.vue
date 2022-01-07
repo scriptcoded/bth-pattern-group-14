@@ -7,6 +7,7 @@
         <th> latitude end </th>
         <th> longitude start </th>
         <th> longitude end </th>
+        <th> Name </th>
         <th> Updated </th>
         <th> Update </th>
         <th> Delete </th>
@@ -46,20 +47,26 @@
             step="0.0001"
           >
         </td>
+        <td>
+          <input
+            v-model="item.name"
+            type="string"
+          >
+        </td>
         <td> {{ item.updatedAt }} </td>
         <td class="update">
-          <button @click="updateChargingZone(item.id)">
+          <button @click="updateDrivingZone(item.id)">
             Update
           </button>
         </td>
         <td class="delete">
-          <button @click="deleteChargingZone(item.id)">
+          <button @click="deleteDrivingZone(item.id)">
             X
           </button>
         </td>
       </tr>
     </table>
-    <button @click="createChargingZone()">
+    <button @click="createDrivingZone()">
       Create charging zone
     </button>
   </div>
@@ -76,25 +83,26 @@ export default {
     }
   },
   mounted () {
-    this.getStations()
+    this.getDrivingZones()
   },
   methods: {
-    async getStations () {
-      this.arr = await this.$api.get('/charging-stations')
+    async getDrivingZones () {
+      this.arr = await this.$api.get('/driving-zones')
     },
     onClick (id) {
       this.selectedItem = this.arr.filter(e => e.id === id)[0]
     },
-    async updateChargingZone () {
+    async updateDrivingZone () {
       const id = this.selectedItem.id
       const data = {
         latitudeStart: this.selectedItem.latitudeStart,
         latitudeEnd: this.selectedItem.latitudeEnd,
         longitudeStart: this.selectedItem.longitudeStart,
-        longitudeEnd: this.selectedItem.longitudeEnd
+        longitudeEnd: this.selectedItem.longitudeEnd,
+        name: this.selectedItem.name
       }
 
-      const res = await this.$api.patch(`/charging-stations/${id}`, data)
+      const res = await this.$api.patch(`/driving-zones/${id}`, data)
       // Find bike to modify and modify it
       const bike = this.arr.find(b => b.id === id)
       bike.updatedAt = res.updatedAt
@@ -104,20 +112,23 @@ export default {
       // rectivity in Vue.
       this.arr = this.arr.map(b => b.id === id ? bike : b)
     },
-    async createChargingZone () {
+    async createDrivingZone () {
+      const name = prompt('Where is this zone located?')
+      if (!name) return
       const data = {
         latitudeStart: 55.5624,
         latitudeEnd: 55.5724,
         longitudeStart: 13.0370,
-        longitudeEnd: 13.0470
+        longitudeEnd: 13.0470,
+        name: name
       }
-      const res = await this.$api.post('/charging-stations', data)
+      const res = await this.$api.post('/driving-zones', data)
       this.arr.push(res)
     },
-    async deleteChargingZone (id) {
+    async deleteDrivingZone (id) {
       const yes = confirm('You sure you wanna delete this zone?')
       if (!yes) return
-      await this.$api.delete(`/charging-stations/${id}`)
+      await this.$api.delete(`/driving-zones/${id}`)
     }
   }
 }
