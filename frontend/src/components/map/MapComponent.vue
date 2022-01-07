@@ -153,6 +153,12 @@ export default {
       const parkingzones = await this.$api.get('/parking-zones')
       const drivingzones = await this.$api.get('/driving-zones')
 
+      drivingzones.forEach((e, i) => {
+        const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        const recXY = [[position[0], position[1]], [position[2], position[3]]]
+        L.rectangle(recXY, { color: 'blue', weight: 1, fillOpacity: 0 }).addTo(this.mapContainer)
+      })
+
       chargingstations.forEach((e, i) => {
         const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
         this.chargingPosition.push(position)
@@ -167,13 +173,6 @@ export default {
         const recXY = [[position[0], position[1]], [position[2], position[3]]]
         L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(this.mapContainer).bindPopup(`Parking-zone ${i + 1}`)
         // this.mapLayers.addLayer(zone)
-      })
-
-      drivingzones.forEach((e, i) => {
-        const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
-        this.parkingPosition.push(position)
-        const recXY = [[position[0], position[1]], [position[2], position[3]]]
-        L.rectangle(recXY, { color: 'blue', weight: 1, fillOpacity: 0 }).addTo(this.mapContainer)
       })
     },
 
