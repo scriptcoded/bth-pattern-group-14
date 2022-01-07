@@ -20,6 +20,10 @@ module.exports.createDrivingZone = [
   auth('ADMIN'),
 
   checkSchema({
+    name: {
+      isString: true,
+      errorMessage: 'Name end must be a string'
+    },
     latitudeStart: {
       isDecimal: true,
       errorMessage: 'Latitude start must be a decimal'
@@ -48,6 +52,7 @@ module.exports.createDrivingZone = [
   useAsync(async (req, res) => {
     const drivingZone = await req.db.drivingZone.create({
       data: {
+        name: req.body.name,
         latitudeStart: req.body.latitudeStart,
         longitudeStart: req.body.longitudeStart,
         latitudeEnd: req.body.latitudeEnd,
@@ -103,6 +108,11 @@ module.exports.updateDrivingZone = [
   auth('ADMIN'),
 
   checkSchema({
+    name: {
+      isOptional: true,
+      isString: true,
+      errorMessage: 'Name end must be a string'
+    },
     latitudeStart: {
       optional: true,
       isDecimal: true,

@@ -6,8 +6,14 @@ const { useAsync } = require('../utils/express')
 
 module.exports.getAllBikes = [
   useAsync(async (req, res) => {
-    const zones = await req.db.bike.findMany()
-    res.json({ data: zones })
+    let bikes = await req.db.bike.findMany()
+
+    bikes = bikes.map(bike => {
+      delete bike.token
+      return bike
+    })
+
+    res.json({ data: bikes })
   })
 ]
 

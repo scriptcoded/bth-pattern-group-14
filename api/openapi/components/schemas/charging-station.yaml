@@ -1,0 +1,26 @@
+type: object
+properties:
+  id:
+    type: string
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time
+  latitudeStart:
+    type: string
+  longitudeStart:
+    type: string
+  latitudeEnd:
+    type: string
+  longitudeEnd:
+    type: string
+example:
+  id: cky4ih7rt0253o1zfofbs1jkm
+  createdAt: '2022-01-02T14:54:38.577Z'
+  updatedAt: '2022-01-02T14:54:38.577Z'
+  latitudeStart: '55.904014'
+  longitudeStart: '12.717577'
+  latitudeEnd: '55.90314'
+  longitudeEnd: '12.719198'
