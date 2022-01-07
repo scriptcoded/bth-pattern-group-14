@@ -1,5 +1,9 @@
 # bth-pattern-group-14
 
+## REST API documentation
+
+Documentation for the REST API is available here: https://github.nihlen.io/bth-pattern-group-14/.
+
 ## Working with Git
 
 The project uses Git Flow as its branching strategy. You can [read more about it here](https://guides.github.com/introduction/flow/).
