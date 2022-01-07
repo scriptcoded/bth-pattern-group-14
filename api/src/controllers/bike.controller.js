@@ -132,7 +132,7 @@ module.exports.getOneBike = [
     })
 
     if (!bike) {
-      throw createError(404, 'User not found')
+      throw createError(404, 'Bike not found')
     }
 
     delete bike.token
@@ -216,7 +216,7 @@ module.exports.startRide = [
       }
     })
 
-    res.send({ data: ride })
+    res.json({ data: ride })
   })
 ]
 
@@ -266,7 +266,7 @@ module.exports.endRide = [
 
     await paymentService.chargeUser(req.db, req.user.id, rideCost)
 
-    res.send({ data: ride })
+    res.json({ data: ride })
   })
 ]
 
@@ -327,6 +327,6 @@ module.exports.updateStatus = [
 
     delete bike.token
 
-    res.send({ data: updatedBike })
+    res.json({ data: updatedBike })
   })
 ]

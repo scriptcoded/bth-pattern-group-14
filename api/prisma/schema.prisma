@@ -58,6 +58,7 @@ model Payment {
   userId String
 }
 
+// TODO: This must not be plural!
 model Applications {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())

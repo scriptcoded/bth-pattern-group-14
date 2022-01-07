@@ -10,7 +10,7 @@ module.exports.getCurrentUser = [
   auth(),
 
   useAsync((req, res) => {
-    res.send({ data: req.user })
+    res.json({ data: req.user })
   })
 ]
 
@@ -56,6 +56,6 @@ module.exports.logout = [
    */
   useAsync((req, res) => {
     req.logout()
-    res.send({})
+    res.json({})
   })
 ]

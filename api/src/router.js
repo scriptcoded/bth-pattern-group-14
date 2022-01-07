@@ -7,7 +7,9 @@ const bikeController = require('./controllers/bike.controller')
 const chargingStationController = require('./controllers/charging-stations.controller')
 const parkingZoneController = require('./controllers/parking-zones.controller')
 const applicationController = require('./controllers/application.controller')
+const restController = require('./controllers/rest.controller')
 const { auth } = require('./middleware/auth')
+const { restAuth } = require('./middleware/restAuth')
 
 const router = new Router()
 
@@ -57,6 +59,13 @@ router.post('/applications', auth('ADMIN'), applicationController.createApplicat
 router.delete('/applications/:id', auth('ADMIN'), applicationController.deleteApplication)
 router.get('/applications/:id', auth('ADMIN'), applicationController.getOneApplication)
 router.patch('/applications/:id', auth('ADMIN'), applicationController.updateApplication)
+
+router.get('/rest/v1/bikes', restAuth(), restController.getAllBikes)
+router.get('/rest/v1/bikes/:id', restAuth(), restController.getOneBike)
+router.get('/rest/v1/charging-stations', restAuth(), restController.getAllChargingStations)
+router.get('/rest/v1/charging-stations/:id', restAuth(), restController.getOneChargingStation)
+router.get('/rest/v1/parking-zones', restAuth(), restController.getAllParkingZones)
+router.get('/rest/v1/parking-zones/:id', restAuth(), restController.getOneParkingZone)
 
 module.exports = {
   router
