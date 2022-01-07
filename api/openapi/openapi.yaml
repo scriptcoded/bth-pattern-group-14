@@ -1,0 +1,183 @@
+openapi: 3.1.0
+info:
+  title: ELSP REST API
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:4000/rest/v1'
+    description: Local dev environment
+  - url: 'https://elsp.example.com/rest/v1'
+    description: Example live environment
+tags:
+  - name: Bikes
+  - name: Charging stations
+  - name: Parking zones
+  - name: Driving zones
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      in: header
+      name: Bearer token
+      description: |
+        All requests must be authenticated using a bearer token. The token is
+        provided by the system administrator and is used to track API usage.
+security:
+  - bearerAuth: []
+paths:
+  /bikes:
+    get:
+      tags:
+        - Bikes
+      summary: List all bikes
+      responses:
+        '200':
+          description: An array of bikes
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ./components/schemas/bike.yaml
+  /bikes/{id}:
+    get:
+      tags:
+        - Bikes
+      summary: Get single bike
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the bike
+      responses:
+        '200':
+          description: A bike object
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    $ref: ./components/schemas/bike.yaml
+  /charging-stations:
+    get:
+      tags:
+        - Charging stations
+      summary: List all charging stations
+      responses:
+        '200':
+          description: An array of charging stations
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ./components/schemas/charging-station.yaml
+  /charging-stations/{id}:
+    get:
+      tags:
+        - Charging stations
+      summary: Get single charging station
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the charging station
+      responses:
+        '200':
+          description: A charging station object
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    $ref: ./components/schemas/charging-station.yaml
+  /parking-zones:
+    get:
+      tags:
+        - Parking zones
+      summary: List all parking zones
+      responses:
+        '200':
+          description: An array of parking zones
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ./components/schemas/parking-zone.yaml
+  /parking-zones/{id}:
+    get:
+      tags:
+        - Parking zones
+      summary: Get single parking zone
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the parking zone
+      responses:
+        '200':
+          description: A parking zone object
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    $ref: ./components/schemas/parking-zone.yaml
+  /driving-zones:
+    get:
+      tags:
+        - Driving zones
+      summary: List all driving zones
+      responses:
+        '200':
+          description: An array of driving zones
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ./components/schemas/driving-zone.yaml
+  /driving-zones/{id}:
+    get:
+      tags:
+        - Driving zones
+      summary: Get single driving zone
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the driving zone
+      responses:
+        '200':
+          description: A driving zone object
+          content:
+            application/json:
+              schema:
+                type: object  
+                properties:
+                  data:
+                    $ref: ./components/schemas/driving-zone.yaml

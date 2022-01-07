@@ -1,0 +1,29 @@
+type: object
+properties:
+  id:
+    type: string
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time
+  latitude:
+    type: string
+  longitude:
+    type: string
+  battery:
+    type: number
+  speed:
+    type: number
+  disabled:
+    type: boolean
+example:
+  id: YWGL5
+  createdAt: '2022-01-02T14:54:38.577Z'
+  updatedAt: '2022-01-02T14:54:38.577Z'
+  latitude: '55.904213'
+  longitude: '12.712783'
+  battery: 49
+  speed: 8
+  disabled: false

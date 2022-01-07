@@ -1,0 +1,29 @@
+type: object
+properties:
+  id:
+    type: string
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time
+  name:
+    type: string
+  latitudeStart:
+    type: string
+  longitudeStart:
+    type: string
+  latitudeEnd:
+    type: string
+  longitudeEnd:
+    type: string
+example:
+  id: cky4irunl0006alzfw7ood24w
+  createdAt: '2022-01-02T14:54:38.577Z'
+  updatedAt: '2022-01-02T14:54:38.577Z'
+  name: Ven
+  latitudeStart: '55.923404'
+  longitudeStart: '12.663078'
+  latitudeEnd: '55.889129'
+  longitudeEnd: '12.729762'
