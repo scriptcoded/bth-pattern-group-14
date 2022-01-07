@@ -1,7 +1,11 @@
 <template>
   <nav>
-    <router-link :to="{name: 'home'}">Home</router-link>
-    <router-link :to="{name: 'map'}">Map</router-link>
+    <router-link :to="{name: 'home'}">
+      Home
+    </router-link>
+    <router-link :to="{name: 'map'}">
+      Map
+    </router-link>
     <!-- EXTRA | Dropdown -->
     <!-- <div class="dropdown">
       <a class="dropbtn">Dropdown
