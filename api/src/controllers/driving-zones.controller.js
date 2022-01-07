@@ -8,15 +8,15 @@ const { auth } = require('../middleware/auth')
 const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
-module.exports.getAllParkingZones = [
+module.exports.getAllDrivingZones = [
 
   useAsync(async (req, res) => {
-    const zones = await req.db.parkingZone.findMany()
+    const zones = await req.db.drivingZone.findMany()
     res.json({ data: zones })
   })
 ]
 
-module.exports.createParkingZone = [
+module.exports.createDrivingZone = [
   auth('ADMIN'),
 
   checkSchema({
@@ -41,7 +41,7 @@ module.exports.createParkingZone = [
   validate(),
 
   useAsync(async (req, res) => {
-    const parkingZone = await req.db.parkingZone.create({
+    const drivingZone = await req.db.drivingZone.create({
       data: {
         latitudeStart: req.body.latitudeStart,
         longitudeStart: req.body.longitudeStart,
@@ -49,25 +49,25 @@ module.exports.createParkingZone = [
         longitudeEnd: req.body.longitudeEnd
       }
     })
-    res.json({ data: parkingZone })
+    res.json({ data: drivingZone })
   })
 ]
 
-module.exports.deleteParkingZone = [
+module.exports.deleteDrivingZone = [
   auth('ADMIN'),
 
   useAsync(async (req, res) => {
     try {
-      const parkingZone = await req.db.parkingZone.delete({
+      const drivingZone = await req.db.drivingZone.delete({
         where: {
           id: req.params.id
         }
       })
 
-      res.json({ data: parkingZone })
+      res.json({ data: drivingZone })
     } catch (e) {
       if (isPrismaError(e, 'P2025')) {
-        throw createError(404, 'Parking zone not found')
+        throw createError(404, 'Driving zone not found')
       }
 
       throw e
@@ -75,25 +75,25 @@ module.exports.deleteParkingZone = [
   })
 ]
 
-module.exports.getOneParkingZone = [
+module.exports.getOneDrivingZone = [
   auth('ADMIN'),
 
   useAsync(async (req, res) => {
-    const parkingzone = await req.db.parkingZone.findUnique({
+    const drivingzone = await req.db.drivingZone.findUnique({
       where: {
         id: req.params.id
       }
     })
 
-    if (!parkingzone) {
-      throw createError(404, 'Parking zone not found')
+    if (!drivingzone) {
+      throw createError(404, 'Driving zone not found')
     }
 
-    res.json({ data: parkingzone })
+    res.json({ data: drivingzone })
   })
 ]
 
-module.exports.updateParkingZone = [
+module.exports.updateDrivingZone = [
   auth('ADMIN'),
 
   checkSchema({
@@ -123,17 +123,17 @@ module.exports.updateParkingZone = [
 
   useAsync(async (req, res) => {
     try {
-      const parkingZone = await req.db.parkingZone.update({
+      const drivingZone = await req.db.drivingZone.update({
         where: {
           id: req.params.id
         },
         data: req.body
       })
 
-      res.json({ data: parkingZone })
+      res.json({ data: drivingZone })
     } catch (e) {
       if (isPrismaError(e, 'P2025')) {
-        throw createError(404, 'Parking zone not found')
+        throw createError(404, 'Driving zone not found')
       }
 
       throw e

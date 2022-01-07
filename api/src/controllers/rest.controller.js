@@ -74,3 +74,26 @@ module.exports.getOneParkingZone = [
     res.json({ data: parkingzone })
   })
 ]
+
+module.exports.getAllDrivingZones = [
+  useAsync(async (req, res) => {
+    const zones = await req.db.drivingZone.findMany()
+    res.json({ data: zones })
+  })
+]
+
+module.exports.getOneDrivingZone = [
+  useAsync(async (req, res) => {
+    const drivingzone = await req.db.drivingZone.findUnique({
+      where: {
+        id: req.params.id
+      }
+    })
+
+    if (!drivingzone) {
+      throw createError(404, 'Driving zone not found')
+    }
+
+    res.json({ data: drivingzone })
+  })
+]

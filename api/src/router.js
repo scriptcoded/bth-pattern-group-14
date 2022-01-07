@@ -6,6 +6,7 @@ const userController = require('./controllers/user.controller')
 const bikeController = require('./controllers/bike.controller')
 const chargingStationController = require('./controllers/charging-stations.controller')
 const parkingZoneController = require('./controllers/parking-zones.controller')
+const drivingZoneController = require('./controllers/driving-zones.controller')
 const applicationController = require('./controllers/application.controller')
 const restController = require('./controllers/rest.controller')
 const { auth } = require('./middleware/auth')
@@ -52,7 +53,13 @@ router.get('/parking-zones', parkingZoneController.getAllParkingZones)
 router.post('/parking-zones', parkingZoneController.createParkingZone)
 router.delete('/parking-zones/:id', parkingZoneController.deleteParkingZone)
 router.get('/parking-zones/:id', parkingZoneController.getOneParkingZone)
-router.patch('/parking-zones/:id', parkingZoneController.updateParkingStation)
+router.patch('/parking-zones/:id', parkingZoneController.updateParkingZone)
+
+router.get('/driving-zones', drivingZoneController.getAllDrivingZones)
+router.post('/driving-zones', drivingZoneController.createDrivingZone)
+router.delete('/driving-zones/:id', drivingZoneController.deleteDrivingZone)
+router.get('/driving-zones/:id', drivingZoneController.getOneDrivingZone)
+router.patch('/driving-zones/:id', drivingZoneController.updateDrivingZone)
 
 router.get('/applications', auth('ADMIN'), applicationController.getAllApplications)
 router.post('/applications', auth('ADMIN'), applicationController.createApplication)
@@ -66,6 +73,8 @@ router.get('/rest/v1/charging-stations', restAuth(), restController.getAllChargi
 router.get('/rest/v1/charging-stations/:id', restAuth(), restController.getOneChargingStation)
 router.get('/rest/v1/parking-zones', restAuth(), restController.getAllParkingZones)
 router.get('/rest/v1/parking-zones/:id', restAuth(), restController.getOneParkingZone)
+router.get('/rest/v1/driving-zones', restAuth(), restController.getAllDrivingZones)
+router.get('/rest/v1/driving-zones/:id', restAuth(), restController.getOneDrivingZone)
 
 module.exports = {
   router
