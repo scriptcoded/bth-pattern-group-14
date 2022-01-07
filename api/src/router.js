@@ -13,6 +13,7 @@ const router = new Router()
 router.get('/auth/me', authController.getCurrentUser)
 router.get('/auth/github', authController.githubAuth)
 router.get('/auth/github/callback', authController.githubCallback)
+router.post('/auth/logout', authController.logout)
 
 router.post('/payments/topup', auth(), paymentController.topup)
 router.post('/payments/invoice', auth('ADMIN'), paymentController.invoice)

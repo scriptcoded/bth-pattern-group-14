@@ -10,8 +10,14 @@ class Auth {
     window.location.href = `${config.apiURL}/auth/${provider}`
   }
 
-  logout () {
-    // TODO: Implement
+  async logout () {
+    try {
+      await this.api.post('/auth/logout')
+      window.location.reload()
+    } catch (e) {
+      // Silently dump error
+      console.info('Auth failed:', e)
+    }
   }
 
   async checkLogin () {

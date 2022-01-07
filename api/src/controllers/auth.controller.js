@@ -49,3 +49,13 @@ module.exports.githubCallback = [
     }
   })(req, res, next)
 ]
+
+module.exports.logout = [
+  /**
+   * @type {import("express").RequestHandler}
+   */
+  useAsync((req, res) => {
+    req.logout()
+    res.send({})
+  })
+]
