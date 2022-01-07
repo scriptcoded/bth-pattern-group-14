@@ -35,6 +35,11 @@ module.exports.createDrivingZone = [
     longitudeEnd: {
       isDecimal: true,
       errorMessage: 'Longitude end must be a decimal'
+    },
+    name: {
+      isString: true,
+      optional: true,
+      errorMessage: 'name must be a string'
     }
   }),
 
@@ -46,7 +51,8 @@ module.exports.createDrivingZone = [
         latitudeStart: req.body.latitudeStart,
         longitudeStart: req.body.longitudeStart,
         latitudeEnd: req.body.latitudeEnd,
-        longitudeEnd: req.body.longitudeEnd
+        longitudeEnd: req.body.longitudeEnd,
+        name: req.body.name
       }
     })
     res.json({ data: drivingZone })
@@ -116,6 +122,11 @@ module.exports.updateDrivingZone = [
       optional: true,
       isDecimal: true,
       errorMessage: 'Longitude end must be a decimal'
+    },
+    name: {
+      optional: true,
+      isString: true,
+      errorMessage: 'name must be a string'
     }
   }),
 
