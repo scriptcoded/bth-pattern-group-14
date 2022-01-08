@@ -52,6 +52,6 @@ jobs:
           file: ./${{ matrix.tier }}/Dockerfile
           push: true
           tags: |
-            scriptcoded/scriptcoded/bth-pattern-g14-${{ matrix.tier }}:${{ steps.sha.outputs.short }}
-            scriptcoded/scriptcoded/bth-pattern-g14-${{ matrix.tier }}:${{ needs.release-please.outputs.tag_name }}
-            scriptcoded/scriptcoded/bth-pattern-g14-${{ matrix.tier }}:latest
+            scriptcoded/bth-pattern-g14-${{ matrix.tier }}:${{ steps.sha.outputs.short }}
+            scriptcoded/bth-pattern-g14-${{ matrix.tier }}:${{ needs.release-please.outputs.tag_name }}
+            scriptcoded/bth-pattern-g14-${{ matrix.tier }}:latest
