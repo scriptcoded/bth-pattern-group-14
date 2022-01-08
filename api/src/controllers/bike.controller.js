@@ -14,7 +14,6 @@ const { generateToken } = require('../utils/crypto')
 const paymentService = require('../services/payment.service')
 
 module.exports.getAllBikes = [
-
   useAsync(async (req, res) => {
     const isAdmin = req.user.role === 'ADMIN'
 

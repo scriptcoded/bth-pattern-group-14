@@ -68,10 +68,10 @@ test('getOneParkingZone returns correct parking zone', async () => {
   expect(res.json).toHaveBeenCalledWith({ data: mockZones[0] })
 })
 
-test('updateParkingStation respects url param', async () => {
+test('updateParkingZone respects url param', async () => {
   req.params.id = 'a'
 
-  getControllerMethod(parkingZoneController.updateParkingStation)(req, res, next)
+  getControllerMethod(parkingZoneController.updateParkingZone)(req, res, next)
   await next.waitToHaveBeenCalled()
 
   expect(req.db.parkingZone.update).toHaveBeenCalledWith(expect.objectContaining({
@@ -81,13 +81,12 @@ test('updateParkingStation respects url param', async () => {
   }))
 })
 
-
-test('updateParkingStation modifies parking zone', async () => {
+test('updateParkingZone modifies parking zone', async () => {
   req.body = {
     name: 'steve'
   }
 
-  getControllerMethod(parkingZoneController.updateParkingStation)(req, res, next)
+  getControllerMethod(parkingZoneController.updateParkingZone)(req, res, next)
   await next.waitToHaveBeenCalled()
 
   expect(req.db.parkingZone.update).toHaveBeenCalledWith(expect.objectContaining({
@@ -97,13 +96,13 @@ test('updateParkingStation modifies parking zone', async () => {
   }))
 })
 
-test('updateParkingStation returns updated parking zone', async () => {
+test('updateParkingZone returns updated parking zone', async () => {
   req.body = {
     name: 'steve'
   }
   req.db.parkingZone.update.mockResolvedValue(req.body)
 
-  getControllerMethod(parkingZoneController.updateParkingStation)(req, res, next)
+  getControllerMethod(parkingZoneController.updateParkingZone)(req, res, next)
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: req.body })

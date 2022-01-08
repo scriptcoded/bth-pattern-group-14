@@ -3,20 +3,22 @@ const { createWaitableMock, getControllerMethod } = require('../utils/tests/test
 
 const bikeController = require('./bike.controller')
 
-const mockZones = [
+const mockBikes = [
   {
     id: 'a',
-    latitudeStart: 1,
-    longitudeStart: 2,
-    latitudeEnd: 3,
-    longitudeEnd: 4
+    latitude: 1,
+    longitude: 2,
+    battery: 59,
+    speed: 8,
+    disabled: false
   },
   {
     id: 'b',
-    latitudeStart: 5,
-    longitudeStart: 6,
-    latitudeEnd: 7,
-    longitudeEnd: 8
+    latitude: 3,
+    longitude: 4,
+    battery: 37,
+    speed: 0,
+    disabled: false
   }
 ]
 
@@ -26,7 +28,8 @@ let next
 beforeEach(() => {
   req = {
     db: prismaMock,
-    params: {}
+    params: {},
+    user: {}
   }
 
   res = {
@@ -37,12 +40,12 @@ beforeEach(() => {
 })
 
 test('getAllBikes returns correct bikes', async () => {
-  req.db.bike.findMany.mockResolvedValue(mockZones)
+  req.db.bike.findMany.mockResolvedValue(mockBikes)
 
   getControllerMethod(bikeController.getAllBikes)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(res.json).toHaveBeenCalledWith({ data: mockZones })
+  expect(res.json).toHaveBeenCalledWith({ data: mockBikes })
 })
 
 test('getOneBike respects url param', async () => {
@@ -59,13 +62,13 @@ test('getOneBike respects url param', async () => {
 })
 
 test('getOneBike returns correct bike', async () => {
-  req.db.bike.findUnique.mockResolvedValue(mockZones[0])
+  req.db.bike.findUnique.mockResolvedValue(mockBikes[0])
   req.params.id = 'a'
 
   getControllerMethod(bikeController.getOneBike)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(res.json).toHaveBeenCalledWith({ data: mockZones[0] })
+  expect(res.json).toHaveBeenCalledWith({ data: mockBikes[0] })
 })
 
 test('updateBike respects url param', async () => {
@@ -80,7 +83,6 @@ test('updateBike respects url param', async () => {
     }
   }))
 })
-
 
 test('updateBike modifies bike', async () => {
   req.body = {
@@ -123,10 +125,10 @@ test('deleteBike respects url param', async () => {
 })
 
 test('deleteBike returns deleted bike', async () => {
-  req.db.bike.delete.mockResolvedValue(mockZones[0])
+  req.db.bike.delete.mockResolvedValue(mockBikes[0])
 
   getControllerMethod(bikeController.deleteBike)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(res.json).toHaveBeenCalledWith({ data: mockZones[0] })
+  expect(res.json).toHaveBeenCalledWith({ data: mockBikes[0] })
 })
