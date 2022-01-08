@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.2](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.0.1...v1.0.2) (2022-01-08)
+
+
+### Bug Fixes
+
+* rename last things ([2839532](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/28395329091f15426e249f837fcffbc61ecae47c))
+
 ### [1.0.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.0.0...v1.0.1) (2022-01-08)
 
 
