@@ -1,0 +1,57 @@
+on:
+  push:
+    branches:
+      - main
+name: release-please
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v2
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: simple
+          package-name: elsp
+
+  build-docker:
+    needs: release-please
+    strategy:
+      matrix:
+        tier: [frontend, api]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        if: ${{ needs.release-please.outputs.release_created }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        if: ${{ needs.release-please.outputs.release_created }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        if: ${{ needs.release-please.outputs.release_created }}
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get short SHA
+        if: ${{ needs.release-please.outputs.release_created }}
+        id: sha
+        run: echo "::set-output name=short::$(git rev-parse --short HEAD)"
+
+      - name: Build ${{ matrix.tier }} and push
+        if: ${{ needs.release-please.outputs.release_created }}
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ matrix.tier }}
+          file: ./${{ matrix.tier }}/Dockerfile
+          push: true
+          tags: |
+            scriptcoded/scriptcoded/bth-pattern-g14-${{ matrix.tier }}:${{ steps.sha.outputs.short }}
+            scriptcoded/scriptcoded/bth-pattern-g14-${{ matrix.tier }}:${{ needs.release-please.outputs.tag_name }}
+            scriptcoded/scriptcoded/bth-pattern-g14-${{ matrix.tier }}:latest
