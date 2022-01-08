@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +18,9 @@ jobs:
           node-version: 14.x
       - name: Install dependencies
         run: npm ci
+        working-directory: ./api
+      - name: Generate Prisma Client
+        run: npx prisma generate
         working-directory: ./api
       - run: npm test
         working-directory: ./api
