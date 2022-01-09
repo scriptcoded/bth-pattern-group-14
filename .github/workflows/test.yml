@@ -22,7 +22,7 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
         working-directory: ./api
-      - run: npm test:coverage
+      - run: npm run test:coverage
         working-directory: ./api
       - uses: codecov/codecov-action@v2
         with:
