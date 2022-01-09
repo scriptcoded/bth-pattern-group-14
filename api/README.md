@@ -33,12 +33,20 @@
     npm run dev
     ```
 
-# Creating OAuth credentials for GitHub
+## Environment variables and Stripe
 
-You should follow [this
-guide](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app).
+The API requires a few environment variables to run properly. A dotenv-file is used to quickly set environment variables. Start by copying the example envfile:
 
-You will need the following information:
+```bash
+cp .env.example .env
+```
+
+When copied, use the command `openssl rand -hex 32` to generate a value for `APP_SECRET`. Then come back here and follow the remaining steps.
+
+### Creating OAuth credentials for GitHub
+
+To be able to autheticate against GitHub you'll need to generate a secret pair. You should follow [this
+guide](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app) using the information below:
 
 |Field|Value|
 |-|-|
@@ -47,11 +55,15 @@ You will need the following information:
 |Application description|Anything you like, can be left empty|
 |Authorization callback URL|`http://localhost:4000/auth/github/callback`|
 
-# Setting up Stripe
+When done, fill out `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
 
-## Stripe credentials
+### Setting up Stripe
 
-First you must configure your Stripe credentials. This lets the applications
+Stripe is not necessary to run the application, but it is to be able to test the billing functionality. It requires a few extra environment variables and optionally a webhook client.
+
+#### Stripe credentials
+
+First you must configure your Stripe credentials. This lets the application
 create payments and invoices.
 
 1. You need a account with Stripe. If you don't already, create one here: https://dashboard.stripe.com/register
@@ -68,13 +80,12 @@ create payments and invoices.
     STRIPE_PUBLISHABLE_KEY="pk_test_yyy"
     ```
 
-## Stripe webhooks
+### Stripe webhooks
 
-Now you need to enable Stripe to call your application when a payment is
-completed using webhooks.
+Webhooks allow the application to know when a payment is completed. It can be left out, in which case the user has to click the "Pay now" button again after a payment is completed.
 
 1. Install the Stripe CLI utillity. https://stripe.com/docs/stripe-cli#install
-2. Before string the API/backend, run the following command. This will allow
+2. Before starting the API/backend, run the following command. This will allow
    Stripe to call your application:
     ```bash
     stripe listen --forward-to localhost:4000/payments/stripe/webhook
@@ -84,8 +95,7 @@ completed using webhooks.
     ```env
     STRIPE_WEBHOOK_SECRET="whsec_zzz"
     ```
-4. Now you can start the API/backend. The webhook secret will most likely be the
-   same between runs.
+4. Now you can start the API/backend. The webhook secret is usually the same between runs.
 
 # UML / Database structure
 
