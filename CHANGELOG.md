@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.3](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.0.2...v1.0.3) (2022-01-09)
+
+
+### Bug Fixes
+
+* charging zones as parking zones ([119e091](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/119e091c000c71d52b9cd928606ec69e262fc301))
+
 ### [1.0.2](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.0.1...v1.0.2) (2022-01-08)
 
 
