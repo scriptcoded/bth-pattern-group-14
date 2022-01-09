@@ -4,8 +4,6 @@ const createError = require('http-errors')
 const { checkSchema } = require('express-validator')
 
 const { useAsync } = require('../utils/express')
-const { auth } = require('../middleware/auth')
-const { bikeAuth } = require('../middleware/bikeAuth')
 const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 const { generateBikeID } = require('../utils/bike')
@@ -43,8 +41,6 @@ module.exports.getAllBikes = [
 ]
 
 module.exports.createBike = [
-  auth('ADMIN'),
-
   checkSchema({
     latitude: {
       isDecimal: true,
@@ -97,8 +93,6 @@ module.exports.createBike = [
 ]
 
 module.exports.deleteBike = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     try {
       const bike = await req.db.bike.delete({
@@ -121,8 +115,6 @@ module.exports.deleteBike = [
 ]
 
 module.exports.getOneBike = [
-  auth(),
-
   useAsync(async (req, res) => {
     const bike = await req.db.bike.findUnique({
       where: {
@@ -141,8 +133,6 @@ module.exports.getOneBike = [
 ]
 
 module.exports.updateBike = [
-  auth('ADMIN'),
-
   checkSchema({
     disabled: {
       optional: true,
@@ -176,8 +166,6 @@ module.exports.updateBike = [
 ]
 
 module.exports.startRide = [
-  auth(),
-
   useAsync(async (req, res) => {
     // Make sure that there is not already a ride in progress
     const activeRide = await req.db.ride.findFirst({
@@ -222,8 +210,6 @@ module.exports.startRide = [
 ]
 
 module.exports.endRide = [
-  auth(),
-
   useAsync(async (req, res) => {
     // Make sure that there is not already a ride in progress
     const activeRide = await req.db.ride.findFirst({
@@ -274,8 +260,6 @@ module.exports.endRide = [
 ]
 
 module.exports.updateStatus = [
-  bikeAuth(),
-
   checkSchema({
     latitude: {
       isDecimal: true,

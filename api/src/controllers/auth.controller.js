@@ -3,12 +3,9 @@
 const passport = require('passport')
 
 const { config } = require('../config')
-const { auth } = require('../middleware/auth')
 const { useAsync } = require('../utils/express')
 
 module.exports.getCurrentUser = [
-  auth(),
-
   useAsync((req, res) => {
     res.json({ data: req.user })
   })

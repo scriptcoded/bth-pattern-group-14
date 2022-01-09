@@ -9,7 +9,6 @@ const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
 module.exports.getAllDrivingZones = [
-
   useAsync(async (req, res) => {
     const zones = await req.db.drivingZone.findMany()
     res.json({ data: zones })
@@ -17,8 +16,6 @@ module.exports.getAllDrivingZones = [
 ]
 
 module.exports.createDrivingZone = [
-  auth('ADMIN'),
-
   checkSchema({
     name: {
       isString: true,
@@ -39,11 +36,6 @@ module.exports.createDrivingZone = [
     longitudeEnd: {
       isDecimal: true,
       errorMessage: 'Longitude end must be a decimal'
-    },
-    name: {
-      isString: true,
-      optional: true,
-      errorMessage: 'name must be a string'
     }
   }),
 
@@ -56,8 +48,7 @@ module.exports.createDrivingZone = [
         latitudeStart: req.body.latitudeStart,
         longitudeStart: req.body.longitudeStart,
         latitudeEnd: req.body.latitudeEnd,
-        longitudeEnd: req.body.longitudeEnd,
-        name: req.body.name
+        longitudeEnd: req.body.longitudeEnd
       }
     })
     res.json({ data: drivingZone })
@@ -65,8 +56,6 @@ module.exports.createDrivingZone = [
 ]
 
 module.exports.deleteDrivingZone = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     try {
       const drivingZone = await req.db.drivingZone.delete({
@@ -87,8 +76,6 @@ module.exports.deleteDrivingZone = [
 ]
 
 module.exports.getOneDrivingZone = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     const drivingzone = await req.db.drivingZone.findUnique({
       where: {
@@ -105,8 +92,6 @@ module.exports.getOneDrivingZone = [
 ]
 
 module.exports.updateDrivingZone = [
-  auth('ADMIN'),
-
   checkSchema({
     name: {
       isOptional: true,
@@ -132,11 +117,6 @@ module.exports.updateDrivingZone = [
       optional: true,
       isDecimal: true,
       errorMessage: 'Longitude end must be a decimal'
-    },
-    name: {
-      optional: true,
-      isString: true,
-      errorMessage: 'name must be a string'
     }
   }),
 

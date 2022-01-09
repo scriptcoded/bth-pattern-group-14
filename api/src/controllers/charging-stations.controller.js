@@ -9,7 +9,6 @@ const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
 module.exports.getAllStations = [
-
   useAsync(async (req, res) => {
     const stations = await req.db.chargingStation.findMany()
     res.json({ data: stations })
@@ -17,8 +16,6 @@ module.exports.getAllStations = [
 ]
 
 module.exports.createStation = [
-  auth('ADMIN'),
-
   checkSchema({
     latitudeStart: {
       isDecimal: true,
@@ -54,8 +51,6 @@ module.exports.createStation = [
 ]
 
 module.exports.deleteStation = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     try {
       const station = await req.db.chargingStation.delete({
@@ -76,8 +71,6 @@ module.exports.deleteStation = [
 ]
 
 module.exports.getOneStation = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     const station = await req.db.chargingStation.findUnique({
       where: {
@@ -94,8 +87,6 @@ module.exports.getOneStation = [
 ]
 
 module.exports.updateStation = [
-  auth('ADMIN'),
-
   checkSchema({
     latitudeStart: {
       optional: true,

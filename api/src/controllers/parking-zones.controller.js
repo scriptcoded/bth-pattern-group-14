@@ -9,7 +9,6 @@ const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
 module.exports.getAllParkingZones = [
-
   useAsync(async (req, res) => {
     const zones = await req.db.parkingZone.findMany()
     res.json({ data: zones })
@@ -17,8 +16,6 @@ module.exports.getAllParkingZones = [
 ]
 
 module.exports.createParkingZone = [
-  auth('ADMIN'),
-
   checkSchema({
     latitudeStart: {
       isDecimal: true,
@@ -54,8 +51,6 @@ module.exports.createParkingZone = [
 ]
 
 module.exports.deleteParkingZone = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     try {
       const parkingZone = await req.db.parkingZone.delete({
@@ -76,8 +71,6 @@ module.exports.deleteParkingZone = [
 ]
 
 module.exports.getOneParkingZone = [
-  auth('ADMIN'),
-
   useAsync(async (req, res) => {
     const parkingzone = await req.db.parkingZone.findUnique({
       where: {
@@ -94,8 +87,6 @@ module.exports.getOneParkingZone = [
 ]
 
 module.exports.updateParkingZone = [
-  auth('ADMIN'),
-
   checkSchema({
     latitudeStart: {
       optional: true,
