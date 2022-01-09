@@ -9,7 +9,7 @@ const { bikeAuth } = require('../middleware/bikeAuth')
 const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 const { generateBikeID } = require('../utils/bike')
-const { findParkingZoneAtPoint } = require('../utils/zone')
+const { findParkingZoneAtPoint, findChargingStationAtPoint } = require('../utils/zone')
 const { generateToken } = require('../utils/crypto')
 const paymentService = require('../services/payment.service')
 
@@ -202,6 +202,8 @@ module.exports.startRide = [
     }
 
     const parkingZone = await findParkingZoneAtPoint(req.db, bike.latitude, bike.longitude)
+    const chargingZone = await findChargingStationAtPoint(req.db, bike.latitude, bike.longitude)
+    const validZone = !!(parkingZone || chargingZone)
 
     // Create a new ride
     const ride = await req.db.ride.create({
@@ -209,7 +211,7 @@ module.exports.startRide = [
         bike: { connect: { id: bike.id } },
         user: { connect: { id: req.user.id } },
         startTime: new Date(),
-        fromParkingZone: !!parkingZone,
+        fromParkingZone: validZone,
         startLatitude: bike.latitude,
         startLongitude: bike.longitude
       }
@@ -242,10 +244,12 @@ module.exports.endRide = [
     const bike = activeRide.bike
     const endTime = new Date()
     const parkingZone = await findParkingZoneAtPoint(req.db, bike.latitude, bike.longitude)
+    const chargingZone = await findChargingStationAtPoint(req.db, bike.latitude, bike.longitude)
+    const validZone = !!(parkingZone || chargingZone)
 
     const rideMinutes = Math.ceil((endTime - activeRide.startTime) / 1000 / 60)
-    const correctedParking = !activeRide.fromParkingZone && !!parkingZone
-    const invalidParking = !parkingZone
+    const correctedParking = !activeRide.fromParkingZone && validZone
+    const invalidParking = !validZone
 
     const rideCost = paymentService.calculateRideCost(rideMinutes, correctedParking, invalidParking)
 
