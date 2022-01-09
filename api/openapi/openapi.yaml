@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: ELSP REST API
-  version: 1.0.0
+  version: v1
 servers:
   - url: 'http://localhost:4000/rest/v1'
     description: Local dev environment
