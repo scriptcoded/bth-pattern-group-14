@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/scriptcoded/bth-pattern-group-14/actions/workflows/test.yml/badge.svg)](https://github.com/scriptcoded/bth-pattern-group-14/actions/workflows/test.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/scriptcoded/bth-pattern-group-14/badges/quality-score.png?b=develop&s=7937d46ee3357a843e8c67a5d123c4a35c83deef)](https://scrutinizer-ci.com/g/scriptcoded/bth-pattern-group-14/?branch=develop)
+[![codecov](https://codecov.io/gh/scriptcoded/bth-pattern-group-14/branch/main/graph/badge.svg?token=17V09SGATP)](https://codecov.io/gh/scriptcoded/bth-pattern-group-14)
 
 ## REST API documentation
 
