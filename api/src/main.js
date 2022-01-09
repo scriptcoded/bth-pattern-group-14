@@ -12,6 +12,7 @@ const { config, checkConfig } = require('./config')
 const { prisma } = require('./utils/prisma')
 const passportSerializers = require('./passport/serializers')
 const { githubStrategy } = require('./passport/github.stragegy')
+const { startSchedules } = require('./schedule')
 
 checkConfig()
 
@@ -73,3 +74,5 @@ app.use(errorHandler)
 app.listen(config.port, () => {
   console.log(`🚀 Server is running on port ${config.port}`)
 })
+
+startSchedules()

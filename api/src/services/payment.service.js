@@ -78,6 +78,28 @@ async function createInvoiceFromBalance (db, userId) {
 }
 
 /**
+ * Send invoices to all users based on their balances.
+ * @param {import("@prisma/client").PrismaClient} db Prisma instance
+ * @param {string} userId
+ */
+async function sendInvoices (db, userId) {
+  // Users that owe us money
+  const users = await db.user.findMany({
+    where: {
+      balance: {
+        lt: 0
+      }
+    }
+  })
+
+  for (const user of users) {
+    await createInvoiceFromBalance(db, user.id)
+  }
+
+  console.log(`Sent ${users.length} invoices`)
+}
+
+/**
  * Ensure that a user is registered as a customer in Stripe. If not, create a
  * new customer.
  * @param {import("@prisma/client").PrismaClient} db Prisma instance
@@ -325,6 +347,7 @@ async function topUpUser (db, userId, amount) {
 module.exports = {
   createInvoice,
   createInvoiceFromBalance,
+  sendInvoices,
   ensureCustomer,
   createCheckoutSession,
   getInvoiceStatus,
