@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.1.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.1.0...v1.1.1) (2022-01-11)
+
+
+### Bug Fixes
+
+* accidental push all ([7afa18c](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/7afa18c32d071f4a7cb41cfb30206af2d1fb8d57))
+
 ## [1.1.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.0.2...v1.1.0) (2022-01-09)
 
 
