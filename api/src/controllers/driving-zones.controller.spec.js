@@ -108,6 +108,63 @@ test('updateDrivingZone returns updated driving zone', async () => {
   expect(res.json).toHaveBeenCalledWith({ data: req.body })
 })
 
+// test('updateDrivingZone without id', async () => {
+//   req.body = {
+//     id: null
+//   }
+//   req.db.drivingZone.update.mockResolvedValue(req.body)
+
+//   req.params.id = null
+//   getControllerMethod(drivingZoneController.updateDrivingZone)(req, res, next)
+//   await next.waitToHaveBeenCalled()
+
+//   // console.log(expect(res.json))
+
+//   expect(res.json).toHaveBeenCalledWith({ data: req.body })
+// })
+
+// test('bad error', async () => {
+//   req.body = {
+//     name: 'steve'
+//   }
+//   req.db.drivingZone.update.mockResolvedValue(req.body)
+
+//   getControllerMethod(drivingZoneController.updateDrivingZone)(req, res, next)
+//   await next.waitToHaveBeenCalled()
+
+//   // expect(res.json).toHaveBeenCalledWith({ data: req.body })
+//   const t = () => {
+//     throw new createError()
+//   }
+//   expect(t).toThrow(createError)
+// })
+
+test('createDrivingZone', async () => {
+  req.body = {
+    name: 'c',
+    latitudeStart: 1,
+    longitudeStart: 2,
+    latitudeEnd: 3,
+    longitudeEnd: 4
+  }
+  req.db.drivingZone.create.mockResolvedValue(req.body)
+
+  getControllerMethod(drivingZoneController.createDrivingZone)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: req.body })
+})
+
+// test('createDrivingZone with no value', async () => {
+//   req.body = {}
+//   req.db.drivingZone.create.mockResolvedValue(req.body)
+
+//   getControllerMethod(drivingZoneController.createDrivingZone)(req, res, next)
+//   await next.waitToHaveBeenCalled()
+
+//   expect(res.json).toHaveBeenCalledWith({ data: req.body })
+// })
+
 test('deleteDrivingZone respects url param', async () => {
   req.params.id = 'a'
 

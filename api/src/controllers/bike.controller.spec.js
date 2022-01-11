@@ -3,9 +3,15 @@ const { createWaitableMock, getControllerMethod } = require('../utils/tests/test
 
 const bikeController = require('./bike.controller')
 
+const mockUsers = [
+  {
+    id: 'user1'
+  }
+]
+
 const mockBikes = [
   {
-    id: 'a',
+    id: 'bike1',
     latitude: 1,
     longitude: 2,
     battery: 59,
@@ -13,12 +19,38 @@ const mockBikes = [
     disabled: false
   },
   {
-    id: 'b',
+    id: 'bike2',
     latitude: 3,
     longitude: 4,
     battery: 37,
     speed: 0,
     disabled: false
+  }
+]
+
+const mockRide = [
+  {
+    bike: {
+      connect: {
+        id: mockUsers[0].id
+      }
+    },
+    user: {
+      connect: {
+        id: mockUsers[0].id
+      }
+    },
+    startTime: new Date(),
+    fromParkingZone: true,
+    startLatitude: mockBikes[0].latitude,
+    startLongitude: mockBikes[0].longitude
+  },
+  {
+    endTime: new Date(),
+    toParkingZone: true,
+    endLatitude: mockBikes[0].latitude,
+    endLongitude: mockBikes[0].longitude,
+    chargedAmount: 20
   }
 ]
 
@@ -69,6 +101,24 @@ test('getOneBike returns correct bike', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockBikes[0] })
+})
+
+test('createBike creates a bike', async () => {
+  req.body = {
+    id: 'c',
+    latitude: 3,
+    longitude: 4,
+    battery: 37,
+    speed: 0,
+    disabled: false
+  }
+
+  req.db.bike.create.mockResolvedValue(req.body)
+
+  getControllerMethod(bikeController.createBike)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: req.body })
 })
 
 test('updateBike respects url param', async () => {
@@ -132,3 +182,65 @@ test('deleteBike returns deleted bike', async () => {
 
   expect(res.json).toHaveBeenCalledWith({ data: mockBikes[0] })
 })
+
+test('startRide returns data from ride', async () => {
+  req.db.ride.findFirst.mockResolvedValue(false)
+  req.db.bike.findUnique.mockResolvedValue(true)
+  req.db.ride.create.mockResolvedValue(mockRide[0])
+  // findParkingZoneAtPoint.mockResolvedValue(true)
+
+  getControllerMethod(bikeController.startRide)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: mockRide[0] })
+})
+
+test('startRide active ride already exists', async () => {
+  req.db.ride.findFirst.mockResolvedValue(true)
+
+  getControllerMethod(bikeController.startRide)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  const t = () => {
+    throw new Error()
+  }
+
+  expect(t).toThrow()
+})
+
+test('startRide bike not found', async () => {
+  req.db.ride.findFirst.mockResolvedValue(false)
+  req.db.bike.findUnique.mockResolvedValue(false)
+
+  getControllerMethod(bikeController.startRide)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  const t = () => {
+    throw new Error()
+  }
+
+  expect(t).toThrow()
+})
+
+// test('updateStatus bike that is rented', async () => {
+//   req.body.latitude = 5
+//   req.body.longitude = 6
+//   req.body.battery = 40
+//   req.body.speed = 50
+
+//   req.db.bike.findUnique.mockResolvedValue(mockBikes[0])
+//   // req.db.bike.update.mockResolvedValue(newBike)
+//   // req.db.bike.findUnique.mockResolvedValue(false)
+
+//   getControllerMethod(bikeController.updateStatus)(req, res, next)
+//   await next.waitToHaveBeenCalled()
+
+//   expect(res.json).toHaveBeenCalledWith({
+//     data: {
+//       latitude: req.body.latitude,
+//       longitude: req.body.longitude,
+//       battery: req.body.battery,
+//       speed: req.body.speed
+//     }
+//   })
+// })
