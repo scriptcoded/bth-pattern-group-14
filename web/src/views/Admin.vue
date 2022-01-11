@@ -27,6 +27,18 @@
     >
       Driving Zone
     </router-link>
+    <router-link
+      v-if="$auth.hasRole('admin')"
+      :to="{ name: 'application' }"
+    >
+      Application
+    </router-link>
+    <router-link
+      v-if="$auth.hasRole('admin')"
+      :to="{ name: 'users' }"
+    >
+      Users
+    </router-link>
   </div>
 </template>
 

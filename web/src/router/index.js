@@ -10,6 +10,8 @@ import Bike from '../views/Bike.vue'
 import Parking from '../views/Parking.vue'
 import Charging from '../views/ChargingStation.vue'
 import Driving from '../views/DrivingZone.vue'
+import Application from '../views/ApplicationView.vue'
+import Users from '../views/UsersView.vue'
 import { authGuard } from '../guards/auth'
 
 Vue.use(VueRouter)
@@ -62,6 +64,22 @@ export default (auth) => {
       path: '/driving',
       name: 'driving',
       component: Driving,
+      meta: {
+        auth: 'admin'
+      }
+    },
+    {
+      path: '/application',
+      name: 'application',
+      component: Application,
+      meta: {
+        auth: 'admin'
+      }
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: Users,
       meta: {
         auth: 'admin'
       }
