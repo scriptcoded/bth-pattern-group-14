@@ -116,10 +116,15 @@ func main() {
 						return fmt.Errorf("count must be at least 1")
 					}
 
+					ids := make([]string, count)
+					for i := 0; i < count; i++ {
+						ids[i] = fmt.Sprintf("S%04d", i)
+					}
+
 					stopReport := cmd.Simulate(
 						verbose,
 						endpoint,
-						[]string{"YWGL5"},
+						ids,
 						1*time.Second,
 					)
 

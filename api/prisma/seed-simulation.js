@@ -7,27 +7,27 @@ const zones = [
     bikeCount: 200,
     fenceStart: [55.607457, 12.975199],
     fenceEnd: [55.558648, 13.055093]
-  },
-  {
-    bikeCount: 200,
-    fenceStart: [55.730383, 13.156146],
-    fenceEnd: [55.692376, 13.234241]
-  },
-  {
-    bikeCount: 200,
-    fenceStart: [56.223860, 15.612477],
-    fenceEnd: [56.194692, 15.661401]
-  },
-  {
-    bikeCount: 400,
-    fenceStart: [59.490462, 17.818657],
-    fenceEnd: [59.218775, 18.228153]
-  },
-  {
-    bikeCount: 50,
-    fenceStart: [55.916021, 12.684624],
-    fenceEnd: [55.902818, 12.711622]
   }
+  // {
+  //   bikeCount: 200,
+  //   fenceStart: [55.730383, 13.156146],
+  //   fenceEnd: [55.692376, 13.234241]
+  // },
+  // {
+  //   bikeCount: 200,
+  //   fenceStart: [56.223860, 15.612477],
+  //   fenceEnd: [56.194692, 15.661401]
+  // },
+  // {
+  //   bikeCount: 400,
+  //   fenceStart: [59.490462, 17.818657],
+  //   fenceEnd: [59.218775, 18.228153]
+  // },
+  // {
+  //   bikeCount: 50,
+  //   fenceStart: [55.916021, 12.684624],
+  //   fenceEnd: [55.902818, 12.711622]
+  // }
 ]
 
 function randomFloat (min, max) {

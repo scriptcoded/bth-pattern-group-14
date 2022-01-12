@@ -90,7 +90,6 @@ func (b *Bike) SetToken(token string) {
 // SetPosition sets the bike's latitude and longitude to the given values.
 // Should be used by the harware interface.
 func (b *Bike) SetPosition(point Point) {
-	log.Println("Setting bike position", point)
 	b.Latitude = point.Latitude
 	b.Longitude = point.Longitude
 }
@@ -167,7 +166,7 @@ func (b *Bike) Report() error {
 func (b *Bike) SimulatePath(points []Point) {
 	// Random speed between 10 and 20 km/h
 	speed := randFloat(10, 20)
-	log.Printf("Speed: %f\n", speed)
+	// log.Printf("Speed: %f\n", speed)
 
 	// b.SetPosition(Point{
 	// 	Latitude:  "55.582000",
@@ -192,22 +191,22 @@ func (b *Bike) SimulatePath(points []Point) {
 
 		lastPointLat, err := strconv.ParseFloat(lastPoint.Latitude, 64)
 		if err != nil {
-			log.Printf("Error parsing last point latitude: %s", err)
+			log.Printf("Error parsing last point latitude: %v", err)
 			continue
 		}
 		lastPointLon, err := strconv.ParseFloat(lastPoint.Longitude, 64)
 		if err != nil {
-			log.Printf("Error parsing last point longitude: %s", err)
+			log.Printf("Error parsing last point longitude: %v", err)
 			continue
 		}
 		currPointLat, err := strconv.ParseFloat(point.Latitude, 64)
 		if err != nil {
-			log.Printf("Error parsing current point latitude: %s", err)
+			log.Printf("Error parsing current point latitude: %v", err)
 			continue
 		}
 		currPointLon, err := strconv.ParseFloat(point.Longitude, 64)
 		if err != nil {
-			log.Printf("Error parsing current point longitude: %s", err)
+			log.Printf("Error parsing current point longitude: %v", err)
 			continue
 		}
 
