@@ -18,6 +18,8 @@
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import markerBlue from '@/assets/blue.png'
+import markerYellow from '@/assets/yellow3.png'
+import markerGreen from '@/assets/green.png'
 import markerGray from '@/assets/gray.png'
 import markerPurple from '@/assets/purple.png'
 import markerRed from '@/assets/red.png'
@@ -53,6 +55,12 @@ export default {
         iconAnchor: [12, 12],
         popupAnchor: [0, 0]
       }),
+      locationMarkerGreen: L.icon({
+        iconUrl: markerGreen,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, 0]
+      }),
       locationMarkerPurple: L.icon({
         iconUrl: markerPurple,
         iconSize: [24, 24],
@@ -73,6 +81,12 @@ export default {
       }),
       locationMarkerGray: L.icon({
         iconUrl: markerGray,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, 0]
+      }),
+      locationMarkerYellow: L.icon({
+        iconUrl: markerYellow,
         iconSize: [24, 24],
         iconAnchor: [12, 12],
         popupAnchor: [0, 0]
@@ -125,7 +139,7 @@ export default {
        * P[3] = longitudeEnd
        */
       if (disabled) {
-        return [this.locationMarkerGray, false]
+        return [this.locationMarkerRed, false]
       }
 
       const marker = [this.locationMarkerBlue, false]
@@ -191,6 +205,8 @@ export default {
           attribution: 'Map data (c) <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
           maxZoom: 18,
           id: 'mapbox/streets-v11',
+          zoomOffset: -1,
+          tileSize: 512,
           accessToken: 'pk.eyJ1IjoiYXJlb25sIiwiYSI6ImNrdzFibmFndTE3N2gyeG5vcGlieXZsMWMifQ.S0ysiWIrgu-AbLrC_OAmKA'
         }
       ).addTo(this.mapContainer)
@@ -241,7 +257,7 @@ export default {
     async rentedBikeUpdate (id) {
       const rentedBike = await this.$api.get(`/bikes/${id}`)
       const position = [rentedBike.latitude, rentedBike.longitude]
-      const mark = L.marker(position, { icon: this.locationMarkerRed })
+      const mark = L.marker(position, { icon: this.locationMarkerGreen })
 
       mark.bindPopup(`
           <h1>Bike id:${rentedBike.id}</h1>
@@ -269,50 +285,59 @@ export default {
        * Remove active popup from changing on map
        */
       // console.log('Leta: ', arr, this.activePopup)
-      const bike = arr.map(b => b.id === this.activePopup ? null : b).filter(n => n)
+      const bikes = arr.map(b => b.id === this.activePopup ? null : b).filter(n => n)
       /**
        * Spew out markers randomly :D
        */
-      bike.forEach(async (e, i) => {
+      bikes.forEach(async (bike, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
-        // console.log(e)
+        // console.log(bike)
         // Lat = Y, Long = X
-        // console.log('Bike: ', e)
-        const position = [e.latitude, e.longitude]
+        // console.log('Bike: ', bike)
+        // if (i % 2 == 0) {
+        //   continue
+        // }
+        const position = [bike.latitude, bike.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
         // console.log('%c Color' + i, 'background: #222; color: #bada55')
-        const icon = this.checkZone(position, e.disabled)
+        const icon = this.checkZone(position, bike.disabled)
         const charge = icon[1]
 
         mark.options.icon = icon[0]
 
+        if (bike.battery < 40 && icon[0] === this.locationMarkerBlue) {
+          console.log('hej < 40')
+          mark.options.icon = this.locationMarkerYellow
+        }
         // mark.on('click', this.onMarkClick)
         // console.log(charge)
+
         charge
           ? mark.bindPopup(`
-          <h1>Bike id:${e.id}</h1>
+          <h1>Bike id:${bike.id}</h1>
           <h2 class="dab">Get me when im full!</h2>
           <p>Im charging!</p>
-        `)
-          : !e.disabled
+        `) // Charging
+          : !bike.disabled
               ? mark.bindPopup(`
-                <h1>Bike id:${e.id}</h1>
+                <h1>Bike id:${bike.id}</h1>
                 <h2 class="dab">Hello there</h2>
                 <p>*Available for ride*</p>
-              `)
+              `) // Not charging and not disabled
               : mark.bindPopup(`
-                  <h1>Bike id:${e.id}</h1>
-                  <h2>Not active</h2>
+                  <h1>Bike id:${bike.id}</h1>
+                  <h2>Disabled</h2>
                   <p>Please help me :<</p>
-                `)
+                `) // Not charging and disabled
+
         mark.addEventListener('click', () => {
           console.log('Hej', mark.getPopup())
           this.selectedBike = {
-            battery: e.battery,
-            bikeId: e.id,
-            latitude: e.latitude,
-            longitude: e.longitude
+            battery: bike.battery,
+            bikeId: bike.id,
+            latitude: bike.latitude,
+            longitude: bike.longitude
           }
           // this.activePopup = e.id
           // const markerId = mark._leaflet_id

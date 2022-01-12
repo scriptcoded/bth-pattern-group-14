@@ -19,6 +19,9 @@ module.exports.getAllBikes = [
       ? undefined
       : {
           disabled: false,
+          battery: {
+            gt: 10
+          },
           rides: {
             every: {
               endTime: {
@@ -238,7 +241,6 @@ module.exports.endRide = [
     const invalidParking = !validZone
 
     const rideCost = paymentService.calculateRideCost(rideMinutes, correctedParking, invalidParking)
-
     // Update active ride
     const ride = await req.db.ride.update({
       where: {
@@ -254,6 +256,7 @@ module.exports.endRide = [
     })
 
     await paymentService.chargeUser(req.db, req.user.id, rideCost)
+    console.log('IM HERE', req.user.id, rideCost)
 
     res.json({ data: ride })
   })
