@@ -55,9 +55,37 @@ func Simulate(
 		{
 			BikeCount: 200,
 			LatStart:  55.607457,
-			LatEnd:    55.558648,
-			LonStart:  12.975199,
+			LatEnd:    12.975199,
+			LonStart:  55.558648,
 			LonEnd:    13.055093,
+		},
+		{
+			BikeCount: 200,
+			LatStart:  55.730383,
+			LatEnd:    13.156146,
+			LonStart:  55.692376,
+			LonEnd:    13.234241,
+		},
+		{
+			BikeCount: 200,
+			LatStart:  56.223860,
+			LatEnd:    15.612477,
+			LonStart:  56.194692,
+			LonEnd:    15.661401,
+		},
+		{
+			BikeCount: 400,
+			LatStart:  59.490462,
+			LatEnd:    17.818657,
+			LonStart:  59.218775,
+			LonEnd:    18.228153,
+		},
+		{
+			BikeCount: 50,
+			LatStart:  55.916021,
+			LatEnd:    12.684624,
+			LonStart:  55.902818,
+			LonEnd:    12.711622,
 		},
 	}
 
