@@ -4,7 +4,7 @@ const createError = require('http-errors')
 const { checkSchema } = require('express-validator')
 
 const { useAsync } = require('../utils/express')
-const { auth } = require('../middleware/auth')
+// const { auth } = require('../middleware/auth')
 const { validate } = require('../middleware/validate')
 const { isPrismaError } = require('../utils/prisma')
 
@@ -94,7 +94,7 @@ module.exports.getOneDrivingZone = [
 module.exports.updateDrivingZone = [
   checkSchema({
     name: {
-      isOptional: true,
+      optional: true,
       isString: true,
       errorMessage: 'Name end must be a string'
     },
