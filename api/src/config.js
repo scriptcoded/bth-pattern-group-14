@@ -6,6 +6,7 @@
  */
 const config = {
   isDev: process.env.NODE_ENV === 'development',
+  isSimulation: process.env.SIMULATION_MODE === 'true',
 
   port: process.env.PORT || 4000,
 

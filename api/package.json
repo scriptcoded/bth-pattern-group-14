@@ -9,7 +9,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "generate-uml": "prisma generate && dbml-renderer -i prisma/dbml/schema.dbml -f dot | dot -Tpng -o docs/uml.png",
-    "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done"
+    "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done",
+    "db:seed:simulation": "node -r dotenv/config prisma/seed-simulation.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

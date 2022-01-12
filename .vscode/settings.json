@@ -1,6 +1,7 @@
 {
   "files.exclude": {
     "api": true,
-    "web": true
+    "web": true,
+    "bikebrain": true
   }
 }
