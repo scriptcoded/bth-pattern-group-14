@@ -90,12 +90,6 @@ func main() {
 				Usage: "simlulate a number of bikes",
 				Flags: []cli.Flag{
 					&cli.IntFlag{
-						Name:    "bike-count",
-						Aliases: []string{"b"},
-						Value:   100,
-						Usage:   "amount of bikes to simulate",
-					},
-					&cli.IntFlag{
 						Name:    "user-count",
 						Aliases: []string{"u"},
 						Value:   100,
@@ -114,22 +108,12 @@ func main() {
 					},
 				},
 				Action: func(c *cli.Context) error {
-					bikeCount := c.Int("bike-count")
 					userCount := c.Int("user-count")
 					endpoint := c.String("endpoint")
 					verbose := c.Bool("verbose")
 
-					if bikeCount < 1 {
-						return fmt.Errorf("bike-count must be at least 1")
-					}
-
 					if userCount < 1 {
 						return fmt.Errorf("user-count must be at least 1")
-					}
-
-					bikeIds := make([]string, bikeCount)
-					for i := 0; i < bikeCount; i++ {
-						bikeIds[i] = fmt.Sprintf("S%04d", i)
 					}
 
 					userIds := make([]string, userCount)
@@ -140,7 +124,6 @@ func main() {
 					stopReport := cmd.Simulate(
 						verbose,
 						endpoint,
-						bikeIds,
 						userIds,
 						1*time.Second,
 					)

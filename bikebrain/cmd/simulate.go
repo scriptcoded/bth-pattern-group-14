@@ -43,7 +43,6 @@ type Zone struct {
 func Simulate(
 	verbose bool,
 	endpoint string,
-	bikeIds []string,
 	userIds []string,
 	reportInterval time.Duration,
 ) chan struct{} {
