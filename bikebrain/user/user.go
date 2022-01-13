@@ -215,15 +215,15 @@ func (u *User) SimulateEndRide() {
 }
 
 func (u *User) SimulateRideSleep() {
-	min := 2
-	max := 8
+	min := 30
+	max := 240
 	seconds := rand.Intn(max-min) + min
 	time.Sleep(time.Duration(seconds) * time.Second)
 }
 
 func (u *User) SimulatePauseSleep() {
-	min := 2
-	max := 8
+	min := 10
+	max := 120
 	seconds := rand.Intn(max-min) + min
 	time.Sleep(time.Duration(seconds) * time.Second)
 }
