@@ -10,10 +10,9 @@ module.exports.githubStrategy = new GitHubStrategy(
     callbackURL: `${config.apiURL}/auth/github/callback`
   },
   function (accessToken, refreshToken, profile, done) {
-    const email = 'erik@familjensvensson.se'
-    // const email = profile.emails.length && profile.emails[0].value
-    //   ? profile.emails[0].value
-    //   : profile._json.email
+    const email = profile.emails.length && profile.emails[0].value
+      ? profile.emails[0].value
+      : profile._json.email
 
     prisma.user.upsert({
       where: {
