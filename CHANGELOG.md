@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.4](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.3...v1.2.4) (2022-01-13)
+
+
+### Bug Fixes
+
+* frontend catchall ([4e3485f](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/4e3485fe304769c0d3ed9c756bbf818e99dddf41))
+
 ### [1.2.3](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.2...v1.2.3) (2022-01-13)
 
 
