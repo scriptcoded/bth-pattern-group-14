@@ -316,7 +316,6 @@ export default {
         mark.options.icon = icon[0]
 
         if (bike.battery < 40 && icon[0] === this.locationMarkerBlue) {
-          console.log('hej < 40')
           mark.options.icon = this.locationMarkerYellow
         }
         // mark.on('click', this.onMarkClick)
@@ -341,7 +340,6 @@ export default {
                 `) // Not charging and disabled
 
         mark.addEventListener('click', () => {
-          console.log('Hej', mark.getPopup())
           this.selectedBike = {
             battery: bike.battery,
             bikeId: bike.id,
