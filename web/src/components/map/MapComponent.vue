@@ -125,6 +125,25 @@ export default {
       this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, bikeId)
       return true
     },
+    getPopupText (charge, bike) {
+      if (charge) {
+        return `<h1>Bike id:${bike.id}</h1>
+          <h2 class="dab">Get me when im full!</h2>
+          <p>Im charging!</p>`
+      } else if (bike.disabled) {
+        return `<h1>Bike id:${bike.id}</h1>
+          <h2>Disabled</h2>
+          <p>Bike is currently disabled</p>`
+      } else if (bike.available) {
+        return `<h1>Bike id:${bike.id}</h1>
+          <h2>Available</h2>
+          <p>Bike is currently available</p>`
+      } else {
+        return `<h1>Bike id:${bike.id}</h1>
+          <h2 class="dab">Already taken</h2>
+          <p>Riding</p>`
+      }
+    },
     /**
      * Toggels startedRide variable between true or false
      * Makse sure the start / end ride button changes accordingly
@@ -133,7 +152,7 @@ export default {
     toggleStartedRide () {
       this.startedRide = !this.startedRide
     },
-    checkZone (bikePosition, disabled) {
+    checkZone (bikePosition, disabled, available) {
       /**
        * BP[0] = Latitude
        * BP[1] = Long
@@ -159,6 +178,11 @@ export default {
           marker[1] = true
         }
       })
+
+      if (!available) {
+        marker[0] = this.locationMarkerGreen
+        marker[1] = false
+      }
       return marker
     },
 
@@ -299,6 +323,7 @@ export default {
       // // TODO: Implement
       // }
       const bikes = await this.$api.get('/bikes')
+      console.log(bikes)
       const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
       const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.updatedAt)
       const bikeIds = bikes.map(bike => bike.id)
@@ -307,9 +332,9 @@ export default {
       const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id))
       // console.log(bikesOnMapIds)
       const updatedBikes = bikes.filter(bike => !bikesOnMapUpdated.includes(bike.updatedAt) && bikesOnMapIds.includes(bike.id))
-      // console.log('removed', removedBikes)
-      // console.log('added', addedBikes)
-      // console.log('updated', updatedBikes)
+      console.log('removed', removedBikes)
+      console.log('added', addedBikes)
+      console.log('updated', updatedBikes)
 
       // await this.resetMap()
 
@@ -387,8 +412,8 @@ export default {
         const position = [parseFloat(bike.latitude), parseFloat(bike.longitude)]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
         // console.log('%c Color' + i, 'background: #222; color: #bada55')
-        const icon = this.checkZone(position, bike.disabled)
-        const charge = icon[1]
+        const icon = this.checkZone(position, bike.disabled, bike.available)
+        // const charge = icon[1]
 
         mark.options.icon = icon[0]
 
@@ -397,24 +422,14 @@ export default {
         }
         // mark.on('click', this.onMarkClick)
         // console.log(charge)
+        // console.log(bike)
+        // if (bike.available) {
+        //   const available = 'available for ride!'
+        // }
 
-        charge
-          ? mark.bindPopup(`
-          <h1>Bike id:${bike.id}</h1>
-          <h2 class="dab">Get me when im full!</h2>
-          <p>Im charging!</p>
-        `) // Charging
-          : !bike.disabled
-              ? mark.bindPopup(`
-                <h1>Bike id:${bike.id}</h1>
-                <h2 class="dab">Hello there</h2>
-                <p>*Available for ride*</p>
-              `) // Not charging and not disabled
-              : mark.bindPopup(`
-                  <h1>Bike id:${bike.id}</h1>
-                  <h2>Disabled</h2>
-                  <p>Please help me :<</p>
-                `) // Not charging and disabled
+        const text = await this.getPopupText(icon[1], bike)
+
+        mark.bindPopup(text)
 
         mark.addEventListener('click', () => {
           this.selectedBike = {
