@@ -299,14 +299,14 @@ export default {
       const bikes = await this.$api.get('/bikes')
       const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
       const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.updatedAt)
-      const bikeIds = bikes.map(bike => bike.id)
+      // const bikeIds = bikes.map(bike => bike.id)
 
-      const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
+      // const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
       const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id))
       const updatedBikes = bikes.filter(bike => !bikesOnMapUpdated.includes(bike.updatedAt))
-      console.log('removed', removedBikes)
-      console.log('added', addedBikes)
-      console.log('updated', updatedBikes)
+      // console.log('removed', removedBikes)
+      // console.log('added', addedBikes)
+      // console.log('updated', updatedBikes)
 
       await this.resetMap()
 
