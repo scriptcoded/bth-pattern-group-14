@@ -30,7 +30,9 @@ type Bike struct {
 	Verbose bool
 	// SimulationPrecision specifies how often the bike should update it's
 	// simulated position in traveled meters.
-	SimulationPrecision float64
+	SimulationPrecision        float64
+	DistanceSinceLastDecharge  float64
+	MetersPerBatteryPercentage float64
 
 	token string
 }
@@ -59,15 +61,17 @@ type ReportResponse struct {
 
 func New(id string, reportEndpoint string) *Bike {
 	return &Bike{
-		Id:                  id,
-		Latitude:            "0.000000", // Null island
-		Longitude:           "0.000000",
-		Battery:             100,
-		Speed:               0,
-		Disabled:            false,
-		ReportEndpoint:      reportEndpoint,
-		Verbose:             false,
-		SimulationPrecision: 5,
+		Id:                         id,
+		Latitude:                   "0.000000", // Null island
+		Longitude:                  "0.000000",
+		Battery:                    100,
+		Speed:                      0,
+		Disabled:                   false,
+		ReportEndpoint:             reportEndpoint,
+		Verbose:                    false,
+		SimulationPrecision:        5,
+		DistanceSinceLastDecharge:  0,
+		MetersPerBatteryPercentage: 25,
 
 		token: "",
 	}
@@ -87,6 +91,26 @@ func (b *Bike) SetPosition(point helpers.Point) {
 	// Don't update the position unless the bike is actually in use
 	if b.Available {
 		return
+	}
+
+	// Don't move if the battery is dead
+	if b.Battery <= 0 {
+		return
+	}
+
+	fromLat, fromLon := helpers.ParsePoint(helpers.Point{
+		Latitude:  b.Latitude,
+		Longitude: b.Longitude,
+	})
+	toLat, toLon := helpers.ParsePoint(point)
+
+	distance := HaversinDistance(fromLat, fromLon, toLat, toLon)
+
+	b.DistanceSinceLastDecharge += distance
+
+	if b.DistanceSinceLastDecharge >= b.MetersPerBatteryPercentage {
+		b.DistanceSinceLastDecharge = 0
+		b.Battery -= 1
 	}
 
 	b.Latitude = point.Latitude
