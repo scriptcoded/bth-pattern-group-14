@@ -152,6 +152,11 @@ export default {
       }
       await this.$api.patch(`/bikes/${id}`, data)
     },
+    async deleteBike (id) {
+      const yes = confirm('You sure you wanna delete this bike?')
+      if (!yes) return
+      await this.$api.delete(`/bikes/${id}`)
+    },
     prevPage () {
       if (this.page > 0) {
         this.page--
