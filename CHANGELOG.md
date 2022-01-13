@@ -1,5 +1,43 @@
 # Changelog
 
+## [1.2.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.1.0...v1.2.0) (2022-01-13)
+
+
+### Features
+
+* add Application and Users to adminview ([ccdb94f](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/ccdb94f59993c234c18a8bb634cc8149b4393aaf))
+* battery show on map bike and scale map font ([b5fba26](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/b5fba266df6fb807a5bec9e3bc0687e8b5be0389))
+* bike pagination ([00912b5](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/00912b5e7873e303dd5faacc14fb113b028c7727))
+* bikebreain and seeding ([95f1b28](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/95f1b287137d59480e0b680421e2c630e1dc27b5))
+* decreaase simulation ([810a64e](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/810a64e07bfb374c6e352de26249314d00ea70e9))
+* decrease battery levels ([b36942d](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/b36942d30414b2965bde4c918f023bf26819d1b8))
+* increase simulation delays ([9c53783](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/9c53783b2bb30bc6643fb1b9b7a351a0057891d1))
+* map cluster group ([1a29ead](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/1a29ead3363e8cf772276b6e0f6e6ea0e9f23e32))
+* map stuff ([81de80f](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/81de80f8ea86e87b80a1298d0d3b094dc064a713))
+* send bike active ([05dcf05](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/05dcf05ea19f834cf3e210370ec723f70d57a853))
+* simlate 200 bikes ([c60997b](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/c60997b22047d4949dc4d9621a19358792a62ed7))
+* simulate 1000 bikes ([2b7d28b](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/2b7d28bd2cf4c3807c2837ec3ea4d8c4abd34b54))
+* simulate users ([7467f6d](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/7467f6d806ca8b7f87062c8e7cf6a7e614d3ef0a))
+* simulation values ([aa2e7e1](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/aa2e7e19ca8fa08cc931d72ca8ef77f34ade8bfe))
+
+
+### Bug Fixes
+
+* accidental push all ([7afa18c](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/7afa18c32d071f4a7cb41cfb30206af2d1fb8d57))
+* availablity for bikes and show green ([7086a93](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/7086a938630e81612cdac2ab925629b3ed9dfb4e))
+* bike continuous movement ([41cab93](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/41cab933d9d88dfbd4a0be4e99babba64f7ea1bf))
+* coordinate order ([2f06aa6](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/2f06aa6441ef9293d6b298662fcd66cae9611fb8))
+* disable log ([5713579](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/57135792fc934b8c1eb17487d921e221c8d82aaa))
+* email oopsie ([0cb471a](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/0cb471aadef6cd008be7a69789511e3ff140182b))
+* get github email ([ea669fb](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/ea669fb39642ee0e1ac679321802297726acfeaa))
+* include bikes ([a6f31d3](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/a6f31d3b968a0a714c860710d1f82d96f795eb7e))
+* isOptional to optional ([2a8e994](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/2a8e9949c70c4ba1e94ba081d840d2286b8a25b6))
+* no log ([4c4b548](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/4c4b5489925d7857256a6273b6aaa8e099c68f11))
+* remove and update bikes ([4240fb7](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/4240fb770a99832489c897b4d95b9432159053b8))
+* remove console.logs ([5c5ac0a](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/5c5ac0a6a2667a02096862bfb4214b41c128be4d))
+* update positions without deleting marker ([8b9b644](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/8b9b644c40f1e50df530fb7a96eb922cb8cb21b9))
+* weird if ([ac472e9](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/ac472e9976f691161458bfaa77cdaf1182d43631))
+
 ## [1.1.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.0.2...v1.1.0) (2022-01-09)
 
 
