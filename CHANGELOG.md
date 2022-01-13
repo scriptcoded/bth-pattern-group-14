@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.3](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.2...v1.2.3) (2022-01-13)
+
+
+### Bug Fixes
+
+* redis url ([12225fa](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/12225fabcb9ef7a2c55d5e03f1dc5777ad7bb88d))
+
 ### [1.2.2](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.1...v1.2.2) (2022-01-13)
 
 
