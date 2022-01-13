@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.0...v1.2.1) (2022-01-13)
+
+
+### Bug Fixes
+
+* don't run dotenv in prod ([4756efd](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/4756efdf65dbc0946c8f3a011fdf879e5f25771f))
+
 ## [1.2.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.1.0...v1.2.0) (2022-01-13)
 
 
