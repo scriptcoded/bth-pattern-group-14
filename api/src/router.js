@@ -12,6 +12,7 @@ const restController = require('./controllers/rest.controller')
 const { bikeAuth } = require('./middleware/bikeAuth')
 const { auth } = require('./middleware/auth')
 const { restAuth } = require('./middleware/restAuth')
+const { config } = require('./config')
 
 const router = new Router()
 
@@ -19,6 +20,10 @@ router.get('/auth/me', auth(), authController.getCurrentUser)
 router.get('/auth/github', authController.githubAuth)
 router.get('/auth/github/callback', authController.githubCallback)
 router.post('/auth/logout', authController.logout)
+
+if (config.isSimulation) {
+  router.post('/auth/simulation/login', authController.simulationLogin)
+}
 
 router.post('/payments/topup', auth(), paymentController.topup)
 router.post('/payments/invoice', auth('ADMIN'), paymentController.invoice)

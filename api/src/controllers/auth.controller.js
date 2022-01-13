@@ -1,6 +1,7 @@
 /// <reference path="../polyfill.d.ts" />
 
 const passport = require('passport')
+const createError = require('http-errors')
 
 const { config } = require('../config')
 const { useAsync } = require('../utils/express')
@@ -51,8 +52,48 @@ module.exports.logout = [
   /**
    * @type {import("express").RequestHandler}
    */
-  useAsync((req, res) => {
+  (req, res) => {
     req.logout()
     res.json({})
+  }
+]
+
+module.exports.simulationLogin = [
+  /**
+   * @type {import("express").RequestHandler}
+   */
+  useAsync(async (req, res) => {
+    if (!config.isSimulation) {
+      res.status(404)
+      return
+    }
+
+    const user = await req.db.user.findUnique({
+      where: {
+        id: req.body.id
+      },
+      include: {
+        rides: {
+          where: {
+            endTime: null
+          }
+        }
+      }
+    })
+
+    if (!user) {
+      throw createError(404, 'User not found')
+    }
+
+    await new Promise((resolve, reject) => {
+      req.login(user, (err) => {
+        if (err) { reject(err) }
+        resolve()
+      })
+    })
+
+    res.send({
+      data: user
+    })
   })
 ]

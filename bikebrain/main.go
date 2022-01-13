@@ -90,10 +90,16 @@ func main() {
 				Usage: "simlulate a number of bikes",
 				Flags: []cli.Flag{
 					&cli.IntFlag{
-						Name:    "count",
-						Aliases: []string{"c"},
+						Name:    "bike-count",
+						Aliases: []string{"b"},
 						Value:   100,
 						Usage:   "amount of bikes to simulate",
+					},
+					&cli.IntFlag{
+						Name:    "user-count",
+						Aliases: []string{"u"},
+						Value:   100,
+						Usage:   "amount of users to simulate",
 					},
 					&cli.StringFlag{
 						Name:    "endpoint",
@@ -108,23 +114,34 @@ func main() {
 					},
 				},
 				Action: func(c *cli.Context) error {
-					count := c.Int("count")
+					bikeCount := c.Int("bike-count")
+					userCount := c.Int("user-count")
 					endpoint := c.String("endpoint")
 					verbose := c.Bool("verbose")
 
-					if count < 1 {
-						return fmt.Errorf("count must be at least 1")
+					if bikeCount < 1 {
+						return fmt.Errorf("bike-count must be at least 1")
 					}
 
-					ids := make([]string, count)
-					for i := 0; i < count; i++ {
-						ids[i] = fmt.Sprintf("S%04d", i)
+					if userCount < 1 {
+						return fmt.Errorf("user-count must be at least 1")
+					}
+
+					bikeIds := make([]string, bikeCount)
+					for i := 0; i < bikeCount; i++ {
+						bikeIds[i] = fmt.Sprintf("S%04d", i)
+					}
+
+					userIds := make([]string, userCount)
+					for i := 0; i < userCount; i++ {
+						userIds[i] = fmt.Sprintf("S%04d", i)
 					}
 
 					stopReport := cmd.Simulate(
 						verbose,
 						endpoint,
-						ids,
+						bikeIds,
+						userIds,
 						1*time.Second,
 					)
 

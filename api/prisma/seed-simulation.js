@@ -30,6 +30,8 @@ const zones = [
   // }
 ]
 
+const userCount = 1000
+
 function randomFloat (min, max) {
   return (Math.random() * (min - max) + max).toFixed(6)
 }
@@ -55,6 +57,20 @@ async function seed () {
 
       counter += 1
     }
+  }
+
+  for (let i = 0; i < userCount; i++) {
+    const paddedIndex = i.toString().padStart(4, '0')
+
+    await prisma.user.create({
+      data: {
+        id: 'S' + paddedIndex,
+        email: `user${paddedIndex}@example.com`,
+        githubId: `dummy_${paddedIndex}`,
+        name: `User ${paddedIndex}`,
+        balance: Math.floor(Math.random() * (100 + 1))
+      }
+    })
   }
 }
 
