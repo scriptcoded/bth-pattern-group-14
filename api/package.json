@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node -r src/main.js",
+    "start": "node src/main.js",
     "dev": "nodemon -r dotenv/config src/main.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
