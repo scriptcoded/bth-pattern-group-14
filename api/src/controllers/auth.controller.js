@@ -13,7 +13,7 @@ module.exports.getCurrentUser = [
 ]
 
 module.exports.githubAuth = passport.authenticate('github', {
-  scope: ['user:email', 'read:user']
+  scope: ['user', 'read:user']
 })
 
 module.exports.githubCallback = [

@@ -8,29 +8,8 @@ import (
 	"time"
 
 	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/bike"
-	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/helpers"
 	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/user"
 )
-
-func generatePath(center bike.Point, steps int) []bike.Point {
-	lastLat, lastLon := helpers.ParsePoint(center)
-
-	path := []bike.Point{}
-
-	for i := 0; i < steps; i++ {
-		lat := helpers.RandFloat(lastLat-0.0020, lastLat+0.0020)
-		lon := helpers.RandFloat(lastLon-0.0020, lastLon+0.0020)
-
-		path = append(path, bike.Point{
-			Latitude:  fmt.Sprintf("%f", lat),
-			Longitude: fmt.Sprintf("%f", lon),
-		})
-
-		lastLat, lastLon = helpers.ParsePoint(path[len(path)-1])
-	}
-
-	return path
-}
 
 type Zone struct {
 	BikeCount int
@@ -88,23 +67,36 @@ func Simulate(
 
 	endpoint = strings.TrimRight(endpoint, "/")
 
+	// bikes := []*bike.Bike{}
+	// counter := 0
+	// for zone := range zones {
+	// 	for i := 0; i < zones[zone].BikeCount; i++ {
+	// 		id := fmt.Sprintf("S%04d", counter)
+	// 		lat := helpers.RandFloat(zones[zone].LatStart, zones[zone].LatEnd)
+	// 		lon := helpers.RandFloat(zones[zone].LonStart, zones[zone].LonEnd)
+	// 		point := helpers.Point{
+	// 			Latitude:  fmt.Sprintf("%f", lat),
+	// 			Longitude: fmt.Sprintf("%f", lon),
+	// 		}
+
+	// 		path := generatePath(point, 5)
+	// 		simBike := bike.New(id, fmt.Sprintf("%s/bikes/%s/status", endpoint, id))
+	// 		bikes = append(bikes, simBike)
+	// 		simBike.SetVerbose(verbose)
+	// 		go simBike.SimulatePath(path)
+	// 		counter++
+	// 	}
+	// }
+
 	bikes := []*bike.Bike{}
 	counter := 0
-	for zone := range zones {
-		for i := 0; i < zones[zone].BikeCount; i++ {
+	for _, zone := range zones {
+		for i := 0; i < zone.BikeCount; i++ {
 			id := fmt.Sprintf("S%04d", counter)
-			lat := helpers.RandFloat(zones[zone].LatStart, zones[zone].LatEnd)
-			lon := helpers.RandFloat(zones[zone].LonStart, zones[zone].LonEnd)
-			point := bike.Point{
-				Latitude:  fmt.Sprintf("%f", lat),
-				Longitude: fmt.Sprintf("%f", lon),
-			}
-
-			path := generatePath(point, 5)
 			simBike := bike.New(id, fmt.Sprintf("%s/bikes/%s/status", endpoint, id))
 			bikes = append(bikes, simBike)
 			simBike.SetVerbose(verbose)
-			go simBike.SimulatePath(path)
+			go simBike.SimulateInfinitePath(zone.LatStart, zone.LatEnd, zone.LonStart, zone.LonEnd)
 			counter++
 		}
 	}

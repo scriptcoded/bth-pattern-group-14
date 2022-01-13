@@ -1,4 +1,5 @@
 const GitHubStrategy = require('passport-github2')
+const fetch = require('node-fetch')
 
 const { config } = require('../config')
 const { prisma } = require('../utils/prisma')
@@ -10,24 +11,31 @@ module.exports.githubStrategy = new GitHubStrategy(
     callbackURL: `${config.apiURL}/auth/github/callback`
   },
   function (accessToken, refreshToken, profile, done) {
-    const email = profile.emails.length && profile.emails[0].value
-      ? profile.emails[0].value
-      : profile._json.email
-
-    prisma.user.upsert({
-      where: {
-        githubId: profile.id
-      },
-      create: {
-        githubId: profile.id,
-        name: profile.displayName,
-        email
-      },
-      update: {
-        name: profile.displayName
+    fetch('https://api.github.com/user/emails', {
+      headers: {
+        Authorization: `token ${accessToken}`
       }
     })
-      .then(user => done(null, user))
+      .then(res => res.json())
+      .then((emails) => {
+        const primaryRecord = emails.find(email => email.primary) ?? emails[0]
+
+        prisma.user.upsert({
+          where: {
+            githubId: profile.id
+          },
+          create: {
+            githubId: profile.id,
+            name: profile.displayName,
+            email: primaryRecord.email
+          },
+          update: {
+            name: profile.displayName
+          }
+        })
+          .then(user => done(null, user))
+          .catch(err => done(err))
+      })
       .catch(err => done(err))
   }
 )
