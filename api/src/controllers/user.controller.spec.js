@@ -14,6 +14,37 @@ const mockUsers = [
   }
 ]
 
+const mockRides = [
+  {
+    id: 'a',
+    startTime: new Date(),
+    endTime: new Date(),
+    startLatitude: 1,
+    startLongitude: 2,
+    endLatitude: 3,
+    endLongitude: 4,
+    fromParkingZone: false,
+    toParkingZone: false,
+    bikeId: 'a',
+    userId: mockUsers[0].id
+  }
+]
+
+const mockPayments = [
+  {
+    userId: 'a',
+    amount: 10,
+    automatic: true,
+    paid: true
+  },
+  {
+    userId: 'B',
+    amount: 2000,
+    automatic: false,
+    paid: false
+  }
+]
+
 let req
 let res
 let next
@@ -75,7 +106,6 @@ test('updateUser respects url param', async () => {
   }))
 })
 
-
 test('updateUser modifies user', async () => {
   req.body = {
     name: 'steve'
@@ -101,6 +131,28 @@ test('updateUser returns updated user', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: req.body })
+})
+
+test('getMyRides returns payments', async () => {
+  req.db.ride.findMany.mockResolvedValue(mockRides[0])
+  req.user = {
+    id: 'a'
+  }
+  getControllerMethod(userController.getMyRides)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: mockRides[0] })
+})
+
+test('getMyPayments returns payments', async () => {
+  req.db.payment.findMany.mockResolvedValue(mockPayments[0])
+  req.user = {
+    id: 'a'
+  }
+  getControllerMethod(userController.getMyPayments)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: mockPayments[0] })
 })
 
 test('deleteUser respects url param', async () => {
