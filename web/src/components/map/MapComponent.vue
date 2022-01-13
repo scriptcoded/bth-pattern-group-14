@@ -298,7 +298,7 @@ export default {
        * Spew out markers randomly :D
        */
       bikes.forEach(async (bike, i) => {
-        console.log(bikes)
+        // console.log(bikes)
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         // console.log(bike)
