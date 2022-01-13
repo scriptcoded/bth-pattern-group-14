@@ -1,75 +1,115 @@
 <template>
-  <table>
-    <tr class="table-header">
-      <th> ID </th>
-      <th> Active </th>
-      <th> long </th>
-      <th> lat </th>
-      <th> Battery </th>
-      <th> Update </th>
-      <th />
-    </tr>
-    <tr
-      v-for="item in arr"
-      :key="item.id"
-      class="table-content"
+  <div>
+    <p><b>Page:</b> {{ page + 1 }} / {{ pageCount }}</p>
+    <button
+      :disabled="page <= 0"
+      @click="prevPage"
     >
-      <td> {{ item.id }} </td>
-      <td v-if="item.disabled">
-        No
-      </td>
-      <td v-else>
-        Yes
-      </td>
-      <td>
-        <input
-          v-model="item.longitude"
-          type="number"
-          step="0.0001"
-        >
-      </td>
-      <td>
-        <input
-          v-model="item.latitude"
-          type="number"
-          step="0.0001"
-        >
-      </td>
-      <td> {{ item.battery }} </td>
-      <td
-        v-if="!item.disabled"
-        class="update"
-      >
-        <button @click="updateBike(item.id, item.longitude, item.latitude)">
-          Update bike
-        </button>
-      </td>
-      <td v-if="!item.disabled">
-        <button @click="disableBike(item.id, item.disabled)">
-          Disable bike
-        </button>
-      </td>
-      <td v-else>
-        <button
-          class="red"
-          @click="disableBike(item.id, item.disabled)"
-        >
-          Turn on bike
-        </button>
-      </td>
-    </tr>
-    <button @click="createBike()">
-      Create bike
+      Previous
     </button>
-  </table>
+    <button
+      :disabled="page >= pageCount"
+      @click="nextPage"
+    >
+      Next
+    </button>
+
+    <table>
+      <tr class="table-header">
+        <th> ID </th>
+        <th> Active </th>
+        <th> long </th>
+        <th> lat </th>
+        <th> Battery </th>
+        <th> Update </th>
+        <th />
+      </tr>
+      <tr
+        v-for="item in shownArr"
+        :key="item.id"
+        class="table-content"
+      >
+        <td> {{ item.id }} </td>
+        <td v-if="item.disabled">
+          No
+        </td>
+        <td v-else>
+          Yes
+        </td>
+        <td>
+          <input
+            v-model="item.longitude"
+            type="number"
+            step="0.0001"
+          >
+        </td>
+        <td>
+          <input
+            v-model="item.latitude"
+            type="number"
+            step="0.0001"
+          >
+        </td>
+        <td> {{ item.battery }} </td>
+        <td
+          v-if="!item.disabled"
+          class="update"
+        >
+          <button @click="updateBike(item.id, item.longitude, item.latitude)">
+            Update bike
+          </button>
+        </td>
+        <td v-if="!item.disabled">
+          <button @click="disableBike(item.id, item.disabled)">
+            Disable bike
+          </button>
+        </td>
+        <td v-else>
+          <button
+            class="red"
+            @click="disableBike(item.id, item.disabled)"
+          >
+            Turn on bike
+          </button>
+        </td>
+      </tr>
+      <button @click="createBike()">
+        Create bike
+      </button>
+    </table>
+
+    <p><b>Page:</b> {{ page + 1 }} / {{ pageCount }}</p>
+    <button
+      :disabled="page <= 0"
+      @click="prevPage"
+    >
+      Previous
+    </button>
+    <button
+      :disabled="page >= pageCount"
+      @click="nextPage"
+    >
+      Next
+    </button>
+  </div>
 </template>
 
 <script>
 
 export default {
-  data () {
-    return {
-      arr: null
+  data: () => ({
+    arr: [],
+    page: 0,
+    pageSize: 100
+  }),
+  computed: {
+    pageCount () {
+      return Math.ceil(this.arr.length / this.pageSize)
+    },
+    shownArr () {
+      const start = this.page * this.pageSize
+      const end = start + this.pageSize
+      return this.arr.slice(start, end)
     }
   },
   mounted () {
@@ -111,6 +151,16 @@ export default {
         longitude: long
       }
       await this.$api.patch(`/bikes/${id}`, data)
+    },
+    prevPage () {
+      if (this.page > 0) {
+        this.page--
+      }
+    },
+    nextPage () {
+      if (this.page < this.pageCount - 1) {
+        this.page++
+      }
     }
   }
 }

@@ -143,21 +143,16 @@ func (u *User) Simulate() {
 
 func (u *User) SimulateIteration() {
 	// Things that can happen:
-	// 1. Start riding bike    - If not riding
-	// 2. Stop riding bike		 - If riding
-	// 3. Pause             	 - If not riding
-	log.Println("Loop")
+	// 1. Ride a bike
+	// 2. Sleep for a while
 
-	if u.CurrentBikeId == "" {
-		switch rand.Intn(1) {
-		case 0:
-			u.SimulateStartRide()
-			u.SimulateRideSleep()
-		case 1:
-			u.SimulatePauseSleep()
-		}
-	} else {
+	switch rand.Intn(1) {
+	case 0:
+		u.SimulateStartRide()
+		u.SimulateRideSleep()
 		u.SimulateEndRide()
+	case 1:
+		u.SimulatePauseSleep()
 	}
 }
 

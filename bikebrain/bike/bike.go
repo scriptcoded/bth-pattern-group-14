@@ -167,12 +167,6 @@ func (b *Bike) Report() error {
 func (b *Bike) SimulatePath(points []Point) {
 	// Random speed between 10 and 20 km/h
 	speed := randFloat(10, 20)
-	// log.Printf("Speed: %f\n", speed)
-
-	// b.SetPosition(Point{
-	// 	Latitude:  "55.582000",
-	// 	Longitude: "12.941529",
-	// })
 
 	b.SetSpeed(float32(speed))
 
