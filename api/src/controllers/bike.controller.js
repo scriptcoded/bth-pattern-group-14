@@ -32,7 +32,14 @@ module.exports.getAllBikes = [
         }
 
     const bikes = await req.db.bike.findMany({
-      where
+      where,
+      include: {
+        rides: {
+          where: {
+            endTime: null
+          }
+        }
+      }
     })
 
     for (const bike of bikes) {
@@ -103,6 +110,13 @@ module.exports.deleteBike = [
       const bike = await req.db.bike.delete({
         where: {
           id: req.params.id
+        },
+        include: {
+          rides: {
+            where: {
+              endTime: null
+            }
+          }
         }
       })
 
@@ -126,6 +140,13 @@ module.exports.getOneBike = [
     const bike = await req.db.bike.findUnique({
       where: {
         id: req.params.id
+      },
+      include: {
+        rides: {
+          where: {
+            endTime: null
+          }
+        }
       }
     })
 
@@ -158,7 +179,14 @@ module.exports.updateBike = [
         where: {
           id: req.params.id
         },
-        data: req.body
+        data: req.body,
+        include: {
+          rides: {
+            where: {
+              endTime: null
+            }
+          }
+        }
       })
 
       bike.active = bike.rides.length > 0
