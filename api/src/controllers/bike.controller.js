@@ -141,6 +141,16 @@ module.exports.updateBike = [
       optional: true,
       isBoolean: true,
       errorMessage: 'disabled must be a boolean'
+    },
+    latitude: {
+      optional: true,
+      isDecimal: true,
+      errorMessage: 'latitude must be a decimal'
+    },
+    longitude: {
+      optional: true,
+      isDecimal: true,
+      errorMessage: 'longitude must be a decimal'
     }
   }),
 
@@ -242,6 +252,7 @@ module.exports.endRide = [
 
     const rideCost = paymentService.calculateRideCost(rideMinutes, correctedParking, invalidParking)
     // Update active ride
+    console.log(parkingZone, !!parkingZone)
     const ride = await req.db.ride.update({
       where: {
         id: activeRide.id
@@ -256,7 +267,7 @@ module.exports.endRide = [
     })
 
     await paymentService.chargeUser(req.db, req.user.id, rideCost)
-    console.log('IM HERE', req.user.id, rideCost)
+    // console.log('IM HERE', req.user.id, rideCost)
 
     res.json({ data: ride })
   })

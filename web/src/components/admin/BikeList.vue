@@ -3,7 +3,10 @@
     <tr class="table-header">
       <th> ID </th>
       <th> Active </th>
+      <th> long </th>
+      <th> lat </th>
       <th> Battery </th>
+      <th> Update </th>
       <th />
     </tr>
     <tr
@@ -18,7 +21,29 @@
       <td v-else>
         Yes
       </td>
+      <td>
+        <input
+          v-model="item.longitude"
+          type="number"
+          step="0.0001"
+        >
+      </td>
+      <td>
+        <input
+          v-model="item.latitude"
+          type="number"
+          step="0.0001"
+        >
+      </td>
       <td> {{ item.battery }} </td>
+      <td
+        v-if="!item.disabled"
+        class="update"
+      >
+        <button @click="updateBike(item.id, item.longitude, item.latitude)">
+          Update bike
+        </button>
+      </td>
       <td v-if="!item.disabled">
         <button @click="disableBike(item.id, item.disabled)">
           Disable bike
@@ -79,6 +104,13 @@ export default {
       this.arr = this.arr.map(b => b.id === id ? bike : b)
       // yanky solution to refresh page
       // this.$router.go()
+    },
+    async updateBike (id, long, lat) {
+      const data = {
+        latitude: lat,
+        longitude: long
+      }
+      await this.$api.patch(`/bikes/${id}`, data)
     }
   }
 }
