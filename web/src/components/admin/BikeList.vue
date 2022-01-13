@@ -51,10 +51,7 @@
           >
         </td>
         <td> {{ item.battery }} </td>
-        <td
-          v-if="!item.disabled"
-          class="update"
-        >
+        <td class="update">
           <button @click="updateBike(item.id, item.longitude, item.latitude)">
             Update bike
           </button>
