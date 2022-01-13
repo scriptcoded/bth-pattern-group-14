@@ -18,10 +18,11 @@ type Bike struct {
 	Latitude  string
 	Longitude string
 
-	Battery  int
-	Speed    float32
-	Disabled bool
-	Locked   bool
+	Battery   int
+	Speed     float32
+	Disabled  bool
+	Locked    bool
+	Available bool
 
 	ReportEndpoint string
 
@@ -51,6 +52,7 @@ type ReportResponse struct {
 		Battery   int     `json:"battery"`
 		Speed     float32 `json:"speed"`
 		Disabled  bool    `json:"disabled"`
+		Available bool    `json:"available"`
 	} `json:"data"`
 }
 
@@ -157,8 +159,7 @@ func (b *Bike) Report() error {
 	}
 
 	b.Disabled = responseJSON.Data.Disabled
-	// TODO: When locked is implemented in the server, update the local state as well
-	// b.Locked = responseJSON.Data.Locked
+	b.Available = responseJSON.Data.Available
 
 	return nil
 }
@@ -166,12 +167,6 @@ func (b *Bike) Report() error {
 func (b *Bike) SimulatePath(points []Point) {
 	// Random speed between 10 and 20 km/h
 	speed := randFloat(10, 20)
-	// log.Printf("Speed: %f\n", speed)
-
-	// b.SetPosition(Point{
-	// 	Latitude:  "55.582000",
-	// 	Longitude: "12.941529",
-	// })
 
 	b.SetSpeed(float32(speed))
 
@@ -234,7 +229,7 @@ func (b *Bike) SimulatePath(points []Point) {
 			deltaLon := currPointLon - lastPointLon
 
 			for j := 0; j < int(updateCount); j++ {
-				time.Sleep(time.Duration(updateInterval*1000) * time.Millisecond)
+				time.Sleep(time.Duration(updateInterval) * time.Second)
 
 				progress := float64(j) / float64(updateCount)
 

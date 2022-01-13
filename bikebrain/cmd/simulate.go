@@ -9,6 +9,7 @@ import (
 
 	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/bike"
 	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/helpers"
+	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/user"
 )
 
 func generatePath(center bike.Point, steps int) []bike.Point {
@@ -31,10 +32,6 @@ func generatePath(center bike.Point, steps int) []bike.Point {
 	return path
 }
 
-type Simulation struct {
-	Bike *bike.Bike
-}
-
 type Zone struct {
 	BikeCount int
 	LatStart  float64
@@ -46,7 +43,7 @@ type Zone struct {
 func Simulate(
 	verbose bool,
 	endpoint string,
-	ids []string,
+	userIds []string,
 	reportInterval time.Duration,
 ) chan struct{} {
 	rand.Seed(time.Now().UnixNano())
@@ -91,7 +88,7 @@ func Simulate(
 
 	endpoint = strings.TrimRight(endpoint, "/")
 
-	simulations := []*Simulation{}
+	bikes := []*bike.Bike{}
 	counter := 0
 	for zone := range zones {
 		for i := 0; i < zones[zone].BikeCount; i++ {
@@ -104,13 +101,21 @@ func Simulate(
 			}
 
 			path := generatePath(point, 5)
-			simulation := &Simulation{
-				Bike: bike.New(id, fmt.Sprintf("%s/bikes/%s/status", endpoint, id)),
-			}
-			simulations = append(simulations, simulation)
-			simulation.Bike.SetVerbose(verbose)
-			go simulation.Bike.SimulatePath(path)
+			simBike := bike.New(id, fmt.Sprintf("%s/bikes/%s/status", endpoint, id))
+			bikes = append(bikes, simBike)
+			simBike.SetVerbose(verbose)
+			go simBike.SimulatePath(path)
 			counter++
+		}
+	}
+
+	reportBikes := func() {
+		for _, simBike := range bikes {
+			err := simBike.Report()
+
+			if err != nil {
+				log.Fatalf("report error for bike %s: %v", simBike.Id, err)
+			}
 		}
 	}
 
@@ -121,19 +126,47 @@ func Simulate(
 		for {
 			select {
 			case <-ticker.C:
-				for _, simulation := range simulations {
-					err := simulation.Bike.Report()
-
-					if err != nil {
-						log.Fatalf("report error for bike %s: %v", simulation.Bike.Id, err)
-					}
-				}
+				reportBikes()
 			case <-stopReport:
 				ticker.Stop()
 				return
 			}
 		}
 	}()
+
+	log.Println("Doing initial report")
+	reportBikes()
+	log.Println("Initial report done")
+
+	getRandomBike := func() *bike.Bike {
+		availableBikes := []*bike.Bike{}
+
+		for _, bike := range bikes {
+			if bike.Available {
+				availableBikes = append(availableBikes, bike)
+			}
+		}
+
+		if len(availableBikes) <= 0 {
+			return nil
+		}
+
+		return availableBikes[rand.Intn(len(availableBikes))]
+	}
+
+	users := []*user.User{}
+	for _, id := range userIds {
+		user := user.New(id, endpoint)
+		user.SetRandomBikeFunc(getRandomBike)
+
+		err := user.Login()
+		if err != nil {
+			log.Fatalf("Error logging in user %s: %s", id, err)
+		}
+
+		users = append(users, user)
+		go user.Simulate()
+	}
 
 	return stopReport
 }

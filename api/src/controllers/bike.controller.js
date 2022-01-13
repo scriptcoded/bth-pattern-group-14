@@ -43,7 +43,7 @@ module.exports.getAllBikes = [
     })
 
     for (const bike of bikes) {
-      bike.active = bike.rides.length > 0
+      bike.available = bike.rides.length <= 0
       delete bike.rides
       delete bike.token
     }
@@ -120,7 +120,7 @@ module.exports.deleteBike = [
         }
       })
 
-      bike.active = bike.rides.length > 0
+      bike.available = bike.rides.length <= 0
       delete bike.rides
       delete bike.token
 
@@ -154,7 +154,7 @@ module.exports.getOneBike = [
       throw createError(404, 'Bike not found')
     }
 
-    bike.active = bike.rides.length > 0
+    bike.available = bike.rides.length <= 0
     delete bike.rides
     delete bike.token
 
@@ -199,7 +199,7 @@ module.exports.updateBike = [
         }
       })
 
-      bike.active = bike.rides.length > 0
+      bike.available = bike.rides.length <= 0
       delete bike.rides
       delete bike.token
 
@@ -226,6 +226,24 @@ module.exports.startRide = [
 
     if (activeRide) {
       throw createError(409, 'Bike is already in use')
+    }
+
+    // Make sure that the user does not already have an active ride
+    const user = await req.db.user.findUnique({
+      where: {
+        id: req.user.id
+      },
+      include: {
+        rides: {
+          where: {
+            endTime: null
+          }
+        }
+      }
+    })
+
+    if (user.rides.length > 0) {
+      throw createError(409, 'User already has an active ride')
     }
 
     const bike = await req.db.bike.findUnique({
@@ -369,7 +387,7 @@ module.exports.updateStatus = [
       }
     })
 
-    bike.active = bike.rides.length > 0
+    bike.available = bike.rides.length <= 0
     delete bike.rides
     delete bike.token
 
