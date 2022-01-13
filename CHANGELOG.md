@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.2.2](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.1...v1.2.2) (2022-01-13)
+
+
+### Bug Fixes
+
+* remove flag ([9cb4319](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/9cb4319b59c16857ef1b6f668761f714c5280cd0))
+
 ### [1.2.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.0...v1.2.1) (2022-01-13)
 
 
