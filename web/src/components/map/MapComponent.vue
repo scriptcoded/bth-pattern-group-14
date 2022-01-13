@@ -36,6 +36,8 @@ export default {
   data () {
     return {
       // center: [56.1803, 15.5906],
+      markerArray: [],
+      bikesOnMap: [],
       chargingPosition: [],
       parkingPosition: [],
       startedRide: false,
@@ -230,9 +232,9 @@ export default {
     * @returns the resetted map
     */
     async resetMap () {
-      this.markerLayers.eachLayer(layer => {
-        this.mapContainer.removeLayer(layer)
-      })
+      // this.markerLayers.eachLayer(layer => {
+      //   this.mapContainer.removeLayer(layer)
+      // })
     },
 
     /**
@@ -281,15 +283,75 @@ export default {
     * This function sets up leafletmap
     */
     async setupLeafletMap () {
-      const arr = await this.$api.get('/bikes')
+      // const bikesOnMap = [] // Lista med cyklar
+
+      // async function update() {
+      // const bikes = await getAllBikes()
+      // const bikesOnMapIds = bikesOnMap.map(bike => bike.id)
+      // const bikeIds = bikes.map(bike => bike.id)
+
+      // const removedBikes = bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
+      // const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id))
+      // const updatedBikes = bikes.filter(bike => bikesOnMapIds.includes(bike.id))
+
+      // // TODO: Implement
+      // }
+      const bikes = await this.$api.get('/bikes')
+      const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
+      const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.updatedAt)
+      // const bikeIds = bikes.map(bike => bike.id)
+
+      // const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
+      const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id))
+      const updatedBikes = bikes.filter(bike => !bikesOnMapUpdated.includes(bike.updatedAt))
+      // console.log('removed', removedBikes)
+      // console.log('added', addedBikes)
+      // console.log('updated', updatedBikes)
 
       await this.resetMap()
+
+      updatedBikes.forEach(async (bike, i) => {
+        // console.log(bike)
+        const position = [bike.latitude, bike.longitude]
+        const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
+        // const newLatLng = new L.LatLng(position[0], position[1])
+        marker.mark.setLatLng(position)
+        // this.mapContainer.addTo(marker)
+      })
+      this.bikesOnMap = bikes
+
+      // this.bikesOnMap = this.bikesOnMap.map(e => {
+      //   updatedBikes.forEach(updated => {
+      //     if (!updated.id.includes(e.id)) {
+      //       return e
+      //     }
+      //   })
+      // })
+
+      // console.log(newArray)
+
+      // this.bikesOnMap = this.bikesOnMap.filter(bike => bike.includes(updatedBikes[i]))
+
+      // updated
+
+      /**
+       *
+       * markerArray = [{
+       *   bikeId: 'YMAL2',
+       *   marker: markerObject
+       * },
+       * {
+       *   bikeId: 'YMAL4',
+       *   marker: markerObject
+       * }
+       * ]
+       */
 
       /**
        * Remove active popup from changing on map
        */
       // console.log('Leta: ', arr, this.activePopup)
-      const bikes = arr.map(b => b.id === this.activePopup ? null : b).filter(n => n)
+      // const bikesArray = bikes.map(b => b.id === this.activePopup ? null : b).filter(n => n)
       /**
        * Marker cluster group
        */
@@ -297,8 +359,7 @@ export default {
       /**
        * Spew out markers randomly :D
        */
-      bikes.forEach(async (bike, i) => {
-        // console.log(bikes)
+      addedBikes.forEach(async (bike, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         // console.log(bike)
@@ -362,6 +423,8 @@ export default {
         })
         markers.addLayer(mark)
         this.markerLayers.addLayer(markers)
+        this.markerArray.push({ bikeId: bike.id, mark: mark })
+        this.bikesOnMap.push(bike)
       })
       // || EXTRA || Make popup stay if we click on it, aka remove from markerLayers
       this.markerLayers.addTo(this.mapContainer)
