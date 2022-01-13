@@ -30,8 +30,7 @@ if (config.redisURL) {
 
   // Configure redis client
   const redisClient = redis.createClient({
-    host: 'localhost',
-    port: 6379
+    url: config.redisURL
   })
 
   redisStore = new RedisStore({ client: redisClient })

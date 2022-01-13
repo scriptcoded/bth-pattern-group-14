@@ -11,6 +11,9 @@ services:
     restart: always
     ports:
       - "4000:4000"
+    depends_on:
+      - mysql
+      - redis
     environment:
       - NODE_ENV=production
       - SIMULATION_MODE=false
