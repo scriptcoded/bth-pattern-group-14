@@ -401,7 +401,6 @@ export default {
                 `) // Not charging and disabled
 
         mark.addEventListener('click', () => {
-          console.log('Hej', mark.getPopup())
           this.selectedBike = {
             battery: bike.battery,
             bikeId: bike.id,

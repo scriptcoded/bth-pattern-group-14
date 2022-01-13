@@ -1,7 +1,11 @@
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
+// const { findParkingZoneAtPoint, findChargingStationAtPoint } = require('../utils/zone')
+// const paymentService = require('../services/payment.service')
 
 const bikeController = require('./bike.controller')
+
+// jest.mock('../utils/zone')
 
 const mockUsers = [
   {
@@ -54,15 +58,29 @@ const mockRide = [
   }
 ]
 
+// jest.mock('../utils/zone', () => {
+//   const originalModule = jest.requireActual('../utils/zone')
+
+//   return {
+//     __esModule: true,
+//     ...originalModule,
+//     findParkingZoneAtPoint: false,
+//     findChargingStationAtPoint: false
+//   }
+// })
+
 let req
 let res
 let next
+let throwError
 beforeEach(() => {
   req = {
     db: prismaMock,
     params: {},
     user: {}
   }
+
+  throwError = () => { throw new Error() }
 
   res = {
     json: jest.fn()
@@ -119,6 +137,15 @@ test('createBike creates a bike', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: req.body })
+})
+
+test('createBike throws error when failed to generate uniqe id', async () => {
+  req.db.bike.create.mockResolvedValue(false)
+
+  getControllerMethod(bikeController.createBike)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(throwError).toThrow()
 })
 
 test('updateBike respects url param', async () => {
@@ -201,11 +228,7 @@ test('startRide active ride already exists', async () => {
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  const t = () => {
-    throw new Error()
-  }
-
-  expect(t).toThrow()
+  expect(throwError).toThrow()
 })
 
 test('startRide bike not found', async () => {
@@ -215,32 +238,79 @@ test('startRide bike not found', async () => {
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  const t = () => {
-    throw new Error()
-  }
-
-  expect(t).toThrow()
+  expect(throwError).toThrow()
 })
 
-// test('updateStatus bike that is rented', async () => {
-//   req.body.latitude = 5
-//   req.body.longitude = 6
-//   req.body.battery = 40
-//   req.body.speed = 50
+// test('endRide ends bike', async () => {
+//   const mockUpdate = {
+//     endTime: new Date(),
+//     toParkingZone: false,
+//     endLatitude: mockBikes[0].latitude,
+//     endLongitude: mockBikes[0].longitude,
+//     chargedAmount: 10
+//   }
 
-//   req.db.bike.findUnique.mockResolvedValue(mockBikes[0])
-//   // req.db.bike.update.mockResolvedValue(newBike)
+//   req.db.ride.findFirst.mockResolvedValue(true)
 //   // req.db.bike.findUnique.mockResolvedValue(false)
 
-//   getControllerMethod(bikeController.updateStatus)(req, res, next)
+//   // findParkingZoneAtPoint.mockResolvedValue({})
+//   // findChargingStationAtPoint.mockResolvedValue({})
+//   req.db.ride.update.mockResolvedValue(mockUpdate)
+
+//   // spy on
+//   jest.spyOn(paymentService, 'calculateRideCost').mockResolvedValue({})
+//   jest.spyOn(paymentService, 'chargeUser').mockResolvedValue({})
+
+//   getControllerMethod(bikeController.endRide)(req, res, next)
 //   await next.waitToHaveBeenCalled()
 
-//   expect(res.json).toHaveBeenCalledWith({
-//     data: {
-//       latitude: req.body.latitude,
-//       longitude: req.body.longitude,
-//       battery: req.body.battery,
-//       speed: req.body.speed
-//     }
-//   })
+//   expect(res.json).toHaveBeenCalledWith({ data: mockRide[0] })
 // })
+
+test('updateStatus bike that is rented', async () => {
+  req.body = {
+    latitude: 5,
+    longitude: 6,
+    battery: 40,
+    speed: 50
+  }
+
+  req.db.bike.findUnique.mockResolvedValue(mockBikes[0])
+
+  const mockUpdatedBike = {
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    battery: req.body.battery,
+    speed: req.body.speed
+  }
+
+  req.db.bike.update.mockResolvedValue(mockUpdatedBike)
+
+  getControllerMethod(bikeController.updateStatus)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({
+    data: {
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      battery: req.body.battery,
+      speed: req.body.speed
+    }
+  })
+})
+
+test('updateStatus with invalid bike returns error', async () => {
+  req.body = {
+    latitude: 5,
+    longitude: 6,
+    battery: 40,
+    speed: 50
+  }
+
+  req.db.bike.findUnique.mockResolvedValue(false)
+
+  getControllerMethod(bikeController.updateStatus)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(throwError).toThrow()
+})
