@@ -7,10 +7,11 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/scriptcoded/bth-pattern-group-14/bikebrain/helpers"
 )
 
 type Bike struct {
@@ -56,15 +57,6 @@ type ReportResponse struct {
 	} `json:"data"`
 }
 
-type Point struct {
-	Latitude  string
-	Longitude string
-}
-
-func randFloat(min, max float64) float64 {
-	return min + rand.Float64()*(max-min)
-}
-
 func New(id string, reportEndpoint string) *Bike {
 	return &Bike{
 		Id:                  id,
@@ -91,7 +83,12 @@ func (b *Bike) SetToken(token string) {
 
 // SetPosition sets the bike's latitude and longitude to the given values.
 // Should be used by the harware interface.
-func (b *Bike) SetPosition(point Point) {
+func (b *Bike) SetPosition(point helpers.Point) {
+	// Don't update the position unless the bike is actually in use
+	if b.Available {
+		return
+	}
+
 	b.Latitude = point.Latitude
 	b.Longitude = point.Longitude
 }
@@ -164,19 +161,34 @@ func (b *Bike) Report() error {
 	return nil
 }
 
-func (b *Bike) SimulatePath(points []Point) {
+func (b *Bike) SimulateInfinitePath(latStart float64, latEnd float64, lonStart float64, lonEnd float64) {
+	lat := helpers.RandFloat(latStart, latEnd)
+	lon := helpers.RandFloat(lonStart, lonEnd)
+	startPoint := helpers.Point{
+		Latitude:  fmt.Sprintf("%f", lat),
+		Longitude: fmt.Sprintf("%f", lon),
+	}
+
+	for {
+		path := helpers.GeneratePath(startPoint, 20)
+		startPoint = path[len(path)-1]
+		b.SimulatePath(path)
+	}
+}
+
+func (b *Bike) SimulatePath(points []helpers.Point) {
 	// Random speed between 10 and 20 km/h
-	speed := randFloat(10, 20)
+	speed := helpers.RandFloat(10, 20)
 
 	b.SetSpeed(float32(speed))
 
 	for i, point := range points {
-		var lastPoint Point
+		var lastPoint helpers.Point
 		if i > 0 {
 			lastPoint = points[i-1]
 		} else {
 			// If this is the first point in the list, move from the current position
-			lastPoint = Point{
+			lastPoint = helpers.Point{
 				Latitude:  b.Latitude,
 				Longitude: b.Longitude,
 			}
@@ -236,7 +248,7 @@ func (b *Bike) SimulatePath(points []Point) {
 				lerpLat := deltaLat*progress + lastPointLat
 				lerpLon := deltaLon*progress + lastPointLon
 
-				b.SetPosition(Point{
+				b.SetPosition(helpers.Point{
 					Latitude:  fmt.Sprintf("%f", lerpLat),
 					Longitude: fmt.Sprintf("%f", lerpLon),
 				})
