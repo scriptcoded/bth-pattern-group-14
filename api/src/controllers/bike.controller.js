@@ -36,6 +36,8 @@ module.exports.getAllBikes = [
     })
 
     for (const bike of bikes) {
+      bike.active = bike.rides.length > 0
+      delete bike.rides
       delete bike.token
     }
 
@@ -104,6 +106,8 @@ module.exports.deleteBike = [
         }
       })
 
+      bike.active = bike.rides.length > 0
+      delete bike.rides
       delete bike.token
 
       res.json({ data: bike })
@@ -129,6 +133,8 @@ module.exports.getOneBike = [
       throw createError(404, 'Bike not found')
     }
 
+    bike.active = bike.rides.length > 0
+    delete bike.rides
     delete bike.token
 
     res.json({ data: bike })
@@ -155,6 +161,8 @@ module.exports.updateBike = [
         data: req.body
       })
 
+      bike.active = bike.rides.length > 0
+      delete bike.rides
       delete bike.token
 
       res.json({ data: bike })
@@ -292,7 +300,7 @@ module.exports.updateStatus = [
   }),
 
   useAsync(async (req, res) => {
-    const bike = await req.db.bike.findUnique({
+    let bike = await req.db.bike.findUnique({
       where: {
         id: req.params.id
       }
@@ -303,7 +311,7 @@ module.exports.updateStatus = [
     }
 
     // Update bike
-    const updatedBike = await req.db.bike.update({
+    bike = await req.db.bike.update({
       where: {
         id: bike.id
       },
@@ -312,11 +320,20 @@ module.exports.updateStatus = [
         longitude: req.body.longitude,
         battery: req.body.battery,
         speed: req.body.speed
+      },
+      include: {
+        rides: {
+          where: {
+            endTime: null
+          }
+        }
       }
     })
 
+    bike.active = bike.rides.length > 0
+    delete bike.rides
     delete bike.token
 
-    res.json({ data: updatedBike })
+    res.json({ data: bike })
   })
 ]
