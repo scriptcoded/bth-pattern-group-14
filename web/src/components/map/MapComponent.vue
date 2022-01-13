@@ -17,6 +17,7 @@
 <script>
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import 'leaflet.markercluster'
 import markerBlue from '@/assets/blue.png'
 import markerYellow from '@/assets/yellow3.png'
 import markerGreen from '@/assets/green.png'
@@ -99,7 +100,7 @@ export default {
     const check = await this.getRide()
     if (!check) {
       this.setupLeafletMap()
-      this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+      this.intervalMap = setInterval(this.setupLeafletMap, 5000)
     }
   },
   beforeDestroy () {
@@ -118,7 +119,7 @@ export default {
       const bikeId = bike.bikeId
       this.startedRide = true
       this.rentedBikeUpdate(bikeId)
-      this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, bikeId)
+      this.intervalMap = setInterval(this.rentedBikeUpdate, 5000, bikeId)
       return true
     },
     /**
@@ -143,6 +144,7 @@ export default {
       }
 
       const marker = [this.locationMarkerBlue, false]
+      // this.parkingPosition
       this.parkingPosition.forEach((p, i) => {
         if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
           marker[0] = this.locationMarkerOrange
@@ -174,7 +176,8 @@ export default {
       })
 
       chargingstations.forEach((e, i) => {
-        const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        let position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        position = position.map(Number)
         this.chargingPosition.push(position)
         const recXY = [[position[0], position[1]], [position[2], position[3]]]
         L.rectangle(recXY, { color: '#ff7800', weight: 1 }).addTo(this.mapContainer).bindPopup(`Charging-station ${i + 1}`)
@@ -182,7 +185,8 @@ export default {
       })
 
       parkingzones.forEach((e, i) => {
-        const position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        let position = [e.latitudeStart, e.longitudeStart, e.latitudeEnd, e.longitudeEnd]
+        position = position.map(Number)
         this.parkingPosition.push(position)
         const recXY = [[position[0], position[1]], [position[2], position[3]]]
         L.rectangle(recXY, { color: '#00CAA8', weight: 1 }).addTo(this.mapContainer).bindPopup(`Parking-zone ${i + 1}`)
@@ -242,10 +246,10 @@ export default {
       clearInterval(this.intervalMap)
       if (what) {
         this.rentedBikeUpdate(id)
-        this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
+        this.intervalMap = setInterval(this.rentedBikeUpdate, 5000, id)
       } else {
         this.setupLeafletMap()
-        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
+        this.intervalMap = setInterval(this.setupLeafletMap, 5000)
       }
     },
 
@@ -287,9 +291,14 @@ export default {
       // console.log('Leta: ', arr, this.activePopup)
       const bikes = arr.map(b => b.id === this.activePopup ? null : b).filter(n => n)
       /**
+       * Marker cluster group
+       */
+      const markers = L.markerClusterGroup()
+      /**
        * Spew out markers randomly :D
        */
       bikes.forEach(async (bike, i) => {
+        console.log(bikes)
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
         // console.log(bike)
@@ -298,7 +307,7 @@ export default {
         // if (i % 2 == 0) {
         //   continue
         // }
-        const position = [bike.latitude, bike.longitude]
+        const position = [parseFloat(bike.latitude), parseFloat(bike.longitude)]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
         // console.log('%c Color' + i, 'background: #222; color: #bada55')
         const icon = this.checkZone(position, bike.disabled)
@@ -353,7 +362,8 @@ export default {
           //   }
           // })
         })
-        this.markerLayers.addLayer(mark)
+        markers.addLayer(mark)
+        this.markerLayers.addLayer(markers)
       })
       // || EXTRA || Make popup stay if we click on it, aka remove from markerLayers
       this.markerLayers.addTo(this.mapContainer)
