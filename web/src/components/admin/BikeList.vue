@@ -7,7 +7,8 @@
       <th> lat </th>
       <th> Battery </th>
       <th> Update </th>
-      <th />
+      <th> Turn On/Off </th>
+      <th> Delete </th>
     </tr>
     <tr
       v-for="item in arr"
@@ -36,10 +37,7 @@
         >
       </td>
       <td> {{ item.battery }} </td>
-      <td
-        v-if="!item.disabled"
-        class="update"
-      >
+      <td class="update">
         <button @click="updateBike(item.id, item.longitude, item.latitude)">
           Update bike
         </button>
@@ -55,6 +53,11 @@
           @click="disableBike(item.id, item.disabled)"
         >
           Turn on bike
+        </button>
+      </td>
+      <td class="delete">
+        <button @click="deleteBike(item.id)">
+          Delete bike
         </button>
       </td>
     </tr>
@@ -111,6 +114,11 @@ export default {
         longitude: long
       }
       await this.$api.patch(`/bikes/${id}`, data)
+    },
+    async deleteBike (id) {
+      const yes = confirm('You sure you wanna delete this bike?')
+      if (!yes) return
+      await this.$api.delete(`/bikes/${id}`)
     }
   }
 }

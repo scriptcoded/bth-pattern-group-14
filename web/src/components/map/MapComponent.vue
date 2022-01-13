@@ -45,6 +45,7 @@ export default {
       intervalMap: null,
       mapContainer: null,
       clickedMarker: null,
+      markers: L.markerClusterGroup(),
       mapLayers: [],
       center: [55.5652, 13.0481],
       baseXY: [55.5642, 13.0651],
@@ -102,7 +103,7 @@ export default {
     const check = await this.getRide()
     if (!check) {
       this.setupLeafletMap()
-      this.intervalMap = setInterval(this.setupLeafletMap, 5000)
+      this.intervalMap = setInterval(this.setupLeafletMap, 2000)
     }
   },
   beforeDestroy () {
@@ -121,7 +122,7 @@ export default {
       const bikeId = bike.bikeId
       this.startedRide = true
       this.rentedBikeUpdate(bikeId)
-      this.intervalMap = setInterval(this.rentedBikeUpdate, 5000, bikeId)
+      this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, bikeId)
       return true
     },
     /**
@@ -232,9 +233,10 @@ export default {
     * @returns the resetted map
     */
     async resetMap () {
-      // this.markerLayers.eachLayer(layer => {
-      //   this.mapContainer.removeLayer(layer)
-      // })
+      this.markers.eachLayer(layer => {
+        this.markers.removeLayer(layer)
+      })
+      this.bikesOnMap = []
     },
 
     /**
@@ -248,10 +250,10 @@ export default {
       clearInterval(this.intervalMap)
       if (what) {
         this.rentedBikeUpdate(id)
-        this.intervalMap = setInterval(this.rentedBikeUpdate, 5000, id)
+        this.intervalMap = setInterval(this.rentedBikeUpdate, 2000, id)
       } else {
         this.setupLeafletMap()
-        this.intervalMap = setInterval(this.setupLeafletMap, 5000)
+        this.intervalMap = setInterval(this.setupLeafletMap, 2000)
       }
     },
 
@@ -299,26 +301,40 @@ export default {
       const bikes = await this.$api.get('/bikes')
       const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
       const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.updatedAt)
-      // const bikeIds = bikes.map(bike => bike.id)
+      const bikeIds = bikes.map(bike => bike.id)
 
-      // const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
+      const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
       const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id))
-      const updatedBikes = bikes.filter(bike => !bikesOnMapUpdated.includes(bike.updatedAt))
+      // console.log(bikesOnMapIds)
+      const updatedBikes = bikes.filter(bike => !bikesOnMapUpdated.includes(bike.updatedAt) && bikesOnMapIds.includes(bike.id))
       // console.log('removed', removedBikes)
       // console.log('added', addedBikes)
       // console.log('updated', updatedBikes)
 
-      await this.resetMap()
+      // await this.resetMap()
 
       updatedBikes.forEach(async (bike, i) => {
-        // console.log(bike)
         const position = [bike.latitude, bike.longitude]
         const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
-        // const newLatLng = new L.LatLng(position[0], position[1])
         marker.mark.setLatLng(position)
-        // this.mapContainer.addTo(marker)
       })
+
+      removedBikes.forEach(async (bike) => {
+        const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
+        this.markers.removeLayer(marker.mark)
+        this.mapContainer.removeLayer(marker.mark)
+      })
+
       this.bikesOnMap = bikes
+
+      // this.bikesOnMap = filter
+
+      // this.markerArray.forEach(e => {
+
+      // })
+      // this.markerLayers.eachLayer(layer => {
+      //   this.mapContainer.removeLayer(layer)
+      // })
 
       // this.bikesOnMap = this.bikesOnMap.map(e => {
       //   updatedBikes.forEach(updated => {
@@ -355,7 +371,7 @@ export default {
       /**
        * Marker cluster group
        */
-      const markers = L.markerClusterGroup()
+      // const markers = L.markerClusterGroup()
       /**
        * Spew out markers randomly :D
        */
@@ -421,8 +437,8 @@ export default {
           //   }
           // })
         })
-        markers.addLayer(mark)
-        this.markerLayers.addLayer(markers)
+        this.markers.addLayer(mark)
+        this.markerLayers.addLayer(this.markers)
         this.markerArray.push({ bikeId: bike.id, mark: mark })
         this.bikesOnMap.push(bike)
       })
