@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.3...v1.3.0) (2022-01-14)
+
+
+### Features
+
+* runtime config ([c29390a](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/c29390af6a0b23be5a5ae30d95bfbfbbaa17f006))
+
+
+### Bug Fixes
+
+* frontend catchall ([4e3485f](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/4e3485fe304769c0d3ed9c756bbf818e99dddf41))
+* spa config ([3724596](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/372459642b42591f7dffcd1b76390160fe4bac9d))
+
 ### [1.2.3](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.2...v1.2.3) (2022-01-13)
 
 
