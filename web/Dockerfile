@@ -15,3 +15,5 @@ RUN npm run build
 FROM codecentric/single-page-application-server as production-stage
 
 COPY --from=build-stage /app/dist /app
+
+EXPOSE 80
