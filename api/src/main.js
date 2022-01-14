@@ -43,11 +43,12 @@ app.use(express.json({
     req.rawBody = buf
   }
 }))
+app.set('trust proxy', 1)
 app.use(session({
   secret: config.appSecret,
   store: redisStore,
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   cookie: {
     sameSite: config.isDev ? 'lax' : 'none',
     secure: !config.isDev,

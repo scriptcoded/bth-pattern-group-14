@@ -5,4 +5,4 @@ default:
     content_security_policy:
       base-uri: "'self'"
       block-all-mixed-content: true
-      default-src: "'self' https://api.mapbox.com" 
+      default-src: "'self' https://api.elsp.nihlen.dev https://api.mapbox.com" 
