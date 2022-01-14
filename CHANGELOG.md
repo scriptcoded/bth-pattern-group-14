@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.3.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.3.0...v1.3.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* config loading ([519c1ff](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/519c1ff0ad2402074c1276f7aff85e4e813e3c78))
+* expose ([ba1648e](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/ba1648efb6a1e6eab571748c4b39cff03926e0bf))
+
 ## [1.3.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.2.3...v1.3.0) (2022-01-14)
 
 
