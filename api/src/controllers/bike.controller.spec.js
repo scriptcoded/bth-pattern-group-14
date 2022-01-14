@@ -1,7 +1,7 @@
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 // const { findParkingZoneAtPoint, findChargingStationAtPoint } = require('../utils/zone')
-// const paymentService = require('../services/payment.service')
+const paymentService = require('../services/payment.service')
 
 const bikeController = require('./bike.controller')
 
@@ -313,31 +313,33 @@ test('startRide user already active', async () => {
   expect(throwError).toThrow()
 })
 
-// test('endRide ends bike', async () => {
-//   const mockUpdate = {
-//     endTime: new Date(),
-//     toParkingZone: false,
-//     endLatitude: mockBikes[0].latitude,
-//     endLongitude: mockBikes[0].longitude,
-//     chargedAmount: 10
-//   }
+test('endRide ends ride', async () => {
+  const mockActiveRide = {
+    bike: mockBikes[0],
+    startTime: new Date(),
+    fromParkingZone: true
+  }
+  req.db.ride.findFirst.mockResolvedValue(mockActiveRide)
+  req.db.ride.update.mockResolvedValue(mockRide[0])
 
-//   req.db.ride.findFirst.mockResolvedValue(true)
-//   // req.db.bike.findUnique.mockResolvedValue(false)
+  // spy on
+  jest.spyOn(paymentService, 'calculateRideCost').mockResolvedValue({})
+  jest.spyOn(paymentService, 'chargeUser').mockResolvedValue({})
 
-//   // findParkingZoneAtPoint.mockResolvedValue({})
-//   // findChargingStationAtPoint.mockResolvedValue({})
-//   req.db.ride.update.mockResolvedValue(mockUpdate)
+  getControllerMethod(bikeController.endRide)(req, res, next)
+  await next.waitToHaveBeenCalled()
 
-//   // spy on
-//   jest.spyOn(paymentService, 'calculateRideCost').mockResolvedValue({})
-//   jest.spyOn(paymentService, 'chargeUser').mockResolvedValue({})
+  expect(res.json).toHaveBeenCalledWith({ data: mockRide[0] })
+})
 
-//   getControllerMethod(bikeController.endRide)(req, res, next)
-//   await next.waitToHaveBeenCalled()
+test('endRide bike is not in use', async () => {
+  req.db.ride.findFirst.mockResolvedValue(false)
 
-//   expect(res.json).toHaveBeenCalledWith({ data: mockRide[0] })
-// })
+  getControllerMethod(bikeController.endRide)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(throwError).toThrow()
+})
 
 test('updateStatus bike that is rented', async () => {
   req.body = {
@@ -348,13 +350,6 @@ test('updateStatus bike that is rented', async () => {
   }
 
   req.db.bike.findUnique.mockResolvedValue(mockBikes[0])
-
-  const mockUpdatedBike = {
-    latitude: req.body.latitude,
-    longitude: req.body.longitude,
-    battery: req.body.battery,
-    speed: req.body.speed
-  }
 
   req.db.bike.update.mockResolvedValue(mockBikes[0])
 
