@@ -152,7 +152,7 @@ export default {
     toggleStartedRide () {
       this.startedRide = !this.startedRide
     },
-    checkZone (bikePosition, disabled, available) {
+    checkIcon (bike) {
       /**
        * BP[0] = Latitude
        * BP[1] = Long
@@ -161,28 +161,33 @@ export default {
        * P[2] = latitudeEnd
        * P[3] = longitudeEnd
        */
-      if (disabled) {
+      if (bike.disabled) {
         return [this.locationMarkerRed, false]
       }
 
       const marker = [this.locationMarkerBlue, false]
       // this.parkingPosition
       this.parkingPosition.forEach((p, i) => {
-        if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
+        if ((bike.latitude >= p[0] && bike.latitude <= p[2]) && (bike.longitude >= p[1] && bike.longitude <= p[3])) {
           marker[0] = this.locationMarkerOrange
         }
       })
       this.chargingPosition.forEach((p, i) => {
-        if ((bikePosition[0] >= p[0] && bikePosition[0] <= p[2]) && (bikePosition[1] >= p[1] && bikePosition[1] <= p[3])) {
+        if ((bike.latitude >= p[0] && bike.latitude <= p[2]) && (bike.longitude >= p[1] && bike.longitude <= p[3])) {
           marker[0] = this.locationMarkerPurple
           marker[1] = true
         }
       })
 
-      if (!available) {
+      if (bike.battery < 40 && marker[0] === this.locationMarkerBlue) {
+        marker[0] = this.locationMarkerYellow
+      }
+
+      if (!bike.available) {
         marker[0] = this.locationMarkerGreen
         marker[1] = false
       }
+
       return marker
     },
 
@@ -257,10 +262,23 @@ export default {
     * @returns the resetted map
     */
     async resetMap () {
+      // this.bikesOnMap.push(rentedBike)
+      // this.markers.addLayer(mark)
+      // this.markerLayers.addLayer(this.markers)
+
+      // this.markerLayers.addTo(this.mapContainer)
+      // console.log(this.markerLayers)
+      this.markerLayers.eachLayer(layer => {
+        this.mapContainer.removeLayer(layer)
+      })
       this.markers.eachLayer(layer => {
         this.markers.removeLayer(layer)
       })
+      this.markerArray = []
       this.bikesOnMap = []
+      // console.log('bikesOnMap', this.bikesOnMap.length)
+      // console.log('markerLayers', this.markerLayers.length)
+      // console.log('mapContainer', this.mapContainer.length)
     },
 
     /**
@@ -296,7 +314,16 @@ export default {
           <h2 class="dab">Hey!</h2>
           <p>I'm riding along!</p>
         `).addTo(this.markerLayers)
-      this.markerLayers.addTo(this.mapContainer)
+      const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
+
+      if (!bikesOnMapIds.includes(rentedBike.id)) {
+        this.bikesOnMap.push(rentedBike)
+        this.markers = L.markerClusterGroup()
+        this.markers.addLayer(mark)
+        // this.markerLayers.addLayer(this.markers)
+
+        this.markers.addTo(this.mapContainer)
+      }
 
       this.selectedBike = {
         battery: rentedBike.battery,
@@ -323,31 +350,38 @@ export default {
       // // TODO: Implement
       // }
       const bikes = await this.$api.get('/bikes')
-      console.log(bikes)
+      // console.log(bikes)
       const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
-      const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.updatedAt)
+      // const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.id)
+      // const bikesAvailable = bikes.map
       const bikeIds = bikes.map(bike => bike.id)
 
       const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
-      const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id))
-      // console.log(bikesOnMapIds)
-      const updatedBikes = bikes.filter(bike => !bikesOnMapUpdated.includes(bike.updatedAt) && bikesOnMapIds.includes(bike.id))
-      console.log('removed', removedBikes)
-      console.log('added', addedBikes)
-      console.log('updated', updatedBikes)
+      const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id) && this.markerArray)
+      const updatedBikes = bikes.filter(bike => bikesOnMapIds.includes(bike.id))
+      // console.log('removed', removedBikes)
+      // console.log('added', addedBikes)
+      // console.log('updated', updatedBikes)
+      // console.log(this.markerArray)
 
       // await this.resetMap()
-
-      updatedBikes.forEach(async (bike, i) => {
-        const position = [bike.latitude, bike.longitude]
-        const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
-        marker.mark.setLatLng(position)
-      })
 
       removedBikes.forEach(async (bike) => {
         const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
         this.markers.removeLayer(marker.mark)
         this.mapContainer.removeLayer(marker.mark)
+        this.markerArray = this.markerArray.filter(marker => marker.bikeId !== bike.id)
+      })
+
+      updatedBikes.forEach((bike, i) => {
+        const position = [bike.latitude, bike.longitude]
+        const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
+        marker.mark.setLatLng(position)
+        const icon = this.checkIcon(bike)
+        const text = this.getPopupText(icon[1], bike)
+
+        marker.mark.options.icon = icon[0]
+        marker.mark._popup.setContent(text)
       })
 
       this.bikesOnMap = bikes
@@ -409,10 +443,10 @@ export default {
         // if (i % 2 == 0) {
         //   continue
         // }
-        const position = [parseFloat(bike.latitude), parseFloat(bike.longitude)]
+        const position = [bike.latitude, bike.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
         // console.log('%c Color' + i, 'background: #222; color: #bada55')
-        const icon = this.checkZone(position, bike.disabled, bike.available)
+        const icon = this.checkIcon(bike)
         // const charge = icon[1]
 
         mark.options.icon = icon[0]
@@ -455,7 +489,7 @@ export default {
         this.markers.addLayer(mark)
         this.markerLayers.addLayer(this.markers)
         this.markerArray.push({ bikeId: bike.id, mark: mark })
-        this.bikesOnMap.push(bike)
+        // this.bikesOnMap.push(bike)
       })
       // || EXTRA || Make popup stay if we click on it, aka remove from markerLayers
       this.markerLayers.addTo(this.mapContainer)
