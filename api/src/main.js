@@ -55,9 +55,15 @@ app.use(session({
   }
 }))
 
-// TODO: This is just a temporary solution while in dev. It should not be used in production.
 const corsOptions = {
-  origin: (origin, cb) => cb(null, origin),
+  origin (origin, cb) {
+    if (config.isDev) {
+      cb(null, origin)
+      return
+    }
+
+    cb(null, [config.frontendURL])
+  },
   credentials: true
 }
 

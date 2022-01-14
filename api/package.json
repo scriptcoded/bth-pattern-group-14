@@ -12,9 +12,6 @@
     "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done",
     "db:seed:simulation": "node -r dotenv/config prisma/seed-simulation.js"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "author": "",
   "license": "ISC",
   "devDependencies": {

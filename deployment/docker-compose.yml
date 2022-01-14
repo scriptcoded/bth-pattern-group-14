@@ -65,6 +65,7 @@ services:
     restart: always
     container_name: elsp-api
     labels:
+      - traefik.http.services.elsp-api.loadbalancer.server.port=4000
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.tentamera-api.rule=Host(`api.elsp.nihlen.dev`)
@@ -75,7 +76,7 @@ services:
       - SIMULATION_MODE=false
       - API_URL=https://api.elsp.nihlen.dev
       - FRONTEND_URL=https://elsp.nihlen.dev
-      - DATABASE_URL=mysql://root:${DATABASE_PASSWORD}@mysql:3306/pattern
+      - DATABASE_URL=mysql://root:${DATABASE_PASSWORD}@mysql:3306/elsp
       - REDIS_URL=redis://redis:6379
       - APP_SECRET
       - GITHUB_CLIENT_ID
