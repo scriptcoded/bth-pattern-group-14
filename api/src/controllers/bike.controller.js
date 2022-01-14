@@ -74,7 +74,6 @@ module.exports.createBike = [
     let bike
     for (let i = 0; i < 10; i++) {
       const id = generateBikeID()
-
       try {
         bike = await req.db.bike.create({
           data: {
@@ -124,7 +123,7 @@ module.exports.deleteBike = [
       delete bike.rides
       delete bike.token
 
-      res.json({ data: bike })
+      res.json({ data: bike }) // Needs to return bike?
     } catch (e) {
       if (isPrismaError(e, 'P2025')) {
         throw createError(404, 'Bike not found')

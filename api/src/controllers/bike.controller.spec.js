@@ -19,8 +19,9 @@ const mockBikes = [
     latitude: 1,
     longitude: 2,
     battery: 59,
-    speed: 8,
-    disabled: false
+    speed: 9,
+    disabled: false,
+    rides: 'ride1'
   },
   {
     id: 'bike2',
@@ -28,7 +29,8 @@ const mockBikes = [
     longitude: 4,
     battery: 37,
     speed: 0,
-    disabled: false
+    disabled: false,
+    rides: ''
   }
 ]
 
@@ -86,6 +88,33 @@ beforeEach(() => {
     json: jest.fn()
   }
 
+  mockBikes[0].rides = {
+    bike: {
+      connect: {
+        id: mockUsers[0].id
+      }
+    },
+    endTime: null
+  }
+
+  mockBikes[1].rides = {
+    bike: {
+      connect: {
+        id: mockUsers[0].id
+      }
+    },
+    endTime: new Date()
+  }
+
+  mockUsers[0].rides = {
+    bike: {
+      connect: {
+        id: mockUsers[0].id
+      }
+    },
+    endTime: null
+  }
+
   next = createWaitableMock()
 })
 
@@ -98,8 +127,20 @@ test('getAllBikes returns correct bikes', async () => {
   expect(res.json).toHaveBeenCalledWith({ data: mockBikes })
 })
 
+test('getAllBikes is admin', async () => {
+  req.user = {
+    role: 'ADMIN'
+  }
+  req.db.bike.findMany.mockResolvedValue(mockBikes)
+
+  getControllerMethod(bikeController.getAllBikes)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: mockBikes })
+})
+
 test('getOneBike respects url param', async () => {
-  req.params.id = 'a'
+  req.params.id = 'bike1'
 
   getControllerMethod(bikeController.getOneBike)(req, res, next)
   await next.waitToHaveBeenCalled()
@@ -112,8 +153,8 @@ test('getOneBike respects url param', async () => {
 })
 
 test('getOneBike returns correct bike', async () => {
+  req.params.id = 'bike1'
   req.db.bike.findUnique.mockResolvedValue(mockBikes[0])
-  req.params.id = 'a'
 
   getControllerMethod(bikeController.getOneBike)(req, res, next)
   await next.waitToHaveBeenCalled()
@@ -128,7 +169,8 @@ test('createBike creates a bike', async () => {
     longitude: 4,
     battery: 37,
     speed: 0,
-    disabled: false
+    disabled: false,
+    available: true
   }
 
   req.db.bike.create.mockResolvedValue(req.body)
@@ -148,6 +190,18 @@ test('createBike throws error when failed to generate uniqe id', async () => {
   expect(throwError).toThrow()
 })
 
+test('createBike throws error when failed to create bike', async () => {
+  req.body = {
+    latitude: mockBikes[0].latitude,
+    longitude: mockBikes[0].longitude
+  }
+  req.db.bike.create.mockResolvedValue(false)
+  getControllerMethod(bikeController.createBike)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(throwError).toThrow()
+})
+
 test('updateBike respects url param', async () => {
   req.params.id = 'a'
 
@@ -161,7 +215,7 @@ test('updateBike respects url param', async () => {
   }))
 })
 
-test('updateBike modifies bike', async () => {
+test('updateBike throws error not updating bike', async () => {
   req.body = {
     name: 'steve'
   }
@@ -174,22 +228,26 @@ test('updateBike modifies bike', async () => {
       name: req.body.name
     }
   }))
+  expect(throwError).toThrow()
 })
 
 test('updateBike returns updated bike', async () => {
   req.body = {
-    name: 'steve'
+    disabled: true
   }
-  req.db.bike.update.mockResolvedValue(req.body)
+  req.params.id = 'bike1'
+  req.db.bike.update.mockResolvedValue(mockBikes[0])
 
   getControllerMethod(bikeController.updateBike)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(res.json).toHaveBeenCalledWith({ data: req.body })
+  mockBikes[0].disabled = true
+
+  expect(res.json).toHaveBeenCalledWith({ data: mockBikes[0] })
 })
 
 test('deleteBike respects url param', async () => {
-  req.params.id = 'a'
+  req.params.id = 'bike1'
 
   getControllerMethod(bikeController.deleteBike)(req, res, next)
   await next.waitToHaveBeenCalled()
@@ -212,9 +270,9 @@ test('deleteBike returns deleted bike', async () => {
 
 test('startRide returns data from ride', async () => {
   req.db.ride.findFirst.mockResolvedValue(false)
+  req.db.user.findUnique.mockResolvedValue(mockUsers[0])
   req.db.bike.findUnique.mockResolvedValue(true)
   req.db.ride.create.mockResolvedValue(mockRide[0])
-  // findParkingZoneAtPoint.mockResolvedValue(true)
 
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
@@ -233,7 +291,21 @@ test('startRide active ride already exists', async () => {
 
 test('startRide bike not found', async () => {
   req.db.ride.findFirst.mockResolvedValue(false)
+  req.db.user.findUnique.mockResolvedValue(mockUsers[0])
   req.db.bike.findUnique.mockResolvedValue(false)
+
+  getControllerMethod(bikeController.startRide)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(throwError).toThrow()
+})
+
+test('startRide user already active', async () => {
+  const mockUserError = {
+    rides: 'active ride'
+  }
+  req.db.ride.findFirst.mockResolvedValue(false)
+  req.db.user.findUnique.mockResolvedValue(mockUserError)
 
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
@@ -284,18 +356,13 @@ test('updateStatus bike that is rented', async () => {
     speed: req.body.speed
   }
 
-  req.db.bike.update.mockResolvedValue(mockUpdatedBike)
+  req.db.bike.update.mockResolvedValue(mockBikes[0])
 
   getControllerMethod(bikeController.updateStatus)(req, res, next)
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({
-    data: {
-      latitude: req.body.latitude,
-      longitude: req.body.longitude,
-      battery: req.body.battery,
-      speed: req.body.speed
-    }
+    data: mockBikes[0]
   })
 })
 
