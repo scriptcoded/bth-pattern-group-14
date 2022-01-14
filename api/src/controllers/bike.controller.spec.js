@@ -1,13 +1,12 @@
+const createError = require('http-errors')
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
+
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 // const { findParkingZoneAtPoint, findChargingStationAtPoint } = require('../utils/zone')
 const paymentService = require('../services/payment.service')
-const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
-const createError = require('http-errors')
 
 const bikeController = require('./bike.controller')
-
-// jest.mock('../utils/zone')
 
 const mockUsers = [
   {
@@ -61,17 +60,6 @@ const mockRide = [
     chargedAmount: 20
   }
 ]
-
-// jest.mock('../utils/zone', () => {
-//   const originalModule = jest.requireActual('../utils/zone')
-
-//   return {
-//     __esModule: true,
-//     ...originalModule,
-//     findParkingZoneAtPoint: false,
-//     findChargingStationAtPoint: false
-//   }
-// })
 
 let req
 let res
@@ -211,6 +199,19 @@ test('createBike throws error when failed to create bike', async () => {
   expect(next).toHaveBeenCalledWith(createError(409, 'Failed generating unique ID, please try again'))
 })
 
+test('createBike throws error not prisma', async () => {
+  req.body = {
+    latitude: mockBikes[0].latitude,
+    longitude: mockBikes[0].longitude
+  }
+  req.db.bike.create.mockRejectedValue(new Error())
+
+  getControllerMethod(bikeController.createBike)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
+})
+
 test('updateBike respects url param', async () => {
   req.params.id = 'a'
 
@@ -237,6 +238,14 @@ test('updateBike throws error not updating bike', async () => {
       name: req.body.name
     }
   }))
+})
+
+test('updateBike Bike not found', async () => {
+  req.db.bike.update.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+  getControllerMethod(bikeController.updateBike)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Bike not found'))
 })
 
 test('updateBike returns updated bike', async () => {
@@ -274,6 +283,15 @@ test('deleteBike returns deleted bike', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockBikes[0] })
+})
+
+test('deleteBike throws error Bike not found', async () => {
+  req.db.bike.delete.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(bikeController.deleteBike)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Bike not found'))
 })
 
 test('startRide returns data from ride', async () => {

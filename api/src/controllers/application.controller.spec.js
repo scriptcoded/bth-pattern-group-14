@@ -1,3 +1,6 @@
+const createError = require('http-errors')
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
+
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 
@@ -137,4 +140,52 @@ test('createApplication returns created Application', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockApplication[0] })
+})
+
+test('application error: delete application not found', async () => {
+  req.body = {
+    name: 'App 1'
+  }
+  req.db.applications.delete.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(applicationController.deleteApplication)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Application not found'))
+})
+
+test('application error: delete not prisma error', async () => {
+  req.body = {
+    name: 'App 1'
+  }
+  req.db.applications.delete.mockRejectedValue(new Error())
+
+  getControllerMethod(applicationController.deleteApplication)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
+})
+
+test('application error: update application not found', async () => {
+  req.body = {
+    name: 'App 1'
+  }
+  req.db.applications.update.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(applicationController.updateApplication)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Application not found'))
+})
+
+test('application error: update not prisma error', async () => {
+  req.body = {
+    name: 'App 1'
+  }
+  req.db.applications.update.mockRejectedValue(new Error())
+
+  getControllerMethod(applicationController.updateApplication)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
 })

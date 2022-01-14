@@ -1,3 +1,6 @@
+const createError = require('http-errors')
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
+
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 
@@ -175,4 +178,40 @@ test('deleteUser returns deleted user', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockUsers[0] })
+})
+
+test('user error: update user not found', async () => {
+  req.db.user.update.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(userController.updateUser)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'User not found'))
+})
+
+test('user error: update not prisma error', async () => {
+  req.db.user.update.mockRejectedValue(new Error())
+
+  getControllerMethod(userController.updateUser)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
+})
+
+test('user error: delete user not found', async () => {
+  req.db.user.delete.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(userController.deleteUser)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'User not found'))
+})
+
+test('user error: delete not prisma error', async () => {
+  req.db.user.delete.mockRejectedValue(new Error())
+
+  getControllerMethod(userController.deleteUser)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
 })

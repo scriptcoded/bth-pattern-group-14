@@ -1,3 +1,6 @@
+const createError = require('http-errors')
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
+
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 
@@ -108,37 +111,6 @@ test('updateDrivingZone returns updated driving zone', async () => {
   expect(res.json).toHaveBeenCalledWith({ data: req.body })
 })
 
-// test('updateDrivingZone without id', async () => {
-//   req.body = {
-//     id: null
-//   }
-//   req.db.drivingZone.update.mockResolvedValue(req.body)
-
-//   req.params.id = null
-//   getControllerMethod(drivingZoneController.updateDrivingZone)(req, res, next)
-//   await next.waitToHaveBeenCalled()
-
-//   // console.log(expect(res.json))
-
-//   expect(res.json).toHaveBeenCalledWith({ data: req.body })
-// })
-
-// test('bad error', async () => {
-//   req.body = {
-//     name: 'steve'
-//   }
-//   req.db.drivingZone.update.mockResolvedValue(req.body)
-
-//   getControllerMethod(drivingZoneController.updateDrivingZone)(req, res, next)
-//   await next.waitToHaveBeenCalled()
-
-//   // expect(res.json).toHaveBeenCalledWith({ data: req.body })
-//   const t = () => {
-//     throw new createError()
-//   }
-//   expect(t).toThrow(createError)
-// })
-
 test('createDrivingZone', async () => {
   req.body = {
     name: 'c',
@@ -154,16 +126,6 @@ test('createDrivingZone', async () => {
 
   expect(res.json).toHaveBeenCalledWith({ data: req.body })
 })
-
-// test('createDrivingZone with no value', async () => {
-//   req.body = {}
-//   req.db.drivingZone.create.mockResolvedValue(req.body)
-
-//   getControllerMethod(drivingZoneController.createDrivingZone)(req, res, next)
-//   await next.waitToHaveBeenCalled()
-
-//   expect(res.json).toHaveBeenCalledWith({ data: req.body })
-// })
 
 test('deleteDrivingZone respects url param', async () => {
   req.params.id = 'a'
@@ -185,4 +147,40 @@ test('deleteDrivingZone returns deleted driving zone', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockZones[0] })
+})
+
+test('drivingZone error: update driving zone not found', async () => {
+  req.db.drivingZone.update.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(drivingZoneController.updateDrivingZone)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Driving zone not found'))
+})
+
+test('drivingZone error: update not prisma error', async () => {
+  req.db.drivingZone.update.mockRejectedValue(new Error())
+
+  getControllerMethod(drivingZoneController.updateDrivingZone)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
+})
+
+test('drivingZone error: delete driving zone not found', async () => {
+  req.db.drivingZone.delete.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(drivingZoneController.deleteDrivingZone)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Driving zone not found'))
+})
+
+test('drivingZone error: delete not prisma error', async () => {
+  req.db.drivingZone.delete.mockRejectedValue(new Error())
+
+  getControllerMethod(drivingZoneController.deleteDrivingZone)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
 })

@@ -1,3 +1,6 @@
+const createError = require('http-errors')
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
+
 const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 
@@ -68,6 +71,21 @@ test('getOneStation returns correct charging station', async () => {
   expect(res.json).toHaveBeenCalledWith({ data: mockZones[0] })
 })
 
+test('createStation returns created charging station', async () => {
+  req.body = {
+    latitudeStart: 1,
+    longitudeStart: 2,
+    latitudeEnd: 3,
+    longitudeEnd: 4
+  }
+  req.db.chargingStation.create.mockResolvedValue(req.body)
+
+  getControllerMethod(chargingStationController.createStation)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: req.body })
+})
+
 test('updateStation respects url param', async () => {
   req.params.id = 'a'
 
@@ -80,7 +98,6 @@ test('updateStation respects url param', async () => {
     }
   }))
 })
-
 
 test('updateStation modifies charging station', async () => {
   req.body = {
@@ -129,4 +146,52 @@ test('deleteStation returns deleted charging station', async () => {
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockZones[0] })
+})
+
+test('updateStation error: update charging zone not found', async () => {
+  req.body = {
+    latitudeStart: 1,
+    longitudeStart: 2,
+    latitudeEnd: 3,
+    longitudeEnd: 4
+  }
+  req.db.chargingStation.update.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(chargingStationController.updateStation)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Charging station not found'))
+})
+
+test('updateStation error: update charging zone not prisma error', async () => {
+  req.body = {
+    latitudeStart: 1,
+    longitudeStart: 2,
+    latitudeEnd: 3,
+    longitudeEnd: 4
+  }
+  req.db.chargingStation.update.mockRejectedValue(new Error())
+
+  getControllerMethod(chargingStationController.updateStation)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
+})
+
+test('deleteStation error: delete charging zone not found', async () => {
+  req.db.chargingStation.delete.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2025'))
+
+  getControllerMethod(chargingStationController.deleteStation)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(createError(404, 'Charging station not found'))
+})
+
+test('deleteStation error: delete charging zone not prisma error', async () => {
+  req.db.chargingStation.delete.mockRejectedValue(new Error())
+
+  getControllerMethod(chargingStationController.deleteStation)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(next).toHaveBeenCalledWith(new Error())
 })
