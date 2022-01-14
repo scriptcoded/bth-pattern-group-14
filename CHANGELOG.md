@@ -1,5 +1,14 @@
 # Changelog
 
+### [1.4.2](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.4.1...v1.4.2) (2022-01-14)
+
+
+### Bug Fixes
+
+* map stuff again ([5f5d7c8](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/5f5d7c8e9d2e4459ce46da33a7247d99dc7955ca))
+* remove logs and admin bug ([9198946](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/91989461d4fd0f61f826619d7ff0b480ddc4aaf5))
+* removes end ride for admin when rented ([f6c95ef](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/f6c95ef7743cab32b93f0da0f21b6a03f0678128))
+
 ### [1.4.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.4.0...v1.4.1) (2022-01-14)
 
 

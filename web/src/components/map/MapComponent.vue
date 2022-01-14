@@ -42,9 +42,6 @@ export default {
       chargingPosition: [],
       parkingPosition: [],
       startedRide: false,
-      selectedBike: {
-        available: false
-      },
       isAdmin: false,
       intervalMap: null,
       mapContainer: null,
@@ -98,7 +95,13 @@ export default {
         iconSize: [24, 24],
         iconAnchor: [12, 12],
         popupAnchor: [0, 0]
-      })
+      }),
+      clickListeners: {}
+    }
+  },
+  computed: {
+    selectedBike () {
+      return this.bikesOnMap.find(bike => bike.id === this.selectedBikeId)
     }
   },
   async mounted () {
@@ -353,13 +356,7 @@ export default {
         this.markers.addTo(this.mapContainer)
       }
 
-      this.selectedBike = {
-        battery: rentedBike.battery,
-        bikeId: rentedBike.id,
-        latitude: rentedBike.latitude,
-        longitude: rentedBike.longitude,
-        available: rentedBike.available
-      }
+      this.selectedBikeId = rentedBike.id
     },
     /**
     * This function sets up leafletmap
@@ -412,18 +409,16 @@ export default {
         marker.mark.setLatLng(position)
         const icon = this.checkIcon(bike)
         const text = this.getPopupText(icon[1], bike)
+        console.log(text)
         marker.mark.setIcon(icon[0])
-        marker.mark._popup.setContent(text)
-        marker.mark.removeEventListener('click')
-        marker.mark.addEventListener('click', () => {
-          this.selectedBike = {
-            battery: bike.battery,
-            bikeId: bike.id,
-            latitude: bike.latitude,
-            longitude: bike.longitude,
-            available: bike.available
+        if (!this.clickListeners[bike.id]) {
+          this.clickListeners[bike.id] = () => {
+            this.selectedBikeId = bike.id
           }
-        })
+        }
+        marker.mark.removeEventListener('click', this.clickListeners[bike.id])
+        marker.mark.addEventListener('click', this.clickListeners[bike.id])
+        marker.mark.setPopupContent(text)
       })
 
       this.bikesOnMap = bikes
@@ -499,26 +494,14 @@ export default {
 
         mark.bindPopup(text)
 
-        mark.addEventListener('click', () => {
-          this.selectedBike = {
-            battery: bike.battery,
-            bikeId: bike.id,
-            latitude: bike.latitude,
-            longitude: bike.longitude,
-            available: bike.available
+        if (!this.clickListeners[bike.id]) {
+          this.clickListeners[bike.id] = () => {
+            this.selectedBikeId = bike.id
           }
-          // this.activePopup = e.id
-          // const markerId = mark._leaflet_id
-          // // Marker
-          // // Find bk id ->marker.id where cykild.id = bk.id
+        }
+        mark.removeEventListener('click', this.clickListeners[bike.id])
+        mark.addEventListener('click', this.clickListeners[bike.id])
 
-          // // layer id === marker id (marker är en layer)
-          // this.mapLayers.eachLayer(layer => {
-          //   if (layer._leaflet_id === markerId) {
-          //     this.mapLayers.removeLayer(layer)
-          //   }
-          // })
-        })
         this.markers.addLayer(mark)
         this.markerLayers.addLayer(this.markers)
         this.markerArray.push({ bikeId: bike.id, mark: mark })
