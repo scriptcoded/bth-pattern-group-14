@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/main.js",
     "dev": "nodemon -r dotenv/config src/main.js",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "DATABASE_URL=mysql://x jest",
+    "test:coverage": "DATABASE_URL=mysql://x jest --coverage",
     "generate-uml": "prisma generate && dbml-renderer -i prisma/dbml/schema.dbml -f dot | dot -Tpng -o docs/uml.png",
     "watch-uml": "while inotifywait -e close_write prisma/schema.prisma; do npm run generate-uml; done",
     "db:seed:simulation": "node -r dotenv/config prisma/seed-simulation.js"

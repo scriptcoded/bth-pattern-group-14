@@ -2,5 +2,8 @@
   "collectCoverageFrom": [
     "src/**/*.js",
     "!src/utils/tests/**"
+  ],
+  "setupFilesAfterEnv": [
+    "./src/utils/tests/mockPrisma.js"
   ]
 }
