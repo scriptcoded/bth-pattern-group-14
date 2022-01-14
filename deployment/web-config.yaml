@@ -1,0 +1,8 @@
+default:
+  spa_config:
+    apiURL: https://api.elsp.nihlen.dev
+  hardening:
+    content_security_policy:
+      base-uri: "'self'"
+      block-all-mixed-content: true
+      default-src: "'self' https://api.mapbox.com" 

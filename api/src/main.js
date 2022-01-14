@@ -30,8 +30,7 @@ if (config.redisURL) {
 
   // Configure redis client
   const redisClient = redis.createClient({
-    host: 'localhost',
-    port: 6379
+    url: config.redisURL
   })
 
   redisStore = new RedisStore({ client: redisClient })
@@ -56,9 +55,15 @@ app.use(session({
   }
 }))
 
-// TODO: This is just a temporary solution while in dev. It should not be used in production.
 const corsOptions = {
-  origin: (origin, cb) => cb(null, origin),
+  origin (origin, cb) {
+    if (config.isDev) {
+      cb(null, origin)
+      return
+    }
+
+    cb(null, [config.frontendURL])
+  },
   credentials: true
 }
 
