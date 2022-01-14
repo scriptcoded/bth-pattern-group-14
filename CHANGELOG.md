@@ -1,5 +1,13 @@
 # Changelog
 
+### [1.4.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.4.0...v1.4.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* trust proxy ([c16a82d](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/c16a82d3c1777bcedddab5896d51b5c41af0c3e1))
+* update on everything ([e0a184c](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/e0a184ce151e95a7eed207d5af2d27540964c797))
+
 ## [1.4.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.3.1...v1.4.0) (2022-01-14)
 
 

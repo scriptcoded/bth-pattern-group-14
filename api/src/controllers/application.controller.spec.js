@@ -3,20 +3,6 @@ const { createWaitableMock, getControllerMethod } = require('../utils/tests/test
 
 const applicationController = require('./application.controller')
 
-/**
- *
- * model Applications {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  name  String
-  token String
-
-  apiCalls Int @default(0)
-}
- */
-
 const mockApplication = [
   {
     id: 'a',
@@ -136,6 +122,18 @@ test('deleteApplication returns deleted Application', async () => {
   req.db.applications.delete.mockResolvedValue(mockApplication[0])
 
   getControllerMethod(applicationController.deleteApplication)(req, res, next)
+  await next.waitToHaveBeenCalled()
+
+  expect(res.json).toHaveBeenCalledWith({ data: mockApplication[0] })
+})
+
+test('createApplication returns created Application', async () => {
+  req.body = {
+    name: 'App 1'
+  }
+  req.db.applications.create.mockResolvedValue(mockApplication[0])
+
+  getControllerMethod(applicationController.createApplication)(req, res, next)
   await next.waitToHaveBeenCalled()
 
   expect(res.json).toHaveBeenCalledWith({ data: mockApplication[0] })

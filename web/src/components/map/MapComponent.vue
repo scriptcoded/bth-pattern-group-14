@@ -6,6 +6,7 @@
     />
     <RentedBike
       :started="startedRide"
+      :isAdmin="isAdmin"
       :selected="selectedBike"
       @resetmap="resetMap"
       @toggle-started-ride="toggleStartedRide"
@@ -41,7 +42,10 @@ export default {
       chargingPosition: [],
       parkingPosition: [],
       startedRide: false,
-      selectedBike: null,
+      selectedBike: {
+        available: false
+      },
+      isAdmin: false,
       intervalMap: null,
       mapContainer: null,
       clickedMarker: null,
@@ -150,6 +154,10 @@ export default {
      * @returns {boolean} this.startedRide reversed
      */
     toggleStartedRide () {
+      if (this.startedRide === false) {
+        this.isAdmin = !this.$auth.hasRole('admin')
+      }
+      this.isAdmin = !this.isAdmin
       this.startedRide = !this.startedRide
     },
     checkIcon (bike) {
@@ -168,12 +176,36 @@ export default {
       const marker = [this.locationMarkerBlue, false]
       // this.parkingPosition
       this.parkingPosition.forEach((p, i) => {
-        if ((bike.latitude >= p[0] && bike.latitude <= p[2]) && (bike.longitude >= p[1] && bike.longitude <= p[3])) {
+        let latitudeStart = p[0]
+        let longitudeStart = p[1]
+        let latitudeEnd = p[2]
+        let longitudeEnd = p[3]
+        if (latitudeStart > latitudeEnd) {
+          latitudeStart = p[2]
+          latitudeEnd = p[0]
+        }
+        if (longitudeStart > longitudeEnd) {
+          longitudeStart = p[3]
+          longitudeEnd = p[1]
+        }
+        if ((bike.latitude >= latitudeStart && bike.latitude <= latitudeEnd) && (bike.longitude >= longitudeStart && bike.longitude <= longitudeEnd)) {
           marker[0] = this.locationMarkerOrange
         }
       })
       this.chargingPosition.forEach((p, i) => {
-        if ((bike.latitude >= p[0] && bike.latitude <= p[2]) && (bike.longitude >= p[1] && bike.longitude <= p[3])) {
+        let latitudeStart = p[0]
+        let longitudeStart = p[1]
+        let latitudeEnd = p[2]
+        let longitudeEnd = p[3]
+        if (latitudeStart > latitudeEnd) {
+          latitudeStart = p[2]
+          latitudeEnd = p[0]
+        }
+        if (longitudeStart > longitudeEnd) {
+          longitudeStart = p[3]
+          longitudeEnd = p[1]
+        }
+        if ((bike.latitude >= latitudeStart && bike.latitude <= latitudeEnd) && (bike.longitude >= longitudeStart && bike.longitude <= longitudeEnd)) {
           marker[0] = this.locationMarkerPurple
           marker[1] = true
         }
@@ -267,7 +299,6 @@ export default {
       // this.markerLayers.addLayer(this.markers)
 
       // this.markerLayers.addTo(this.mapContainer)
-      // console.log(this.markerLayers)
       this.markerLayers.eachLayer(layer => {
         this.mapContainer.removeLayer(layer)
       })
@@ -276,9 +307,6 @@ export default {
       })
       this.markerArray = []
       this.bikesOnMap = []
-      // console.log('bikesOnMap', this.bikesOnMap.length)
-      // console.log('markerLayers', this.markerLayers.length)
-      // console.log('mapContainer', this.mapContainer.length)
     },
 
     /**
@@ -329,7 +357,8 @@ export default {
         battery: rentedBike.battery,
         bikeId: rentedBike.id,
         latitude: rentedBike.latitude,
-        longitude: rentedBike.longitude
+        longitude: rentedBike.longitude,
+        available: rentedBike.available
       }
     },
     /**
@@ -350,7 +379,6 @@ export default {
       // // TODO: Implement
       // }
       const bikes = await this.$api.get('/bikes')
-      // console.log(bikes)
       const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
       // const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.id)
       // const bikesAvailable = bikes.map
@@ -358,11 +386,16 @@ export default {
 
       const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
       const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id) && this.markerArray)
-      const updatedBikes = bikes.filter(bike => bikesOnMapIds.includes(bike.id))
+      const updatedBikes = bikes.filter(bike => {
+        if (!bikesOnMapIds.includes(bike.id)) {
+          return false
+        }
+        const mapBike = this.bikesOnMap.find(b => b.id === bike.id)
+        return JSON.stringify(mapBike) !== JSON.stringify(bike)
+      })
       // console.log('removed', removedBikes)
       // console.log('added', addedBikes)
       // console.log('updated', updatedBikes)
-      // console.log(this.markerArray)
 
       // await this.resetMap()
 
@@ -379,9 +412,18 @@ export default {
         marker.mark.setLatLng(position)
         const icon = this.checkIcon(bike)
         const text = this.getPopupText(icon[1], bike)
-
-        marker.mark.options.icon = icon[0]
+        marker.mark.setIcon(icon[0])
         marker.mark._popup.setContent(text)
+        marker.mark.removeEventListener('click')
+        marker.mark.addEventListener('click', () => {
+          this.selectedBike = {
+            battery: bike.battery,
+            bikeId: bike.id,
+            latitude: bike.latitude,
+            longitude: bike.longitude,
+            available: bike.available
+          }
+        })
       })
 
       this.bikesOnMap = bikes
@@ -403,8 +445,6 @@ export default {
       //   })
       // })
 
-      // console.log(newArray)
-
       // this.bikesOnMap = this.bikesOnMap.filter(bike => bike.includes(updatedBikes[i]))
 
       // updated
@@ -425,7 +465,6 @@ export default {
       /**
        * Remove active popup from changing on map
        */
-      // console.log('Leta: ', arr, this.activePopup)
       // const bikesArray = bikes.map(b => b.id === this.activePopup ? null : b).filter(n => n)
       /**
        * Marker cluster group
@@ -437,26 +476,21 @@ export default {
       addedBikes.forEach(async (bike, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
-        // console.log(bike)
         // Lat = Y, Long = X
-        // console.log('Bike: ', bike)
         // if (i % 2 == 0) {
         //   continue
         // }
         const position = [bike.latitude, bike.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
-        // console.log('%c Color' + i, 'background: #222; color: #bada55')
         const icon = this.checkIcon(bike)
         // const charge = icon[1]
 
-        mark.options.icon = icon[0]
+        mark.setIcon(icon[0])
 
         if (bike.battery < 40 && icon[0] === this.locationMarkerBlue) {
-          mark.options.icon = this.locationMarkerYellow
+          mark.setIcon(this.locationMarkerYellow)
         }
         // mark.on('click', this.onMarkClick)
-        // console.log(charge)
-        // console.log(bike)
         // if (bike.available) {
         //   const available = 'available for ride!'
         // }
@@ -470,18 +504,17 @@ export default {
             battery: bike.battery,
             bikeId: bike.id,
             latitude: bike.latitude,
-            longitude: bike.longitude
+            longitude: bike.longitude,
+            available: bike.available
           }
           // this.activePopup = e.id
           // const markerId = mark._leaflet_id
           // // Marker
           // // Find bk id ->marker.id where cykild.id = bk.id
 
-          // // this.mapLayers.eachLayer(e => console.log(e))
           // // layer id === marker id (marker är en layer)
           // this.mapLayers.eachLayer(layer => {
           //   if (layer._leaflet_id === markerId) {
-          //     console.log(layer._leaflet_id, markerId, layer)
           //     this.mapLayers.removeLayer(layer)
           //   }
           // })
@@ -495,10 +528,7 @@ export default {
       this.markerLayers.addTo(this.mapContainer)
     },
     onMarkClick (e) {
-      // console.log("Hej")
       // var popup = e.target.getPopup()
-
-      // console.log(popup)
     }
   }
 }
