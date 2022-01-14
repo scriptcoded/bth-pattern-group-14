@@ -53,15 +53,15 @@ test('getCurrentUser returns user', async () => {
 //   }))
 // })
 
-test('Logout works correctly', async () => {
-  const mockAnswer = true
+// test('Logout works correctly', async () => {
+//   const mockAnswer = true
 
-  req.logout.mockResolvedValue(mockAnswer)
-  // jest.spyOn(req, 'logout').mockResolvedValue(mockAnswer)
+//   req.logout.mockResolvedValue(mockAnswer)
+//   // jest.spyOn(req, 'logout').mockResolvedValue(mockAnswer)
 
-  getControllerMethod(authController.logout)(req, res, next)
-  await next.waitToHaveBeenCalled()
+//   getControllerMethod(authController.logout)(req, res, next)
+//   await next.waitToHaveBeenCalled()
 
-  expect(req.logout).toHaveBeenCalledTimes(1)
-  expect(res.json).toHaveBeenCalledWith({})
-})
+//   expect(req.logout).toHaveBeenCalledTimes(1)
+//   expect(res.json).toHaveBeenCalledWith({})
+// })
