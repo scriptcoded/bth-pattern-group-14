@@ -21,7 +21,7 @@ DigitalOcean. Managing the deployment is most easily done using the
 `DOCKER_HOST` environment variable:
 
 ```bash
-$ export DOCKER_HOST=ssh://elab.nihlen.dev
+$ export DOCKER_HOST=ssh://elsp.nihlen.dev
 $ docker ps # Docker commands will now act on the remove server
 ```
 
@@ -29,7 +29,7 @@ Update deployment:
 
 ```bash
 $ cd deployment
-$ docker compose up --env-file .env -d --remove-orphans
+$ docker compose --env-file .env up -d --remove-orphans
 ```
 
 ## Migrating database
@@ -39,7 +39,7 @@ Prisma Migrate through it:
 
 ```bash
 # Open SSH tunnel
-$ ssh -L 5432:localhost:5432 elab.nihlen.dev
+$ ssh -L 5432:localhost:5432 elsp.nihlen.dev
 
 # In a new terminal
 $ cd api

@@ -33,12 +33,12 @@ services:
       # To create user:password pair, it's possible to use this command:
       # echo $(htpasswd -nB user) | sed -e s/\\$/\\$\\$/g
       - traefik.enable=true
-      - 'traefik.http.routers.dashboard.rule=Host(`traefik.doculys.tentamera.se`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))'
+      - 'traefik.http.routers.dashboard.rule=Host(`traefik.elsp.nihlen.dev`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))'
       - 'traefik.http.routers.dashboard.entrypoints=websecure'
       - 'traefik.http.routers.dashboard.tls.certresolver=tlsresolver'
       - 'traefik.http.routers.dashboard.service=api@internal'
       - 'traefik.http.routers.dashboard.middlewares=dashboard-auth'
-      - 'traefik.http.middlewares.dashboard-auth.basicauth.users=scriptcoded:$$2y$$05$$O13NrAS4m5ccPa5WkCKml.pT/5M.5Imja9nfQ/eZThfNQqraCE65C'
+      - 'traefik.http.middlewares.dashboard-auth.basicauth.users=scriptcoded:$$2y$$05$$MQHVBdDglljo4loIsoqS4e5.NWSzJYiFshlV94kO8kcW.d0.ucvwa'
     ports:
       - '443:443'
       - '80:80'
@@ -46,45 +46,52 @@ services:
       - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  tentamera-web:
-    image: index.docker.io/scriptcoded/tentamera-beta-doculys-web
+  elsp-web:
+    image: index.docker.io/scriptcoded/bth-pattern-g14-web
     restart: always
-    container_name: tentamera-web
+    container_name: elsp-web
     labels:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-      - traefik.http.routers.tentamera-web.rule=Host(`doculys.tentamera.se`)
+      - traefik.http.routers.tentamera-web.rule=Host(`elsp.nihlen.dev`)
       - traefik.http.routers.tentamera-web.entrypoints=websecure
       - traefik.http.routers.tentamera-web.tls.certresolver=tlsresolver
 
-  tentamera-api:
-    image: index.docker.io/scriptcoded/tentamera-beta-doculys-api
+  elsp-api:
+    image: index.docker.io/scriptcoded/bth-pattern-g14-api
     restart: always
-    container_name: tentamera-api
+    container_name: elsp-api
     labels:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
-      - traefik.http.routers.tentamera-api.rule=Host(`api.doculys.tentamera.se`)
+      - traefik.http.routers.tentamera-api.rule=Host(`api.elsp.nihlen.dev`)
       - traefik.http.routers.tentamera-api.entrypoints=websecure
       - traefik.http.routers.tentamera-api.tls.certresolver=tlsresolver
     environment:
-      - PORT=4000
-      - HOST=0.0.0.0
-      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@tentamera-db:5432/tentamera-beta-doculys?schema=public
-      - S3_ENDPOINT=https://ams3.digitaloceanspaces.com/
-      - S3_REGION=ams3
-      - S3_BUCKET=malcolm-dev-tentamera-beta-doculys
-      - DOCULYS_POPPLER_DIR=/usr/local/bin
-      - S3_KEY
-      - S3_SECRET
-      - ADMIN_KEY
+      - NODE_ENV=production
+      - SIMULATION_MODE=false
+      - API_URL=http://localhost:4000
+      - FRONTEND_URL=http://localhost:80
+      - DATABASE_URL=mysql://root:${DATABASE_PASSWORD}@mysql:3306/pattern
+      - REDIS_URL=redis://redis:6379
+      - APP_SECRET
+      - GITHUB_CLIENT_ID
+      - GITHUB_CLIENT_SECRET
+      - STRIPE_SECRET_KEY
+      - STRIPE_PUBLISHABLE_KEY
+      - STRIPE_WEBHOOK_SECRET
 
-  tentamera-db:
-    image: 'postgres:latest'
+  mysql:
+    image: mysql
     restart: always
-    ports:
-      - 5432:5432
-    volumes:
-      - /var/lib/postgresql/data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
+    ports:
+      # Primarily used for migrations and debugging
+      - "3306:3306"
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+
+  redis:
+    image: redis
+    restart: always
