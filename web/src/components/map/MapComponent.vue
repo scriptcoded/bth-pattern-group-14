@@ -168,12 +168,36 @@ export default {
       const marker = [this.locationMarkerBlue, false]
       // this.parkingPosition
       this.parkingPosition.forEach((p, i) => {
-        if ((bike.latitude >= p[0] && bike.latitude <= p[2]) && (bike.longitude >= p[1] && bike.longitude <= p[3])) {
+        let latitudeStart = p[0]
+        let longitudeStart = p[1]
+        let latitudeEnd = p[2]
+        let longitudeEnd = p[3]
+        if (latitudeStart > latitudeEnd) {
+          latitudeStart = p[2]
+          latitudeEnd = p[0]
+        }
+        if (longitudeStart > longitudeEnd) {
+          longitudeStart = p[3]
+          longitudeEnd = p[1]
+        }
+        if ((bike.latitude >= latitudeStart && bike.latitude <= latitudeEnd) && (bike.longitude >= longitudeStart && bike.longitude <= longitudeEnd)) {
           marker[0] = this.locationMarkerOrange
         }
       })
       this.chargingPosition.forEach((p, i) => {
-        if ((bike.latitude >= p[0] && bike.latitude <= p[2]) && (bike.longitude >= p[1] && bike.longitude <= p[3])) {
+        let latitudeStart = p[0]
+        let longitudeStart = p[1]
+        let latitudeEnd = p[2]
+        let longitudeEnd = p[3]
+        if (latitudeStart > latitudeEnd) {
+          latitudeStart = p[2]
+          latitudeEnd = p[0]
+        }
+        if (longitudeStart > longitudeEnd) {
+          longitudeStart = p[3]
+          longitudeEnd = p[1]
+        }
+        if ((bike.latitude >= latitudeStart && bike.latitude <= latitudeEnd) && (bike.longitude >= longitudeStart && bike.longitude <= longitudeEnd)) {
           marker[0] = this.locationMarkerPurple
           marker[1] = true
         }
@@ -358,7 +382,14 @@ export default {
 
       const removedBikes = this.bikesOnMap.filter(bike => !bikeIds.includes(bike.id))
       const addedBikes = bikes.filter(bike => !bikesOnMapIds.includes(bike.id) && this.markerArray)
-      const updatedBikes = bikes.filter(bike => bikesOnMapIds.includes(bike.id))
+      const updatedBikes = bikes.filter(bike => {
+        if (!bikesOnMapIds.includes(bike.id)) {
+          return false
+        }
+        const mapBike = this.bikesOnMap.find(b => b.id === bike.id)
+        // console.log(JSON.stringify(mapBike), JSON.stringify(bike), JSON.stringify(mapBike) !== JSON.stringify(bike))
+        return JSON.stringify(mapBike) !== JSON.stringify(bike)
+      })
       // console.log('removed', removedBikes)
       // console.log('added', addedBikes)
       // console.log('updated', updatedBikes)
@@ -377,10 +408,11 @@ export default {
         const position = [bike.latitude, bike.longitude]
         const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
         marker.mark.setLatLng(position)
+        console.log('lol')
         const icon = this.checkIcon(bike)
         const text = this.getPopupText(icon[1], bike)
-
-        marker.mark.options.icon = icon[0]
+        console.log(icon)
+        marker.mark.setIcon(icon[0])
         marker.mark._popup.setContent(text)
       })
 
@@ -449,10 +481,10 @@ export default {
         const icon = this.checkIcon(bike)
         // const charge = icon[1]
 
-        mark.options.icon = icon[0]
+        mark.setIcon(icon[0])
 
         if (bike.battery < 40 && icon[0] === this.locationMarkerBlue) {
-          mark.options.icon = this.locationMarkerYellow
+          mark.setIcon(this.locationMarkerYellow)
         }
         // mark.on('click', this.onMarkClick)
         // console.log(charge)
