@@ -18,7 +18,7 @@ module.exports.githubStrategy = new GitHubStrategy(
     })
       .then(res => res.json())
       .then((emails) => {
-        const primaryRecord = emails.find(email => email.primary) ?? emails[0]
+        const primaryRecord = emails.find(email => email.primary) || emails[0]
 
         prisma.user.upsert({
           where: {

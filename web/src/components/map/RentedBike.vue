@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!selected.available && (!$auth.hasRole('admin') || isAdmin)">
-      <button @click="endRide(selected.bikeId)">
+      <button @click="endRide(selected.id)">
         End ride
       </button>
     </div>
@@ -14,7 +14,7 @@
       <p>
         Battery Level: {{ selected.battery }}%
       </p>
-      <button @click="startRide(selected.bikeId, selected.latitude, selected.longitude)">
+      <button @click="startRide(selected.id, selected.latitude, selected.longitude)">
         Start ride
       </button>
     </div>

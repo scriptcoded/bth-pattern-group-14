@@ -2,6 +2,8 @@ const { prismaMock } = require('../utils/tests/mockPrisma')
 const { createWaitableMock, getControllerMethod } = require('../utils/tests/tests')
 // const { findParkingZoneAtPoint, findChargingStationAtPoint } = require('../utils/zone')
 const paymentService = require('../services/payment.service')
+const { PrismaClientKnownRequestError } = require('@prisma/client/runtime')
+const createError = require('http-errors')
 
 const bikeController = require('./bike.controller')
 
@@ -74,15 +76,12 @@ const mockRide = [
 let req
 let res
 let next
-let throwError
 beforeEach(() => {
   req = {
     db: prismaMock,
     params: {},
     user: {}
   }
-
-  throwError = () => { throw new Error() }
 
   res = {
     json: jest.fn()
@@ -182,12 +181,22 @@ test('createBike creates a bike', async () => {
 })
 
 test('createBike throws error when failed to generate uniqe id', async () => {
-  req.db.bike.create.mockResolvedValue(false)
+  req.body = {
+    id: 'c',
+    latitude: 3,
+    longitude: 4,
+    battery: 37,
+    speed: 0,
+    disabled: false,
+    available: true
+  }
+
+  req.db.bike.create.mockRejectedValue(new PrismaClientKnownRequestError('test', 'P2002'))
 
   getControllerMethod(bikeController.createBike)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(throwError).toThrow()
+  expect(next).toHaveBeenCalledWith(createError(409, 'Failed generating unique ID, please try again'))
 })
 
 test('createBike throws error when failed to create bike', async () => {
@@ -199,7 +208,7 @@ test('createBike throws error when failed to create bike', async () => {
   getControllerMethod(bikeController.createBike)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(throwError).toThrow()
+  expect(next).toHaveBeenCalledWith(createError(409, 'Failed generating unique ID, please try again'))
 })
 
 test('updateBike respects url param', async () => {
@@ -228,7 +237,6 @@ test('updateBike throws error not updating bike', async () => {
       name: req.body.name
     }
   }))
-  expect(throwError).toThrow()
 })
 
 test('updateBike returns updated bike', async () => {
@@ -286,7 +294,7 @@ test('startRide active ride already exists', async () => {
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(throwError).toThrow()
+  expect(next).toHaveBeenCalledWith(createError(409, 'Bike is already in use'))
 })
 
 test('startRide bike not found', async () => {
@@ -297,7 +305,7 @@ test('startRide bike not found', async () => {
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(throwError).toThrow()
+  expect(next).toHaveBeenCalledWith(createError(404, 'Bike not found'))
 })
 
 test('startRide user already active', async () => {
@@ -310,7 +318,7 @@ test('startRide user already active', async () => {
   getControllerMethod(bikeController.startRide)(req, res, next)
   await next.waitToHaveBeenCalled()
 
-  expect(throwError).toThrow()
+  expect(next).toHaveBeenCalledWith(createError(409, 'User already has an active ride'))
 })
 
 test('endRide ends ride', async () => {
@@ -337,8 +345,6 @@ test('endRide bike is not in use', async () => {
 
   getControllerMethod(bikeController.endRide)(req, res, next)
   await next.waitToHaveBeenCalled()
-
-  expect(throwError).toThrow()
 })
 
 test('updateStatus bike that is rented', async () => {
@@ -373,6 +379,4 @@ test('updateStatus with invalid bike returns error', async () => {
 
   getControllerMethod(bikeController.updateStatus)(req, res, next)
   await next.waitToHaveBeenCalled()
-
-  expect(throwError).toThrow()
 })
