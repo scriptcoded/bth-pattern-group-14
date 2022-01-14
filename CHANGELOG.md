@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.3.1...v1.4.0) (2022-01-14)
+
+
+### Features
+
+* prod origin ([79496a1](https://www.github.com/scriptcoded/bth-pattern-group-14/commit/79496a1c7315c32301689fcc31af7d0531ee0c85))
+
 ### [1.3.1](https://www.github.com/scriptcoded/bth-pattern-group-14/compare/v1.3.0...v1.3.1) (2022-01-14)
 
 
