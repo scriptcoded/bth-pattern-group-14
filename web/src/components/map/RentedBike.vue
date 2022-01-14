@@ -1,11 +1,16 @@
 <template>
   <div>
-    <div v-if="started">
+    <div v-if="!selected.available && (!$auth.hasRole('admin') || isAdmin)">
       <button @click="endRide(selected.bikeId)">
         End ride
       </button>
     </div>
-    <div v-if="selected && !started">
+    <!--
+      user should be able to get button if not started
+      if admin, don't show started rides
+      if admin, show non started rides
+     -->
+    <div v-if="selected && selected.available">
       <p>
         Battery Level: {{ selected.battery }}%
       </p>
@@ -27,7 +32,8 @@ export default {
         return {}
       },
       required: false
-    }
+    },
+    isAdmin: Boolean
   },
   data () {
     return {

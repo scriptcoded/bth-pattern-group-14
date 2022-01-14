@@ -6,6 +6,7 @@
     />
     <RentedBike
       :started="startedRide"
+      :isAdmin="isAdmin"
       :selected="selectedBike"
       @resetmap="resetMap"
       @toggle-started-ride="toggleStartedRide"
@@ -41,7 +42,10 @@ export default {
       chargingPosition: [],
       parkingPosition: [],
       startedRide: false,
-      selectedBike: null,
+      selectedBike: {
+        available: false
+      },
+      isAdmin: false,
       intervalMap: null,
       mapContainer: null,
       clickedMarker: null,
@@ -150,6 +154,7 @@ export default {
      * @returns {boolean} this.startedRide reversed
      */
     toggleStartedRide () {
+      this.isAdmin = this.$auth.hasRole('admin')
       this.startedRide = !this.startedRide
     },
     checkIcon (bike) {
@@ -353,7 +358,8 @@ export default {
         battery: rentedBike.battery,
         bikeId: rentedBike.id,
         latitude: rentedBike.latitude,
-        longitude: rentedBike.longitude
+        longitude: rentedBike.longitude,
+        available: rentedBike.available
       }
     },
     /**
@@ -408,12 +414,20 @@ export default {
         const position = [bike.latitude, bike.longitude]
         const marker = this.markerArray.find(marker => marker.bikeId === bike.id)
         marker.mark.setLatLng(position)
-        console.log('lol')
         const icon = this.checkIcon(bike)
         const text = this.getPopupText(icon[1], bike)
-        console.log(icon)
         marker.mark.setIcon(icon[0])
         marker.mark._popup.setContent(text)
+        marker.mark.removeEventListener('click')
+        marker.mark.addEventListener('click', () => {
+          this.selectedBike = {
+            battery: bike.battery,
+            bikeId: bike.id,
+            latitude: bike.latitude,
+            longitude: bike.longitude,
+            available: bike.available
+          }
+        })
       })
 
       this.bikesOnMap = bikes
@@ -502,7 +516,8 @@ export default {
             battery: bike.battery,
             bikeId: bike.id,
             latitude: bike.latitude,
-            longitude: bike.longitude
+            longitude: bike.longitude,
+            available: bike.available
           }
           // this.activePopup = e.id
           // const markerId = mark._leaflet_id
