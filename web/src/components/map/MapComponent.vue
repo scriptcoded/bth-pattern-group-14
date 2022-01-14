@@ -154,7 +154,10 @@ export default {
      * @returns {boolean} this.startedRide reversed
      */
     toggleStartedRide () {
-      this.isAdmin = this.$auth.hasRole('admin')
+      if (this.startedRide === false) {
+        this.isAdmin = !this.$auth.hasRole('admin')
+      }
+      this.isAdmin = !this.isAdmin
       this.startedRide = !this.startedRide
     },
     checkIcon (bike) {
@@ -296,7 +299,6 @@ export default {
       // this.markerLayers.addLayer(this.markers)
 
       // this.markerLayers.addTo(this.mapContainer)
-      // console.log(this.markerLayers)
       this.markerLayers.eachLayer(layer => {
         this.mapContainer.removeLayer(layer)
       })
@@ -305,9 +307,6 @@ export default {
       })
       this.markerArray = []
       this.bikesOnMap = []
-      // console.log('bikesOnMap', this.bikesOnMap.length)
-      // console.log('markerLayers', this.markerLayers.length)
-      // console.log('mapContainer', this.mapContainer.length)
     },
 
     /**
@@ -380,7 +379,6 @@ export default {
       // // TODO: Implement
       // }
       const bikes = await this.$api.get('/bikes')
-      // console.log(bikes)
       const bikesOnMapIds = this.bikesOnMap.map(bike => bike.id)
       // const bikesOnMapUpdated = this.bikesOnMap.map(bike => bike.id)
       // const bikesAvailable = bikes.map
@@ -393,13 +391,11 @@ export default {
           return false
         }
         const mapBike = this.bikesOnMap.find(b => b.id === bike.id)
-        // console.log(JSON.stringify(mapBike), JSON.stringify(bike), JSON.stringify(mapBike) !== JSON.stringify(bike))
         return JSON.stringify(mapBike) !== JSON.stringify(bike)
       })
       // console.log('removed', removedBikes)
       // console.log('added', addedBikes)
       // console.log('updated', updatedBikes)
-      // console.log(this.markerArray)
 
       // await this.resetMap()
 
@@ -449,8 +445,6 @@ export default {
       //   })
       // })
 
-      // console.log(newArray)
-
       // this.bikesOnMap = this.bikesOnMap.filter(bike => bike.includes(updatedBikes[i]))
 
       // updated
@@ -471,7 +465,6 @@ export default {
       /**
        * Remove active popup from changing on map
        */
-      // console.log('Leta: ', arr, this.activePopup)
       // const bikesArray = bikes.map(b => b.id === this.activePopup ? null : b).filter(n => n)
       /**
        * Marker cluster group
@@ -483,15 +476,12 @@ export default {
       addedBikes.forEach(async (bike, i) => {
         // const X = (this.bottom[0] + Math.random() * maxX).toFixed(4)
         // const Y = (this.left[0] + Math.random() * maxY).toFixed(4)
-        // console.log(bike)
         // Lat = Y, Long = X
-        // console.log('Bike: ', bike)
         // if (i % 2 == 0) {
         //   continue
         // }
         const position = [bike.latitude, bike.longitude]
         const mark = L.marker(position, { icon: this.locationMarkerGray })
-        // console.log('%c Color' + i, 'background: #222; color: #bada55')
         const icon = this.checkIcon(bike)
         // const charge = icon[1]
 
@@ -501,8 +491,6 @@ export default {
           mark.setIcon(this.locationMarkerYellow)
         }
         // mark.on('click', this.onMarkClick)
-        // console.log(charge)
-        // console.log(bike)
         // if (bike.available) {
         //   const available = 'available for ride!'
         // }
@@ -524,11 +512,9 @@ export default {
           // // Marker
           // // Find bk id ->marker.id where cykild.id = bk.id
 
-          // // this.mapLayers.eachLayer(e => console.log(e))
           // // layer id === marker id (marker är en layer)
           // this.mapLayers.eachLayer(layer => {
           //   if (layer._leaflet_id === markerId) {
-          //     console.log(layer._leaflet_id, markerId, layer)
           //     this.mapLayers.removeLayer(layer)
           //   }
           // })
@@ -542,10 +528,7 @@ export default {
       this.markerLayers.addTo(this.mapContainer)
     },
     onMarkClick (e) {
-      // console.log("Hej")
       // var popup = e.target.getPopup()
-
-      // console.log(popup)
     }
   }
 }
